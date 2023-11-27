@@ -6,10 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddLogging();
 
 builder.Services.AddTransient<IEvaluatorProvider, EvaluatorProvider>();
-builder.Services.AddTransient<IEvaluatorProvider, EvaluatorProvider>();
-builder.Services.AddKeyedTransient<ICompiler, CSharpCompiler>(ProgrammingLanguage.CSharp);
+builder.Services.AddTransient<LocalTaskProvider, LocalTaskProvider>();
+builder.Services.AddKeyedTransient<IRuntimeFactory, CSharpRuntimeFactory>(ProgrammingLanguage.CSharp);
 
 var app = builder.Build();
 
@@ -33,10 +34,9 @@ app.MapPost("/evaluate", EvaluateTask)
 app.Run();
 
 
-async Task EvaluateTask(HttpContext context) {
-	var taskEvaluationRequest = await context.Request.ReadFromJsonAsync<TaskEvaluationRequest>();
+async Task EvaluateTask(HttpContext context, TaskRunner taskRunner) {
+	var taskEvaluationRequest = await context.Request.ReadFromJsonAsync<TaskEvaluationModel>();
 	if (taskEvaluationRequest is null) return;
 
-	var taskRunner = new TaskRunner(new LocalTaskProvider(), new EvaluatorProvider());
 	taskRunner.Run(taskEvaluationRequest);
 }

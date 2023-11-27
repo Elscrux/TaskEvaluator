@@ -4,125 +4,164 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 namespace WebApplication1;
 
+public sealed class CompilationFailedException(string message) : Exception(message);
+
 public interface IEvaluator {
-	ITaskResult Evaluate(Task task);
+    IEvaluationResult Evaluate(IRuntime runtime);
 }
-public class UnitTestEvaluator : IEvaluator {
-	public ITaskResult Evaluate(Task task) {
-		
-	}
+
+public interface IStaticEvaluator : IEvaluator {}
+public interface IRuntimeEvaluator : IEvaluator {}
+
+public sealed class UnitTestEvaluator : IRuntimeEvaluator {
+    public IEvaluationResult Evaluate(IRuntime runtime) {}
 }
+
+public interface IRuntime {
+    Code Context { get; }
+
+    IRuntimeResult Run();
+}
+
+public interface IRuntimeResult {
+    bool Success { get; }
+    object? ReturnValue { get; }
+}
+
 public sealed record Task(string Name, Code Code);
-public interface ITaskResult {
-	bool Success { get; }
+
+public interface IEvaluationResult {
+    bool Success { get; }
 }
+
 public interface IEvaluatorProvider {
-	IEnumerable<IEvaluator> GetEvaluators(TaskEvaluationRequest request);
+    IEnumerable<IEvaluator> GetEvaluators(TaskEvaluationModel model);
 }
-public class EvaluatorProvider : IEvaluatorProvider {
-	public IEnumerable<IEvaluator> GetEvaluators(TaskEvaluationRequest request) {
-		if (request.UnitTests.Count > 0) yield return new UnitTestEvaluator();
-	}
+
+public sealed class EvaluatorProvider : IEvaluatorProvider {
+    public IEnumerable<IEvaluator> GetEvaluators(TaskEvaluationModel model) {
+        if (model.UnitTests.Count > 0) yield return new UnitTestEvaluator();
+    }
 }
+
 public enum ProgrammingLanguage {
-	CSharp,
+    CSharp,
 }
-public interface ICompiler {
-	Assembly Compile(string code);
+
+public interface IRuntimeFactory {
+    IRuntime Create(Code code);
 }
-public class CSharpCompiler(ILogger<CSharpCompiler> logger) : ICompiler {
-	public Assembly Compile(string code) {
-		logger.LogInformation("Parsing the code into the SyntaxTree");
-		var syntaxTree = CSharpSyntaxTree.ParseText(code);
 
-		var assemblyName = Path.GetRandomFileName();
-		var mainDirectory = Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location);
+public sealed record CSharpRuntimeResult(bool Success, object? ReturnValue) : IRuntimeResult;
 
-		var refPaths = Directory.EnumerateFiles(mainDirectory)
-			.Where(x => {
-				var fileName = Path.GetFileName(x).ToLower();
-				return fileName.StartsWith("system") && fileName.EndsWith(".dll") && !fileName.Contains("native");
-			})
-			.Concat(Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll"))
-			.Distinct()
-			.ToArray();
+public sealed class CSharpRuntimeFactory(ILogger<CSharpRuntimeFactory> logger) : IRuntimeFactory {
+    public IRuntime Create(Code code) {
+        logger.LogInformation("Parsing the code into the SyntaxTree");
+        var syntaxTree = CSharpSyntaxTree.ParseText(code.Body);
 
-		var references = refPaths.Select(r => MetadataReference.CreateFromFile(r)).ToArray();
+        var assemblyName = Path.GetRandomFileName();
+        var mainDirectory = Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location);
 
-		logger.LogInformation("Adding the following references");
-		foreach (var r in refPaths) Console.WriteLine(r);
+        var refPaths = Directory.EnumerateFiles(mainDirectory)
+            .Where(x => {
+                var fileName = Path.GetFileName(x).ToLower();
+                return fileName.StartsWith("system") && fileName.EndsWith(".dll") && !fileName.Contains("native");
+            })
+            .Concat(Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll"))
+            .Distinct()
+            .ToArray();
 
-		logger.LogInformation("Compiling ...");
-		var compilation = CSharpCompilation.Create(
-			assemblyName,
-			syntaxTrees: new[] { syntaxTree },
-			references: references,
-			options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+        var references = refPaths.Select(path => MetadataReference.CreateFromFile(path)).ToArray();
 
-		using var stream = new MemoryStream();
-		var result = compilation.Emit(stream);
+        logger.LogInformation("Adding the following references");
+        foreach (var r in refPaths) Console.WriteLine(r);
 
-		if (!result.Success) {
-			logger.LogError("Compilation failed!");
-			var failures = result.Diagnostics.Where(diagnostic =>
-				diagnostic.IsWarningAsError ||
-				diagnostic.Severity == DiagnosticSeverity.Error);
+        logger.LogInformation("Compiling ...");
+        var compilation = CSharpCompilation.Create(
+            assemblyName,
+            syntaxTrees: new[] { syntaxTree },
+            references: references,
+            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-			foreach (var diagnostic in failures) {
-				Console.Error.WriteLine("\t{0}: {1}", diagnostic.Id, diagnostic.GetMessage());
-			}
-		} else {
-			logger.LogInformation("Compilation successful! Now instantiating and executing the code ...");
-			stream.Seek(0, SeekOrigin.Begin);
+        using var ilStream = new MemoryStream();
+        var result = compilation.Emit(ilStream);
 
-			var assembly = AssemblyLoadContext.Default.LoadFromStream(stream);
-			var type = assembly.ExportedTypes.First();
-			var instance = assembly.CreateInstance(type.FullName);
-			var methodInfo = type.GetMember("Run").First() as MethodInfo;
-			try {
-				methodInfo?.Invoke(instance, new object?[] {});
-			} catch (Exception e) {
-				logger.LogError("Failed execution script {Name}: {Message} {InnerException}", type.FullName, e.Message, e.InnerException);
-			}
-		}
+        if (!result.Success) {
+            var failures = result.Diagnostics
+                .Where(diagnostic =>
+                    diagnostic.IsWarningAsError ||
+                    diagnostic.Severity == DiagnosticSeverity.Error)
+                .Select(diagnostic => $"\t{diagnostic.Id}: {diagnostic.GetMessage()}");
 
-	}
+            throw new CompilationFailedException(string.Join("\n", failures));
+        } else {
+            logger.LogInformation("Compilation successful! Now instantiating and executing the code ...");
+            ilStream.Seek(0, SeekOrigin.Begin);
+
+            var assembly = AssemblyLoadContext.Default.LoadFromStream(ilStream);
+            var type = assembly.ExportedTypes.First();
+            var instance = assembly.CreateInstance(type.FullName);
+            var methodInfo = type.GetMember(code.EntryPoint)[0] as MethodInfo;
+            if (methodInfo is null) throw new CompilationFailedException($"Could not find the entry point {entryPoint}");
+
+            return new CSharpMethodRuntime(code, instance, methodInfo);
+        }
+
+    }
 }
+
+public sealed class CSharpMethodRuntime(Code code, object instance, MethodInfo methodInfo, ILogger<CSharpMethodRuntime> logger) : IRuntime {
+    public Code Context { get; } = code;
+    public IRuntimeResult Run() {
+        try {
+            var invoke = methodInfo.Invoke(instance, new object?[] {});
+            return new CSharpRuntimeResult(true, invoke);
+        } catch (Exception e) {
+            logger.LogError("Failed execution script {Name}: {Message} {InnerException}", methodInfo.Name, e.Message, e.InnerException);
+        }
+    }
+}
+
 public interface ITaskProvider {
-	IEnumerable<Task> GetTasks();
+    IEnumerable<TaskEvaluationModel> GetTasks();
 }
-public class LocalTaskProvider : ITaskProvider {
-	public IEnumerable<Task> GetTasks() {
-		throw new NotImplementedException();
-	}
-}
-public class CodeCompilationService(IKeyedServiceProvider keyedServiceProvider) {
-	public ICompiler Compile(Code code) {
-		var compiler = keyedServiceProvider.GetRequiredKeyedService<ICompiler>(code.Language);
-		var assembly = compiler.Compile(code.Text);
-		assembly.CreateInstance()
-	}
-}
-public class TaskRunner(
-	CodeCompilationService compilationService,
-	ITaskProvider taskProvider,
-	IEvaluatorProvider evaluatorProvider) {
-	public void Run(TaskEvaluationRequest request) {
-		var tasks = taskProvider.GetTasks();
-		foreach (var task in tasks) {
-			compilationService.Compile(task.Code);
 
-			task.Code
-
-			evaluatorProvider.GetEvaluators(task)
-			foreach (var evaluator in evaluatorProvider) {}
-			var result = evaluator.Evaluate(task);
-			if (result.Success) {}
-		}
-	}
+public sealed class LocalTaskProvider : ITaskProvider {
+    public IEnumerable<TaskEvaluationModel> GetTasks() {
+        throw new NotImplementedException();
+    }
 }
-public record TaskEvaluationRequest(
-	Task Task,
-	IList<string> UnitTests);
 
-public sealed record Code(string Text, ProgrammingLanguage Language);
+public sealed class RuntimeService(IKeyedServiceProvider keyedServiceProvider) {
+    public IRuntime CreateRuntime(Code code) {
+        var compiler = keyedServiceProvider.GetRequiredKeyedService<IRuntimeFactory>(code.Language);
+        return compiler.Create(code);
+    }
+}
+
+public sealed class TaskRunner(
+    RuntimeService runtimeService,
+    LocalTaskProvider localTaskProvider,
+    IEvaluatorProvider evaluatorProvider) {
+
+    public void RunLocal() {
+        foreach (var request in localTaskProvider.GetTasks()) {
+            Run(request);
+        }
+    }
+
+    public void Run(TaskEvaluationModel model) {
+        var runtime = runtimeService.CreateRuntime(model.Task.Code);
+
+        foreach (var evaluator in evaluatorProvider.GetEvaluators(model)) {
+            var result = evaluator.Evaluate(runtime);
+            if (result.Success) {}
+        }
+    }
+}
+
+public sealed record TaskEvaluationModel(
+    Task Task,
+    IList<string> UnitTests);
+
+public sealed record Code(string Body, string EntryPoint, ProgrammingLanguage Language);
