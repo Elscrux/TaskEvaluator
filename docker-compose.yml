@@ -1,0 +1,6 @@
+﻿services:
+  taskevaluator.api:
+    image: taskevaluator.api
+    build:
+      context: .
+      dockerfile: TaskEvaluator.Api/Dockerfile
