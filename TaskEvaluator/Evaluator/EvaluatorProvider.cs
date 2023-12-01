@@ -1,5 +1,5 @@
 ﻿using TaskEvaluator.Evaluator.UnitTest;
-using TaskEvaluator.Task;
+using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Evaluator;
 
 public sealed class EvaluatorProvider(

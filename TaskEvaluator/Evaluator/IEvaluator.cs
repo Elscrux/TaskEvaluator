@@ -1,7 +1,7 @@
 ﻿using TaskEvaluator.Runtime;
-using TaskEvaluator.Task;
+using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Evaluator;
 
 public interface IEvaluator {
-    IEnumerable<IEvaluationResult> Evaluate(TaskEvaluationModel model, IRuntime runtime);
+    IAsyncEnumerable<IEvaluationResult> Evaluate(TaskEvaluationModel model, IRuntime runtime, CancellationToken token = default);
 }

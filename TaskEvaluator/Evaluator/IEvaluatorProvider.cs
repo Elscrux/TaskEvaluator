@@ -1,4 +1,4 @@
-﻿using TaskEvaluator.Task;
+﻿using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Evaluator;
 
 public interface IEvaluatorProvider {

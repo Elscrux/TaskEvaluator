@@ -6,7 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <InvariantGlobalization>true</InvariantGlobalization>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,8 +13,8 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
     </ItemGroup>
 
-    <ItemGroup>>
-      <ProjectReference Include="..\TaskEvaluator\TaskEvaluator.csproj" />
+    <ItemGroup>
+        <ProjectReference Include="..\..\TaskEvaluator\TaskEvaluator.csproj"/>
     </ItemGroup>
 
 </Project>

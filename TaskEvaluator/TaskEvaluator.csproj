@@ -11,14 +11,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Ductus.FluentDocker" Version="2.10.59" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0"/>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Evaluator\CodeQuality\" />
-      <Folder Include="Language\Implementations\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -30,6 +26,9 @@
       </Compile>
       <Compile Update="Evaluator\IStaticEvaluator.cs">
         <DependentUpon>IEvaluator.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Runtime\FuncRuntime.cs">
+        <DependentUpon>IRuntime.cs</DependentUpon>
       </Compile>
     </ItemGroup>
 

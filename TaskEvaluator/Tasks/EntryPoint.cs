@@ -1,4 +1,4 @@
-﻿namespace TaskEvaluator.Task;
+﻿namespace TaskEvaluator.Tasks;
 
 public sealed record EntryPoint(string FullPath, object?[] Parameters) {
     /// <summary>

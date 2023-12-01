@@ -1,10 +1,10 @@
 using System.Text.Json.Serialization;
-using TaskEvaluator.Api;
+using TaskEvaluator.Api.Api;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Evaluator.UnitTest;
-using TaskEvaluator.Language.Implementations.CSharp;
 using TaskEvaluator.Runtime;
-using TaskEvaluator.Task;
+using TaskEvaluator.Runtime.Implementation.CSharp;
+using TaskEvaluator.Tasks;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,12 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => options.SchemaFilter<ExampleSharpFilter>());
 builder.Services.AddLogging();
+builder.Services.AddHttpClient();
 
 builder.Services.AddTransient<IEvaluatorProvider, EvaluatorProvider>();
-builder.Services.AddTransient<UnitTestEvaluator, UnitTestEvaluator>();
+builder.Services.AddTransient<UnitTestEvaluator>();
 builder.Services.AddTransient<LocalTaskProvider, LocalTaskProvider>();
-builder.Services.AddTransient<RuntimeService, RuntimeService>();
-builder.Services.AddTransient<TaskRunner, TaskRunner>();
+builder.Services.AddSingleton<LanguageFactory>();
+builder.Services.AddTransient<TaskRunner>();
 builder.Services.AddCSharp();
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
@@ -37,7 +38,6 @@ app.MapPost("/evaluate", EvaluateTask)
 
 app.Run();
 
-
-List<IEvaluationResult> EvaluateTask(TaskRunner taskRunner, TaskEvaluationModel model) {
-    return taskRunner.Run(model).ToList();
+IAsyncEnumerable<IEvaluationResult> EvaluateTask(TaskRunner taskRunner, TaskEvaluationModel model, CancellationToken token = default) {
+    return taskRunner.Run(model, token);
 }

@@ -1,8 +1,8 @@
 ﻿using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using TaskEvaluator.Task;
-namespace TaskEvaluator.Api;
+using TaskEvaluator.Tasks;
+namespace TaskEvaluator.Api.Api;
 
 public sealed class ExampleSharpFilter : ISchemaFilter {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context) {

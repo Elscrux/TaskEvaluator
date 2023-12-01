@@ -1,6 +1,6 @@
-﻿using TaskEvaluator.Task;
+﻿using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Runtime;
 
-public interface IRuntimeFactory {
-    IRuntime Create(Code code);
+public interface IRuntimeFactory : IDisposable {
+    Task<IRuntime> Create(Code code, CancellationToken token = default);
 }

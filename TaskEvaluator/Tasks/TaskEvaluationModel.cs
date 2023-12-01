@@ -1,5 +1,5 @@
-﻿namespace TaskEvaluator.Task;
+﻿namespace TaskEvaluator.Tasks;
 
 public sealed record TaskEvaluationModel(
-    Task Task,
+    Solution Solution,
     IList<Code> UnitTests);

@@ -1,0 +1,6 @@
+@TaskEvaluator.Language.CSharp_HostAddress = http://localhost:5252
+
+GET {{TaskEvaluator.Language.CSharp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

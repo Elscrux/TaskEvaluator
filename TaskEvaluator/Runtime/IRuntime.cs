@@ -1,8 +1,8 @@
-﻿using TaskEvaluator.Task;
+﻿using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Runtime;
 
 public interface IRuntime {
     Code Context { get; }
 
-    IRuntimeResult Run();
+    Task<IRuntimeResult> Run(CancellationToken token = default);
 }
