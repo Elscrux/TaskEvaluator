@@ -4,8 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator", "TaskEvalua
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.Api", "TaskEvaluator.Api\TaskEvaluator.Api.csproj", "{5863C04C-3EF0-456B-AE9F-6F1AEA3C14E0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9D60021D-5BE5-4E58-BE3E-528B90A063B3}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Languages", "Languages", "{26854194-B6C2-437A-90C8-6B4C6B9CBD0A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.Language.CSharp", "Languages\TaskEvaluator.Language.CSharp\TaskEvaluator.Language.CSharp.csproj", "{4CDE1D15-94F2-457F-8732-6F2C6A2F91CF}"
