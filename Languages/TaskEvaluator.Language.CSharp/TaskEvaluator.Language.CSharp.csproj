@@ -8,13 +8,15 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <!--- copy all files-->
+        <Copy SourceFiles="@(Content)" DestinationFolder="$(OutputPath)\wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" />
+    </Target>
+
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\TaskEvaluator\TaskEvaluator.csproj"/>
+        <PackageReference Include="TaskEvaluator" Version="1.0.0" />
     </ItemGroup>
 
 </Project>

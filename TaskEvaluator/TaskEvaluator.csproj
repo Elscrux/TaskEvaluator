@@ -8,12 +8,15 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <LangVersion>preview</LangVersion>
         <OutputType>Library</OutputType>
+        <IsPackable>true</IsPackable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Ductus.FluentDocker" Version="2.10.59" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0"/>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+        <PackageReference Include="Noggog.CSharpExt" Version="2.60.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
     </ItemGroup>
 
@@ -27,9 +30,25 @@
       <Compile Update="Evaluator\IStaticEvaluator.cs">
         <DependentUpon>IEvaluator.cs</DependentUpon>
       </Compile>
-      <Compile Update="Runtime\FuncRuntime.cs">
+      <Compile Update="Docker\RandomPortPool.cs">
+        <DependentUpon>IPortPool.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Runtime\DockerRuntime.cs">
         <DependentUpon>IRuntime.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Docker\FluentDockerHost.cs">
+        <DependentUpon>IDockerHost.cs</DependentUpon>
       </Compile>
     </ItemGroup>
 
+    <PropertyGroup>
+      <PackToLanguagesRan>false</PackToLanguagesRan>
+    </PropertyGroup>
+
+    <Target Name="PackToLanguages" AfterTargets="AfterBuild" Condition="'$(PackToLanguagesRan)' == 'false'">
+      <Exec Command="powershell -Command &quot;ForEach ($dir in Get-ChildItem -Directory ../Languages) { dotnet pack -c Release -o ../Languages/$dir/.nuget }&quot;" />
+        <PropertyGroup>
+          <PackToLanguagesRan>true</PackToLanguagesRan>
+        </PropertyGroup>
+    </Target>
 </Project>

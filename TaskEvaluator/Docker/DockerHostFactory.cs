@@ -1,7 +1,14 @@
-﻿namespace TaskEvaluator.Docker;
+﻿using TaskEvaluator.Disposable;
+namespace TaskEvaluator.Docker;
 
-public sealed class DockerHostFactory {
+public sealed class DockerHostFactory(IPortPool portPool) {
     private const string Hostname = "localhost";
 
-    public DockerHost Create(int port) => new(Hostname, port);
+    public IDockerHost Create() {
+        var port = portPool.AllocatePort();
+        var dockerHost = new FluentDockerHost(Hostname, port);
+        dockerHost.Add(new FuncDisposable(() => portPool.ReleasePort(port)));
+
+        return dockerHost;
+    }
 }

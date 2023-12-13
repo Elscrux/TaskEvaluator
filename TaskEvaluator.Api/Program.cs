@@ -1,8 +1,7 @@
 using System.Text.Json.Serialization;
 using TaskEvaluator.Api.Api;
 using TaskEvaluator.Evaluator;
-using TaskEvaluator.Evaluator.UnitTest;
-using TaskEvaluator.Runtime;
+using TaskEvaluator.Modules;
 using TaskEvaluator.Runtime.Implementation.CSharp;
 using TaskEvaluator.Tasks;
 var builder = WebApplication.CreateBuilder(args);
@@ -13,12 +12,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => options.SchemaFilter<ExampleSharpFilter>());
 builder.Services.AddLogging();
 builder.Services.AddHttpClient();
+builder.Services.AddHealthChecks();
 
-builder.Services.AddTransient<IEvaluatorProvider, EvaluatorProvider>();
-builder.Services.AddTransient<UnitTestEvaluator>();
-builder.Services.AddTransient<LocalTaskProvider, LocalTaskProvider>();
-builder.Services.AddSingleton<LanguageFactory>();
-builder.Services.AddTransient<TaskRunner>();
+builder.Services.AddTaskEvaluator();
 builder.Services.AddCSharp();
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
@@ -31,6 +27,8 @@ if (app.Environment.IsDevelopment()) {
 }
 
 app.UseHttpsRedirection();
+
+app.MapHealthChecks("/health");
 
 app.MapPost("/evaluate", EvaluateTask)
     .WithName("Evaluate")

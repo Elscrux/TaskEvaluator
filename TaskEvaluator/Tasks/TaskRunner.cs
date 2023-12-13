@@ -17,10 +17,10 @@ public sealed class TaskRunner(
     }
 
     public async IAsyncEnumerable<IEvaluationResult> Run(TaskEvaluationModel model, [EnumeratorCancellation] CancellationToken token = default) {
-        var runtime = await languageFactory.CreateRuntime(model.Solution.Code, token);
+        using var runtime = await languageFactory.CreateRuntime(model.Solution.Code, token);
 
-        foreach (var evaluator in evaluatorProvider.GetEvaluators(model)) {
-            await foreach (var evaluationResult in evaluator.Evaluate(model, runtime, token)) {
+        foreach (var evaluator in evaluatorProvider.GetEvaluators(model, runtime)) {
+            await foreach (var evaluationResult in evaluator.Evaluate(model, token)) {
                 yield return evaluationResult;
             }
         }

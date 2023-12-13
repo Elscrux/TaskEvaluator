@@ -1,3 +1,4 @@
+using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Language.CSharp;
 
 public static class Program {
@@ -8,6 +9,7 @@ public static class Program {
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddHealthChecks();
 
         var app = builder.Build();
 
@@ -19,14 +21,16 @@ public static class Program {
 
         app.UseHttpsRedirection();
 
+        app.MapHealthChecks("/health");
+
         app.MapPost("/unit-test", StartUnitTest)
             .WithName("Unit Test")
             .WithOpenApi();
 
         app.Run();
 
-        void StartUnitTest() {
-            
+        void StartUnitTest(Code unitTest) {
+            Console.WriteLine($"Unit test: {unitTest.Body} ({unitTest.Guid}) {unitTest.EntryPoint} {unitTest.Language}");
         }
     }
 }

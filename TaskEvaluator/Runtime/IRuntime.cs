@@ -1,8 +1,8 @@
 ﻿using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Runtime;
 
-public interface IRuntime {
+public interface IRuntime : IDisposable {
     Code Context { get; }
 
-    Task<IRuntimeResult> Run(CancellationToken token = default);
+    Task<IRuntimeResult> UnitTest(Code unitTest, CancellationToken token = default);
 }

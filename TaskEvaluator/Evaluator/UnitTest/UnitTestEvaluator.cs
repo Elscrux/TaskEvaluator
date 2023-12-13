@@ -3,8 +3,8 @@ using TaskEvaluator.Runtime;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Evaluator.UnitTest;
 
-public sealed class UnitTestEvaluator(LanguageFactory languageFactory) : IRuntimeEvaluator {
-    public async IAsyncEnumerable<IEvaluationResult> Evaluate(TaskEvaluationModel model, IRuntime runtime, [EnumeratorCancellation] CancellationToken token = default) {
+public sealed class UnitTestEvaluator(IRuntime runtime) : IRuntimeEvaluator {
+    public async IAsyncEnumerable<IEvaluationResult> Evaluate(TaskEvaluationModel model, [EnumeratorCancellation] CancellationToken token = default) {
         var unitTestTasks = model.UnitTests
             .Select(unitTest => RunUnitTest(unitTest, token))
             .ToList();
@@ -18,8 +18,8 @@ public sealed class UnitTestEvaluator(LanguageFactory languageFactory) : IRuntim
     }
 
     private async Task<IEvaluationResult> RunUnitTest(Code unitTest, CancellationToken token = default) {
-        var unitTestRuntime = await languageFactory.CreateRuntime(unitTest, token);
-        var runtimeResult = await unitTestRuntime.Run(token);
+        var runtimeResult = await runtime.UnitTest(unitTest, token);
+
         return new UnitTestEvaluationResult(unitTest.Guid, runtimeResult);
     }
 }

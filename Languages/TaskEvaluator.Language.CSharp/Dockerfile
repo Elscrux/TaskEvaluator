@@ -14,6 +14,7 @@ FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 ARG TARGETARCH
 
 COPY . /source
+COPY /.nuget /local_nuget_feed
 
 WORKDIR /source
 
