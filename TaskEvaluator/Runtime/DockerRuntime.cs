@@ -23,11 +23,13 @@ public sealed class DockerRuntime : IRuntime {
         _logger = logger;
         Context = options.Context;
         _dockerHost = dockerHostFactory.Create();
-        _dockerHost.StartContainer(options.DockerImageName, options.ProjectFolder)
-            .ContinueWith(x => _initialized = true);
+        _dockerHost.StartContainer(options.DockerImageName, options.ProjectFolder, new[] {
+                "\"CODE=" + Context.Body.Replace("\"", "\\\"") + "\""
+            })
+            .ContinueWith(_ => _initialized = true);
     }
 
-    public async Task<IRuntimeResult> UnitTest(Code unitTest, CancellationToken token) {
+    public async Task<IRuntimeResult> UnitTest(Code unitTest, CancellationToken token = default) {
         while (!_initialized) {
             await Task.Delay(100, token).ConfigureAwait(false);
         }

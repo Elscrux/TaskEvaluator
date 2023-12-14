@@ -8,9 +8,9 @@ public sealed class FluentDockerHost(string hostname, int port) : IDockerHost {
     private readonly Uri _uri = new UriBuilder(System.Uri.UriSchemeHttp, hostname, port).Uri;
     public Uri Uri(string path) => new(_uri, path);
 
-    public Task StartContainer(string name, string projectFolder, CancellationToken token = default) {
+    public Task StartContainer(string name, string projectFolder, string[] environmentVariables, CancellationToken token = default) {
+        // Create image if necessary
         using var image = new Builder()
-            // Create image if necessary
             .DefineImage(name).ReuseIfAlreadyExists()
             .FromFile(Path.Combine(projectFolder, "Dockerfile")).WorkingFolder(projectFolder)
             .ExposePorts(8080)
@@ -19,7 +19,7 @@ public sealed class FluentDockerHost(string hostname, int port) : IDockerHost {
         // Create container
         new Builder()
             .UseContainer()
-            .UseImage(name)
+            .UseImage(name).WithEnvironment(environmentVariables)
             .ExposePort(port, 8080)
             .WaitForHttp(Uri("health").ToString(), continuation: (r, c) => {
                 return c switch {
