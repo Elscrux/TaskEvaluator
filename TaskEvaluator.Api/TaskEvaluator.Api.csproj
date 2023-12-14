@@ -27,6 +27,9 @@
         <!-- Create the destination directory if it doesn't exist -->
         <MakeDir Directories="$(OutDir)\Languages" />
 
+        <!-- Delete all files in the destination directory -->
+        <Delete Files="$(OutDir)\Languages\**\*.*" />
+
         <!-- Copy the files to the output directory while preserving the directory structure -->
         <Copy SourceFiles="@(LanguageFiles)"
               DestinationFiles="@(LanguageFiles->'$(OutDir)\Languages\%(RecursiveDir)%(Filename)%(Extension)')" />
