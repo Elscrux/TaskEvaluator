@@ -11,12 +11,19 @@
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <!--- copy all files-->
         <Copy SourceFiles="@(Content)" DestinationFolder="$(OutputPath)\wwwroot\%(RecursiveDir)" SkipUnchangedFiles="true" />
+
+        <!--- copy csharp-template-project directory-->
+        <ItemGroup>
+            <TemplateProjectFiles Include="csharp-template-project\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(TemplateProjectFiles)" DestinationFiles="@(TemplateProjectFiles->'$(OutputPath)\csharp-template-project\%(RecursiveDir)%(Filename)%(Extension)')" />
     </Target>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
         <PackageReference Include="TaskEvaluator" Version="1.0.0" />
+        <PackageReference Include="xunit" Version="2.6.3" />
     </ItemGroup>
 
 </Project>
