@@ -1,6 +1,7 @@
-@WebApplication1_HostAddress = http://localhost:5200
+@TaskEvaluator_HostAddress = http://localhost:5200
 
-POST {{WebApplication1_HostAddress}}/evaluate/
+POST {{TaskEvaluator_HostAddress}}/evaluate/
+Content-Type: application/json
 Accept: application/json
 
 ###

@@ -1,71 +1,71 @@
 using System.Diagnostics;
+using System.Xml.Linq;
 using TaskEvaluator.Runtime;
 using TaskEvaluator.Runtime.Implementation.CSharp;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Language.CSharp;
 
 public static class Program {
+    private const string Csproj = """
+                                  <Project Sdk="Microsoft.NET.Sdk">
+                                  
+                                      <PropertyGroup>
+                                          <TargetFramework>net8.0</TargetFramework>
+                                          <ImplicitUsings>enable</ImplicitUsings>
+                                          <Nullable>enable</Nullable>
+                                  
+                                          <IsPackable>false</IsPackable>
+                                          <IsTestProject>true</IsTestProject>
+                                      </PropertyGroup>
+                                  
+                                      <ItemGroup>
+                                          <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0"/>
+                                          <PackageReference Include="xunit" Version="2.4.2"/>
+                                          <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+                                              <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+                                              <PrivateAssets>all</PrivateAssets>
+                                          </PackageReference>
+                                          <PackageReference Include="coverlet.collector" Version="6.0.0">
+                                              <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+                                              <PrivateAssets>all</PrivateAssets>
+                                          </PackageReference>
+                                      </ItemGroup>
+
+                                  </Project>
+                                  """;
+
+    private const string ReplaceComment = "// Replace this with generated code";
+    private const string Task = $$"""
+                                  namespace Task;
+
+                                  public static class TaskClass {
+                                      {{ReplaceComment}}
+                                  }
+                                  """;
+
+    private const string WorkingDirectory = "/home/app";
+    private static readonly string TemplateProjectDirectory = Path.Combine(WorkingDirectory, "./csharp-template-project");
+    private static readonly string TestDirectory = Path.Combine(WorkingDirectory, "./tests");
+
+    private static void InitTemplateDirectory() {
+        // input code ist stored in env variable CODE
+        var code = Environment.GetEnvironmentVariable("CODE")
+         ?? throw new InvalidOperationException("CODE environment variable not set");
+
+        Directory.CreateDirectory(TemplateProjectDirectory);
+
+        // Create project file
+        var project = Path.Combine(TemplateProjectDirectory, "CSharpTemplateProject.csproj");
+        File.WriteAllText(project, Csproj);
+
+        // Create task class where the code lies, insert the code into it
+        var taskClassPath = Path.Combine(TemplateProjectDirectory, "TaskClass.cs");
+        var taskClassContent = Task.Replace(ReplaceComment, code);
+        File.WriteAllText(taskClassPath, taskClassContent);
+    }
+
     public static void Main(string[] args) {
-        var code = Environment.GetEnvironmentVariable("CODE") ?? """
-                                                                 public static int GetWeekday(int year, int month, int day) {
-                                                                     var date = new DateTime(year, month, day);
-                                                                     return date.DayOfWeek switch {
-                                                                         DayOfWeek.Monday => 0,
-                                                                         DayOfWeek.Tuesday => 1,
-                                                                         DayOfWeek.Wednesday => 2,
-                                                                         DayOfWeek.Thursday => 3,
-                                                                         DayOfWeek.Friday => 4,
-                                                                         DayOfWeek.Saturday => 5,
-                                                                         DayOfWeek.Sunday => 6,
-                                                                         _ => throw new ArgumentOutOfRangeException(nameof(date.DayOfWeek))
-                                                                     };
-                                                                 }
-                                                                 """;
-
-        var file = Path.Combine(TemplateProjectDirectory, "TaskClass.cs");
-        var program = /*File
-            .ReadAllText(Path.Combine(file))*/
-            """
-                namespace Task;
-
-                public static class TaskClass {
-                    // Replace this with generated code
-                }
-                """
-                .Replace("// Replace this with generated code", code);
-
-        var directoryName = Path.GetDirectoryName(file);
-        Directory.CreateDirectory(directoryName);
-
-        var directoryAttributes = File.GetAttributes(directoryName);
-        Console.WriteLine(directoryAttributes);
-        Console.WriteLine();
-        foreach (var fileAttributes in Enum.GetValues<FileAttributes>()) {
-            Console.WriteLine(fileAttributes + (directoryAttributes.HasFlag(fileAttributes)).ToString());
-        }
-
-        var attributes = File.GetAttributes(file);
-        Console.WriteLine(attributes);
-        Console.WriteLine();
-        foreach (var fileAttributes in Enum.GetValues<FileAttributes>()) {
-            Console.WriteLine(fileAttributes + (attributes.HasFlag(fileAttributes)).ToString());
-        }
-
-
-        File.WriteAllText(file, program);
-
-        StartUnitTest(new Code(Guid.NewGuid(), """
-                                               using Xunit;
-                                               namespace Task;
-
-                                               public static class TestClass {
-                                                   [Fact]
-                                                   public static void Test_2023_2_3() {
-                                                       var weekday = TaskClass.GetWeekday(2023, 2, 3);
-                                                       Assert.Equal(4, weekday);
-                                                   }
-                                               }
-                                               """, new EntryPoint("TestClass.Test_2023_2_3", []), ProgrammingLanguage.CSharp));
+        InitTemplateDirectory();
 
         var builder = WebApplication.CreateBuilder(args);
 
@@ -94,8 +94,6 @@ public static class Program {
         app.Run();
     }
 
-    private const string TemplateProjectDirectory = "./csharp-template-project";
-    private const string TestDirectory = "./tests";
     private static IRuntimeResult StartUnitTest(Code unitTest) {
         // copy content of TemplateProjectDirectory to a jobs directory and create a new job folder with a unique name (guid)
 
@@ -114,7 +112,7 @@ public static class Program {
         // run the job via dotnet test
         var process = Process.Start(new ProcessStartInfo {
             FileName = "dotnet",
-            Arguments = "test",
+            Arguments = "test --logger \"trx;LogFileName=results.trx\"",
             WorkingDirectory = jobFolder,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -132,9 +130,51 @@ public static class Program {
         // wait for the process to exit
         process.WaitForExit();
 
-        Console.WriteLine(output);
+// read the trx file
+        var trxPath = Path.Combine(jobFolder, "TestResults", "results.trx");
+        var trxContent = File.ReadAllText(trxPath);
+        Console.WriteLine(trxContent);
+
+// parse the XML
+        var doc = XDocument.Parse(trxContent);
+
+// get the test results
+        var ns = XNamespace.Get("http://microsoft.com/schemas/VisualStudio/TeamTest/2010");
+        var testResults = doc.Descendants(ns + "UnitTestResult");
+
+// create a list to hold the results
+        var results = new List<TestResult>();
+
+// iterate over the test results and add them to the list
+        foreach (var testResult in testResults)
+        {
+            Console.WriteLine(testResult);
+            var testName = testResult.Attribute("testName").Value;
+            var outcome = testResult.Attribute("outcome").Value;
+            var duration = testResult.Attribute("duration").Value;
+
+            results.Add(new TestResult
+            {
+                TestName = testName,
+                Outcome = outcome,
+                Duration = duration,
+            });
+        }
+
+// print the results
+        foreach (var result in results)
+        {
+            Console.WriteLine($"Test: {result.TestName}, Outcome: {result.Outcome}, Duration: {result.Duration}");
+        }
+        Console.WriteLine(output + error);
 
         // return the result
         return new CSharpRuntimeResult(process.ExitCode == 0, output + error);
     }
+}
+public class TestResult
+{
+    public string TestName { get; set; }
+    public string Outcome { get; set; }
+    public string Duration { get; set; }
 }

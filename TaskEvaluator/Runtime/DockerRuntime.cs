@@ -40,10 +40,20 @@ public sealed class DockerRuntime : IRuntime {
             var serviceUri = _dockerHost.Uri("unit-test");
             _logger.LogInformation("Calling {Uri}...", serviceUri);
             var result = await httpClient.PostAsJsonAsync(serviceUri, unitTest, token).ConfigureAwait(false);
+            if (!result.IsSuccessStatusCode) {
+                _logger.LogInformation("Service {Uri} failed with: {Result}", serviceUri, result);
 
-            _logger.LogInformation("Service {Uri} returned: {Result}", serviceUri, result);
+                return new CSharpRuntimeResult(false, result.ReasonPhrase);
+            }
 
-            return new CSharpRuntimeResult(true, result);
+            var runtimeResult = await result.Content.ReadFromJsonAsync<CSharpRuntimeResult>(token);
+            if (runtimeResult is null) {
+                throw new InvalidOperationException("Failed to deserialize runtime result");
+            }
+
+            _logger.LogInformation("Service {Uri} succeeded with: {Result}", serviceUri, runtimeResult);
+
+            return runtimeResult;
         } catch (Exception e) {
             _logger.LogError(e, "Error while running code");
 
