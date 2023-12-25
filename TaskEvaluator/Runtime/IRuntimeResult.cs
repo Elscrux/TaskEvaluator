@@ -2,5 +2,5 @@
 
 public interface IRuntimeResult {
     bool Success { get; }
-    object? ReturnValue { get; }
+    string? Context { get; }
 }

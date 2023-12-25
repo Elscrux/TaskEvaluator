@@ -1,7 +1,7 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Xml.Linq;
 using TaskEvaluator.Runtime;
-using TaskEvaluator.Runtime.Implementation.CSharp;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Language.CSharp;
 
@@ -67,7 +67,7 @@ public static class Program {
     public static void Main(string[] args) {
         InitTemplateDirectory();
 
-        var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateSlimBuilder(args);
 
         // Add services to the container.
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -120,7 +120,7 @@ public static class Program {
         });
 
         if (process == null) {
-            return new CSharpRuntimeResult(false, "Failed to start dotnet test");
+            return new UnitTestRuntimeResult(false, "Failed to start dotnet test");
         }
 
         // read the output
@@ -130,51 +130,37 @@ public static class Program {
         // wait for the process to exit
         process.WaitForExit();
 
-// read the trx file
+        // return results
         var trxPath = Path.Combine(jobFolder, "TestResults", "results.trx");
+
+        // return plain output if trx file is not found
+        if (!File.Exists(trxPath)) return new UnitTestRuntimeResult(process.ExitCode == 0, output + error);
+
+        // parse the test results
+        var testResults = ParseTestResults(trxPath).ToList();
+        foreach (var r in testResults) {
+            Console.WriteLine($"Test: {r.TestName}, Outcome: {r.Outcome}, Duration: {r.Duration}");
+        }
+
+        return new UnitTestRuntimeResult(process.ExitCode == 0, output + error, testResults);
+    }
+
+    private static IEnumerable<UnitTestResult> ParseTestResults(string trxPath) {
         var trxContent = File.ReadAllText(trxPath);
-        Console.WriteLine(trxContent);
 
-// parse the XML
+        // Parse the XML
         var doc = XDocument.Parse(trxContent);
-
-// get the test results
         var ns = XNamespace.Get("http://microsoft.com/schemas/VisualStudio/TeamTest/2010");
         var testResults = doc.Descendants(ns + "UnitTestResult");
 
-// create a list to hold the results
-        var results = new List<TestResult>();
-
-// iterate over the test results and add them to the list
-        foreach (var testResult in testResults)
-        {
+        // Get test results
+        foreach (var testResult in testResults) {
             Console.WriteLine(testResult);
-            var testName = testResult.Attribute("testName").Value;
-            var outcome = testResult.Attribute("outcome").Value;
-            var duration = testResult.Attribute("duration").Value;
+            var testName = testResult.Attribute("testName")?.Value ?? "No-Name";
+            var outcome = testResult.Attribute("outcome")?.Value ?? "No Outcome";
+            var duration = testResult.Attribute("duration")?.Value is {} x ? TimeSpan.Parse(x, new DateTimeFormatInfo()) : TimeSpan.Zero;
 
-            results.Add(new TestResult
-            {
-                TestName = testName,
-                Outcome = outcome,
-                Duration = duration,
-            });
+            yield return new UnitTestResult(testName, outcome, duration);
         }
-
-// print the results
-        foreach (var result in results)
-        {
-            Console.WriteLine($"Test: {result.TestName}, Outcome: {result.Outcome}, Duration: {result.Duration}");
-        }
-        Console.WriteLine(output + error);
-
-        // return the result
-        return new CSharpRuntimeResult(process.ExitCode == 0, output + error);
     }
-}
-public class TestResult
-{
-    public string TestName { get; set; }
-    public string Outcome { get; set; }
-    public string Duration { get; set; }
 }

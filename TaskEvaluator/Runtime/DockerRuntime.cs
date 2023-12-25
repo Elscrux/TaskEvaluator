@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using TaskEvaluator.Docker;
-using TaskEvaluator.Runtime.Implementation.CSharp;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Runtime;
 
@@ -29,7 +28,7 @@ public sealed class DockerRuntime : IRuntime {
             .ContinueWith(_ => _initialized = true);
     }
 
-    public async Task<IRuntimeResult> UnitTest(Code unitTest, CancellationToken token = default) {
+    public async Task<UnitTestRuntimeResult> UnitTest(Code unitTest, CancellationToken token = default) {
         while (!_initialized) {
             await Task.Delay(100, token).ConfigureAwait(false);
         }
@@ -43,10 +42,10 @@ public sealed class DockerRuntime : IRuntime {
             if (!result.IsSuccessStatusCode) {
                 _logger.LogInformation("Service {Uri} failed with: {Result}", serviceUri, result);
 
-                return new CSharpRuntimeResult(false, result.ReasonPhrase);
+                return new UnitTestRuntimeResult(false, result.ReasonPhrase);
             }
 
-            var runtimeResult = await result.Content.ReadFromJsonAsync<CSharpRuntimeResult>(token);
+            var runtimeResult = await result.Content.ReadFromJsonAsync<UnitTestRuntimeResult>(token);
             if (runtimeResult is null) {
                 throw new InvalidOperationException("Failed to deserialize runtime result");
             }
@@ -57,7 +56,7 @@ public sealed class DockerRuntime : IRuntime {
         } catch (Exception e) {
             _logger.LogError(e, "Error while running code");
 
-            return new CSharpRuntimeResult(false, e.Message);
+            return new UnitTestRuntimeResult(false, e.Message);
         }
     }
 
