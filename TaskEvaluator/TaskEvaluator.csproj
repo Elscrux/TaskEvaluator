@@ -50,8 +50,8 @@
       <Exec Command="powershell -Command &quot;ForEach ($dir in Get-ChildItem -Directory ../Languages) { if (Test-Path ../Languages/$dir/.nuget) { Remove-Item -Path ../Languages/$dir/.nuget/*.nupkg -Force } }&quot;" />
       <!-- Pack to the Languages folder -->
       <Exec Command="powershell -Command &quot;ForEach ($dir in Get-ChildItem -Directory ../Languages) { dotnet pack -c Release -o ../Languages/$dir/.nuget }&quot;" />
-        <PropertyGroup>
-          <PackToLanguagesRan>true</PackToLanguagesRan>
-        </PropertyGroup>
+      <PropertyGroup>
+        <PackToLanguagesRan>true</PackToLanguagesRan>
+      </PropertyGroup>
     </Target>
 </Project>
