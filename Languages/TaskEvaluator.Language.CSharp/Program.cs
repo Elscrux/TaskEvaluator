@@ -157,7 +157,9 @@ public static class Program {
         foreach (var testResult in testResults) {
             Console.WriteLine(testResult);
             var testName = testResult.Attribute("testName")?.Value ?? "No-Name";
-            var outcome = testResult.Attribute("outcome")?.Value ?? "No Outcome";
+            var outcome = testResult.Attribute("outcome") is {} attr
+                ? Enum.Parse<UnitTestOutcome>(attr.Value)
+                : UnitTestOutcome.Failed;
             var duration = testResult.Attribute("duration")?.Value is {} x ? TimeSpan.Parse(x, new DateTimeFormatInfo()) : TimeSpan.Zero;
 
             yield return new UnitTestResult(testName, outcome, duration);
