@@ -1,6 +1,9 @@
 using System.Text.Json.Serialization;
+using TaskEvaluator;
 using TaskEvaluator.Api.Api;
+using TaskEvaluator.Api.Requests;
 using TaskEvaluator.Evaluator;
+using TaskEvaluator.Generation;
 using TaskEvaluator.Modules;
 using TaskEvaluator.Runtime.Implementation.CSharp;
 using TaskEvaluator.Tasks;
@@ -13,6 +16,7 @@ builder.Services.AddSwaggerGen(options => options.SchemaFilter<ExampleSharpFilte
 builder.Services.AddLogging();
 builder.Services.AddHttpClient();
 builder.Services.AddHealthChecks();
+builder.Configuration.AddUserSecrets<TaskRunner>();
 
 builder.Services.AddTaskEvaluator();
 builder.Services.AddCSharp();
@@ -30,12 +34,28 @@ app.UseHttpsRedirection();
 
 app.MapHealthChecks("/health");
 
-app.MapPost("/evaluate", EvaluateTask)
+app.MapPost("/evaluate", EvaluateCode)
     .WithName("Evaluate")
+    .WithOpenApi();
+
+app.MapPost("/generate",  GenerateCode)
+    .WithName("Generate")
+    .WithOpenApi();
+
+app.MapPost("/full-pass", FullPass)
+    .WithName("Full Pass")
     .WithOpenApi();
 
 app.Run();
 
-IAsyncEnumerable<IEvaluationResult> EvaluateTask(TaskRunner taskRunner, TaskEvaluationModel model, CancellationToken token = default) {
-    return taskRunner.Run(model, token);
+IAsyncEnumerable<IEvaluationResult> EvaluateCode(TaskRunner taskRunner, CodeEvaluationRequest request, CancellationToken token = default) {
+    return taskRunner.Evaluate(request.Code, request.EvaluationModel, token);
+}
+
+IAsyncEnumerable<CodeGenerationResult> GenerateCode(TaskRunner taskRunner, CodeGenerationTask request, CancellationToken token = default) {
+    return taskRunner.Generate(request, token);
+}
+
+IAsyncEnumerable<IEvaluationResult> FullPass(TaskRunner taskRunner, FullRequest request, CancellationToken token = default) {
+    return taskRunner.Process(request.CodeGenerationTask, request.EvaluationModel, token);
 }

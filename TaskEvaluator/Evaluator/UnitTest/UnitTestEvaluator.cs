@@ -1,19 +1,16 @@
 ﻿using System.Runtime.CompilerServices;
+using TaskEvaluator.Extensions;
 using TaskEvaluator.Runtime;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Evaluator.UnitTest;
 
 public sealed class UnitTestEvaluator(IRuntime runtime) : IRuntimeEvaluator {
-    public async IAsyncEnumerable<IEvaluationResult> Evaluate(TaskEvaluationModel model, [EnumeratorCancellation] CancellationToken token = default) {
-        var unitTestTasks = model.UnitTests
-            .Select(unitTest => RunUnitTest(unitTest, token))
-            .ToList();
+    public async IAsyncEnumerable<IEvaluationResult> Evaluate(Code code, EvaluationModel evaluationModel, [EnumeratorCancellation] CancellationToken token = default) {
+        var unitTestTasks = evaluationModel.UnitTests
+            .Select(unitTest => RunUnitTest(unitTest, token));
 
-        while (unitTestTasks.Count > 0) {
-            var completedTask = await Task.WhenAny(unitTestTasks);
-            unitTestTasks.Remove(completedTask);
-
-            yield return await completedTask;
+        await foreach (var result in unitTestTasks.AwaitAll(token)) {
+            yield return result;
         }
     }
 

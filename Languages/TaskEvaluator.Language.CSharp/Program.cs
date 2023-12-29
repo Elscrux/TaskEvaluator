@@ -34,15 +34,6 @@ public static class Program {
                                   </Project>
                                   """;
 
-    private const string ReplaceComment = "// Replace this with generated code";
-    private const string Task = $$"""
-                                  namespace Task;
-
-                                  public static class TaskClass {
-                                      {{ReplaceComment}}
-                                  }
-                                  """;
-
     private const string WorkingDirectory = "/home/app";
     private static readonly string TemplateProjectDirectory = Path.Combine(WorkingDirectory, "./csharp-template-project");
     private static readonly string TestDirectory = Path.Combine(WorkingDirectory, "./tests");
@@ -60,8 +51,7 @@ public static class Program {
 
         // Create task class where the code lies, insert the code into it
         var taskClassPath = Path.Combine(TemplateProjectDirectory, "TaskClass.cs");
-        var taskClassContent = Task.Replace(ReplaceComment, code);
-        File.WriteAllText(taskClassPath, taskClassContent);
+        File.WriteAllText(taskClassPath, code.Replace("\\n", "\n"));
     }
 
     public static void Main(string[] args) {

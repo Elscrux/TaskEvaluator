@@ -1,26 +1,37 @@
 ﻿using System.Runtime.CompilerServices;
 using TaskEvaluator.Evaluator;
+using TaskEvaluator.Extensions;
+using TaskEvaluator.Generation;
 using TaskEvaluator.Runtime;
 namespace TaskEvaluator.Tasks;
 
 public sealed class TaskRunner(
     LanguageFactory languageFactory,
-    LocalTaskProvider localTaskProvider,
-    IEvaluatorProvider evaluatorProvider) {
+    IEvaluatorProvider evaluatorProvider,
+    ICodeGenerationProvider codeGenerationProvider) {
 
-    public async IAsyncEnumerable<IEvaluationResult> RunLocal([EnumeratorCancellation] CancellationToken token = default) {
-        foreach (var model in localTaskProvider.GetTasks()) {
-            await foreach (var result in Run(model, token)) {
-                yield return result;
+    public async IAsyncEnumerable<IEvaluationResult> Evaluate(Code code, EvaluationModel evaluationModel, [EnumeratorCancellation] CancellationToken token = default) {
+        using var runtime = await languageFactory.CreateRuntime(code, token);
+
+        foreach (var evaluator in evaluatorProvider.GetEvaluators(evaluationModel, runtime)) {
+            await foreach (var evaluationResult in evaluator.Evaluate(code, evaluationModel, token)) {
+                yield return evaluationResult;
             }
         }
     }
 
-    public async IAsyncEnumerable<IEvaluationResult> Run(TaskEvaluationModel model, [EnumeratorCancellation] CancellationToken token = default) {
-        using var runtime = await languageFactory.CreateRuntime(model.Solution.Code, token);
+    public async IAsyncEnumerable<CodeGenerationResult> Generate(CodeGenerationTask task, [EnumeratorCancellation] CancellationToken token = default) {
+        var models = codeGenerationProvider.GetGenerators().ToList();
 
-        foreach (var evaluator in evaluatorProvider.GetEvaluators(model, runtime)) {
-            await foreach (var evaluationResult in evaluator.Evaluate(model, token)) {
+        var tasks = models
+            .Select(model => model.Send(task, token))
+            .ToList();
+
+        await foreach (var result in tasks.AwaitAll(token)) yield return result;
+    }
+    public async IAsyncEnumerable<IEvaluationResult> Process(CodeGenerationTask codeGenerationTask, EvaluationModel evaluationModel, [EnumeratorCancellation] CancellationToken token = default) {
+        await foreach (var codeGenerationResult in Generate(codeGenerationTask, token)) {
+            await foreach (var evaluationResult in Evaluate(codeGenerationResult.Code, evaluationModel, token)) {
                 yield return evaluationResult;
             }
         }

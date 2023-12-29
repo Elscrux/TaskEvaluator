@@ -2,5 +2,5 @@
 namespace TaskEvaluator.Evaluator;
 
 public interface IEvaluator {
-    IAsyncEnumerable<IEvaluationResult> Evaluate(TaskEvaluationModel model, CancellationToken token = default);
+    IAsyncEnumerable<IEvaluationResult> Evaluate(Code code, EvaluationModel evaluationModel, CancellationToken token = default);
 }
