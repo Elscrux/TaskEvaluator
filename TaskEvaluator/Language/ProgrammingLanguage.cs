@@ -1,8 +1,8 @@
 ﻿namespace TaskEvaluator.Language;
 
 public enum ProgrammingLanguage {
-    C,
     CSharp,
+    C,
     FSharp,
     Go,
     Haskell,
