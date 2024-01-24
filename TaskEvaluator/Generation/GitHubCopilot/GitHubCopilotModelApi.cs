@@ -14,7 +14,7 @@ public class GitHubCopilotModelApi(
     : ICodeGenerator {
 
     public async Task<CodeGenerationResult> Send(CodeGenerationTask task, CancellationToken token = default) {
-        var httpClient = httpClientFactory.CreateClient();
+        using var httpClient = httpClientFactory.CreateClient();
 
         var authToken = await tokenProvider.GetAuthToken(token);
 

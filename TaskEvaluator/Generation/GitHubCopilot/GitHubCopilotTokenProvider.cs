@@ -18,7 +18,7 @@ public class GitHubCopilotTokenProvider(
     }
 
     private async Task<string> GetNewToken(CancellationToken token = default) {
-        var httpClient = httpClientFactory.CreateClient();
+        using var httpClient = httpClientFactory.CreateClient();
         var copilotSection = config.GetSection("GitHubCopilot");
         var request = new HttpRequestMessage(HttpMethod.Get, copilotSection["TokenUrl"]);
         request.Headers.UserAgent.Add(new ProductInfoHeaderValue(copilotSection["UserAgent"] ?? throw new InvalidOperationException(), copilotSection["UserAgentVersion"]));
