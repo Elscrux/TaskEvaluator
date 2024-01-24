@@ -1,7 +1,7 @@
 ﻿using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
-namespace TaskEvaluator.Api.Requests;
+namespace TaskEvaluator.Tasks;
 
-public sealed record FullRequest(
+public sealed record TaskSet(
     CodeGenerationTask CodeGenerationTask,
     EvaluationModel EvaluationModel);

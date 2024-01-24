@@ -29,9 +29,10 @@ public sealed class TaskRunner(
 
         await foreach (var result in tasks.AwaitAll(token)) yield return result;
     }
-    public async IAsyncEnumerable<IEvaluationResult> Process(CodeGenerationTask codeGenerationTask, EvaluationModel evaluationModel, [EnumeratorCancellation] CancellationToken token = default) {
-        await foreach (var codeGenerationResult in Generate(codeGenerationTask, token)) {
-            await foreach (var evaluationResult in Evaluate(codeGenerationResult.Code, evaluationModel, token)) {
+
+    public async IAsyncEnumerable<IEvaluationResult> Process(TaskSet taskSet, [EnumeratorCancellation] CancellationToken token = default) {
+        await foreach (var codeGenerationResult in Generate(taskSet.CodeGenerationTask, token)) {
+            await foreach (var evaluationResult in Evaluate(codeGenerationResult.Code, taskSet.EvaluationModel, token)) {
                 yield return evaluationResult;
             }
         }

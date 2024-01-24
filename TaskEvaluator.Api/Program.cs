@@ -43,7 +43,7 @@ app.MapPost("/evaluate", EvaluateCode)
     .WithName("Evaluate")
     .WithOpenApi();
 
-app.MapPost("/generate",  GenerateCode)
+app.MapPost("/generate", GenerateCode)
     .WithName("Generate")
     .WithOpenApi();
 
@@ -61,6 +61,6 @@ IAsyncEnumerable<CodeGenerationResult> GenerateCode(TaskRunner taskRunner, CodeG
     return taskRunner.Generate(request, token);
 }
 
-IAsyncEnumerable<IEvaluationResult> FullPass(TaskRunner taskRunner, FullRequest request, CancellationToken token = default) {
-    return taskRunner.Process(request.CodeGenerationTask, request.EvaluationModel, token);
+IAsyncEnumerable<IEvaluationResult> FullPass(TaskRunner taskRunner, TaskSet request, CancellationToken token = default) {
+    return taskRunner.Process(request, token);
 }
