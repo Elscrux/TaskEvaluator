@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.Language.CSha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.SonarQube", "TaskEvaluator.SonarQube\TaskEvaluator.SonarQube.csproj", "{AC5E69C5-29B7-46A8-9232-3B6F25211AD4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.Cli", "TaskEvaluator.Cli\TaskEvaluator.Cli.csproj", "{CD5A81B2-8680-4BA9-BFA2-BC051893ED29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{AC5E69C5-29B7-46A8-9232-3B6F25211AD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC5E69C5-29B7-46A8-9232-3B6F25211AD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC5E69C5-29B7-46A8-9232-3B6F25211AD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD5A81B2-8680-4BA9-BFA2-BC051893ED29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD5A81B2-8680-4BA9-BFA2-BC051893ED29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD5A81B2-8680-4BA9-BFA2-BC051893ED29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD5A81B2-8680-4BA9-BFA2-BC051893ED29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4CDE1D15-94F2-457F-8732-6F2C6A2F91CF} = {26854194-B6C2-437A-90C8-6B4C6B9CBD0A}
