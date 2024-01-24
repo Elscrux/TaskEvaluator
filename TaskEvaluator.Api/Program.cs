@@ -1,11 +1,11 @@
 using System.Text.Json.Serialization;
-using TaskEvaluator;
 using TaskEvaluator.Api.Api;
 using TaskEvaluator.Api.Requests;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Modules;
 using TaskEvaluator.Runtime.Implementation.CSharp;
+using TaskEvaluator.SonarQube;
 using TaskEvaluator.Tasks;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +20,11 @@ builder.Configuration.AddUserSecrets<TaskRunner>();
 
 builder.Services.AddTaskEvaluator();
 builder.Services.AddCSharp();
+builder.Services.AddSonarQube(
+    Environment.GetEnvironmentVariable("SONARQUBE_URL") ?? "http://localhost:9000",
+    Environment.GetEnvironmentVariable("SONARQUBE_USER") ?? "admin",
+    Environment.GetEnvironmentVariable("SONARQUBE_PASSWORD") ?? "1234");
+
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 var app = builder.Build();

@@ -16,6 +16,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\TaskEvaluator\TaskEvaluator.csproj" />
+      <ProjectReference Include="..\TaskEvaluator.SonarQube\TaskEvaluator.SonarQube.csproj" />
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">

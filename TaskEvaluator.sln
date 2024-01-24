@@ -8,6 +8,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Languages", "Languages", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.Language.CSharp", "Languages\TaskEvaluator.Language.CSharp\TaskEvaluator.Language.CSharp.csproj", "{4CDE1D15-94F2-457F-8732-6F2C6A2F91CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.SonarQube", "TaskEvaluator.SonarQube\TaskEvaluator.SonarQube.csproj", "{AC5E69C5-29B7-46A8-9232-3B6F25211AD4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{4CDE1D15-94F2-457F-8732-6F2C6A2F91CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CDE1D15-94F2-457F-8732-6F2C6A2F91CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CDE1D15-94F2-457F-8732-6F2C6A2F91CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC5E69C5-29B7-46A8-9232-3B6F25211AD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC5E69C5-29B7-46A8-9232-3B6F25211AD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC5E69C5-29B7-46A8-9232-3B6F25211AD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC5E69C5-29B7-46A8-9232-3B6F25211AD4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4CDE1D15-94F2-457F-8732-6F2C6A2F91CF} = {26854194-B6C2-437A-90C8-6B4C6B9CBD0A}
