@@ -40,11 +40,7 @@ public sealed class DockerRuntime : IRuntime {
             var serviceUri = _dockerHost.Uri("unit-test");
             _logger.LogInformation("Calling {Uri}...", serviceUri);
             var result = await httpClient.PostAsJsonAsync(serviceUri, unitTest, token).ConfigureAwait(false);
-            if (!result.IsSuccessStatusCode) {
-                _logger.LogInformation("Service {Uri} failed with: {Result}", serviceUri, result);
-
-                return new UnitTestRuntimeResult(false, result.ReasonPhrase);
-            }
+            result.EnsureSuccessStatusCode();
 
             var runtimeResult = await result.Content.ReadFromJsonAsync<UnitTestRuntimeResult>(token);
             if (runtimeResult is null) {
