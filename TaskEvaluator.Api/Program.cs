@@ -20,10 +20,7 @@ builder.Configuration.AddUserSecrets<TaskRunner>();
 
 builder.Services.AddTaskEvaluator();
 builder.Services.AddCSharp();
-builder.Services.AddSonarQube(
-    Environment.GetEnvironmentVariable("SONARQUBE_URL") ?? "http://localhost:9000",
-    Environment.GetEnvironmentVariable("SONARQUBE_USER") ?? "admin",
-    Environment.GetEnvironmentVariable("SONARQUBE_PASSWORD") ?? "1234");
+builder.Services.AddSonarQube();
 
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 

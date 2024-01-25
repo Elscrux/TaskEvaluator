@@ -23,7 +23,7 @@ There are external tools for code generation, code evaluation and data visualiza
         "UserAgentVersion": "1.138.0",
         "EditorVersion": "vscode/1.84.1",
         "EditorPluginVersion": "copilot/1.138.0",
-        "BearerToken": "YOUR:BEARER_TOKEN",
+        "BearerToken": "YOUR_BEARER_TOKEN",
         "Openai-Organization": "github-copilot",
         "Openai-Intent": "copilot-ghost"
     }
@@ -56,7 +56,7 @@ There are external tools for code generation, code evaluation and data visualiza
     "SonarQube": {
         "Url": "http://localhost:9000",
         "User": "admin",
-        "Password": "1234"
+        "Password": "YOUR_NEW_PASSWORD"
     }
 }
 ```
