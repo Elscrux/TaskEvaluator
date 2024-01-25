@@ -6,9 +6,9 @@ namespace TaskEvaluator.SonarQube;
 
 public sealed class SonarScannerApi(IHttpClientFactory httpClientFactory, ILogger<SonarScannerApi> logger) {
     private const string DownloadUrl = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-windows.zip";
-    private const string DownloadPath = "./sonar-scanner.zip";
-    private const string ExtractPath = "./sonar-scanner";
-    private const string BatPath = "./sonar-scanner/bin/sonar-scanner.bat";
+    private const string DownloadPath = "sonar-scanner.zip";
+    private const string ExtractPath = "sonar-scanner";
+    private static readonly string BatPath = Path.Combine(ExtractPath, "sonar-scanner-4.6.2.2472-windows", "bin", "sonar-scanner.bat");
 
     private async Task<bool> Install() {
         if (!File.Exists(DownloadPath)) {
@@ -19,7 +19,7 @@ public sealed class SonarScannerApi(IHttpClientFactory httpClientFactory, ILogge
             await stream.CopyToAsync(fileStream);
         }
 
-        ZipFile.ExtractToDirectory(DownloadPath, ExtractPath);
+        ZipFile.ExtractToDirectory(DownloadPath, ExtractPath, true);
 
         return true;
     }
