@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 namespace TaskEvaluator.Generation.GitHubCopilot;
 
-public class GitHubCopilotTokenProvider(
+public sealed class GitHubCopilotTokenProvider(
     IHttpClientFactory httpClientFactory,
     IConfiguration config) {
 

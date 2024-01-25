@@ -6,7 +6,7 @@ using Noggog;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Generation.GitHubCopilot;
 
-public class GitHubCopilotModelApi(
+public sealed class GitHubCopilotModelApi(
     IHttpClientFactory httpClientFactory,
     IConfiguration config,
     GitHubCopilotTokenProvider tokenProvider,

@@ -3,9 +3,9 @@ using TaskEvaluator.Language;
 using Tiktoken;
 namespace TaskEvaluator.Generation.GitHubCopilot;
 
-public class GitHubCopilotPromptGenerator {
+public sealed class GitHubCopilotPromptGenerator {
     public static readonly Encoding Encoding = Encoding.Get(Encodings.Cl100KBase);
-    
+
     public GitHubCopilotApiRequest GeneratePrompt(CodeGenerationTask task) {
         return new GitHubCopilotApiRequest {
             Prompt = task.Prefix,
