@@ -13,10 +13,13 @@ public sealed class TaskRunner(
     public async IAsyncEnumerable<IEvaluationResult> Evaluate(Code code, EvaluationModel evaluationModel, [EnumeratorCancellation] CancellationToken token = default) {
         using var runtime = await languageFactory.CreateRuntime(code, token);
 
-        foreach (var evaluator in evaluatorProvider.GetEvaluators(evaluationModel, runtime)) {
-            await foreach (var evaluationResult in evaluator.Evaluate(code, evaluationModel, token)) {
-                yield return evaluationResult;
-            }
+        // Merge all the IAsyncEnumerable<T> streams into one
+        await foreach (var evaluationResult in evaluatorProvider
+            .GetEvaluators(evaluationModel, runtime)
+            .AsParallel()
+            .Select(evaluator => evaluator.Evaluate(code, evaluationModel, token))
+            .Merge(token)) {
+            yield return evaluationResult;
         }
     }
 

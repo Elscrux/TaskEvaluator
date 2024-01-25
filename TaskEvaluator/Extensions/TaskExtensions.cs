@@ -13,4 +13,21 @@ public static class TaskExtensions {
             yield return await completedTask;
         }
     }
+
+    public static async IAsyncEnumerable<T> Merge<T>(this IEnumerable<IAsyncEnumerable<T>> enumerables, [EnumeratorCancellation] CancellationToken token = default) {
+        var tasks = enumerables
+            .Select(async source => await source.ToListAsync(token))
+            .ToList();
+
+        while (tasks.Count > 0) {
+            if (token.IsCancellationRequested) yield break;
+
+            var completedTask = await Task.WhenAny(tasks);
+            tasks.Remove(completedTask);
+
+            foreach (var result in completedTask.Result) {
+                yield return result;
+            }
+        }
+    }
 }
