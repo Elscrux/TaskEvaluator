@@ -3,7 +3,7 @@ namespace TaskEvaluator.SonarQube;
 
 public sealed class SonarCubeApiFactory(IHttpClientFactory httpClientFactory) {
     public async Task<SonarQubeApi> Create(string url, string username, string password) {
-        using var httpClient = httpClientFactory.CreateClient();
+        var httpClient = httpClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri(url);
         if (!await Login(httpClient, username, password)) throw new WebException("Failed to login");
 
