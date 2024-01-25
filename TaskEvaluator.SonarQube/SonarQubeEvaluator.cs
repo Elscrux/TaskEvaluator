@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using TaskEvaluator.Evaluator;
-using TaskEvaluator.Evaluator.UnitTest;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.SonarQube;
 

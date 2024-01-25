@@ -13,7 +13,7 @@ public sealed class ExampleSharpFilter : ISchemaFilter {
             nameof(Code.Body) => new OpenApiString("""
                                                    using Xunit;
                                                    namespace Task;
-                                                   
+
                                                    public class Test {
                                                        [Fact]
                                                        public void Test_2023_12_31() {
@@ -24,15 +24,15 @@ public sealed class ExampleSharpFilter : ISchemaFilter {
                                                    """),
             nameof(Code.Language) => new OpenApiInteger(1), //new OpenApiString(ProgrammingLanguage.CSharp.ToString()),
             nameof(CodeGenerationTask.Prefix) => new OpenApiString("""
-                                                                    namespace Task;
+                                                                   namespace Task;
 
-                                                                    public class TaskClass {
-                                                                        /// method that calculates the weekday of a given date
-                                                                        public static int GetWeekday(int year, int month, int day) {
-                                                                    """),
+                                                                   public class TaskClass {
+                                                                       /// method that calculates the weekday of a given date
+                                                                       public static int GetWeekday(int year, int month, int day) {
+                                                                   """),
             nameof(CodeGenerationTask.Suffix) => new OpenApiString("""
-                                                                    }
-                                                                    """),
+                                                                   }
+                                                                   """),
             _ => schema.Example
         };
     }

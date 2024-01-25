@@ -21,8 +21,12 @@ public sealed class GitHubCopilotTokenProvider(
         using var httpClient = httpClientFactory.CreateClient();
         var copilotSection = config.GetSection("GitHubCopilot");
         var request = new HttpRequestMessage(HttpMethod.Get, copilotSection["TokenUrl"]);
-        request.Headers.UserAgent.Add(new ProductInfoHeaderValue(copilotSection["UserAgent"] ?? throw new InvalidOperationException(), copilotSection["UserAgentVersion"]));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", copilotSection["BearerToken"]);
+        request.Headers.UserAgent.Add(new ProductInfoHeaderValue(
+            copilotSection["UserAgent"] ?? throw new InvalidOperationException(),
+            copilotSection["UserAgentVersion"]));
+        request.Headers.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            copilotSection["BearerToken"]);
         request.Headers.Add("Editor-Version", copilotSection["EditorVersion"]);
         request.Headers.Add("Editor-Plugin-Version", copilotSection["EditorPluginVersion"]);
         var response = await httpClient.SendAsync(request, token).ConfigureAwait(true);
@@ -30,7 +34,7 @@ public sealed class GitHubCopilotTokenProvider(
             throw new HttpRequestException("Could not send request to get GitHub Copilot token.");
         }
 
-        var tokenResponse = await response.Content.ReadFromJsonAsync<GitHubCopilotTokenResponse>(cancellationToken: token);
+        var tokenResponse = await response.Content.ReadFromJsonAsync<GitHubCopilotTokenResponse>(token);
         if (tokenResponse is null) throw new HttpRequestException("Could not deserialize GitHub Copilot token response.");
 
         _token = tokenResponse.Token ?? throw new HttpRequestException("GitHub Copilot token is null.");

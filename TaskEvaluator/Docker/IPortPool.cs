@@ -1,4 +1,4 @@
-﻿namespace TaskEvaluator.Docker; 
+﻿namespace TaskEvaluator.Docker;
 
 public interface IPortPool {
     int AllocatePort();
