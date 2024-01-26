@@ -34,10 +34,9 @@ There are external tools for code generation, code evaluation and data visualiza
 ```
 
 - Replace the Bearer Token with your GitHub Copilot Bearer Token
-    - Log into GitHub Copilot with your GitHub Account
-    - Find your Bearer Token in the Developer Tools of your Browser
-    - Open the Network Tab and filter for "Bearer"
-    - Copy the Bearer Token from the Request Header
+    - Run this [python script](https://github.com/aaamoon/copilot-gpt4-service/blob/master/shells/get_copilot_token.py)
+    - Connect with GitHub Account
+    - Copy the Bearer Token from the console output
 
 ### SonarQube
 
