@@ -5,7 +5,7 @@ namespace TaskEvaluator.Evaluator;
 
 public sealed class EvaluatorProvider(IServiceProvider serviceProvider) : IEvaluatorProvider {
     public async IAsyncEnumerable<IEvaluator> GetEvaluators(EvaluationModel model, IRuntime runtime) {
-        if (model.UnitTests.Count > 0) yield return new UnitTestEvaluator(runtime);
+        if (model.UnitTests is not null) yield return new UnitTestEvaluator(runtime);
 
         foreach (var staticEvaluator in serviceProvider.GetServices<IStaticEvaluator>()) {
             yield return staticEvaluator;

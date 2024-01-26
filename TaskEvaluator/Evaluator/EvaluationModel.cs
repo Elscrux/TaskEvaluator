@@ -2,4 +2,4 @@
 namespace TaskEvaluator.Evaluator;
 
 public sealed record EvaluationModel(
-    IList<Code> UnitTests);
+    Code? UnitTests = null);
