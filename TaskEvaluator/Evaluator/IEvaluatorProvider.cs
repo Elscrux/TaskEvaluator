@@ -2,5 +2,5 @@
 namespace TaskEvaluator.Evaluator;
 
 public interface IEvaluatorProvider {
-    IEnumerable<IEvaluator> GetEvaluators(EvaluationModel model, IRuntime runtime);
+    IAsyncEnumerable<IEvaluator> GetEvaluators(EvaluationModel model, IRuntime runtime);
 }

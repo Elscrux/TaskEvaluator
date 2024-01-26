@@ -8,19 +8,24 @@ public static class SonarQubeRegistrationExtension {
     public static IServiceCollection AddSonarQube(this IServiceCollection services) {
         services.AddTransient<SonarScannerApi>();
         services.AddTransient<SonarCubeApiFactory>();
-        services.AddTransient<IStaticEvaluator>(provider => {
+        services.AddTransient<Task<IStaticEvaluator?>>(provider => Task.Run<IStaticEvaluator?>(async () => {
             var configuration = provider.GetRequiredService<IConfiguration>();
             var sonarQubeSection = configuration.GetSection("SonarQube");
             var url = sonarQubeSection["Url"] ?? "http://localhost:9000";
             var user = sonarQubeSection["User"] ?? "admin";
             var password = sonarQubeSection["Password"] ?? "1234";
 
+            var sonarQubeApi = await provider
+                .GetRequiredService<SonarCubeApiFactory>()
+                .Create(url, user, password);
+
+            if (sonarQubeApi is null) return null;
+
             return new SonarQubeEvaluator(
                 provider.GetRequiredService<ILogger<SonarQubeEvaluator>>(),
                 provider.GetRequiredService<SonarScannerApi>(),
-                provider.GetRequiredService<SonarCubeApiFactory>()
-                    .Create(url, user, password));
-        });
+                sonarQubeApi);
+        }));
 
         return services;
     }

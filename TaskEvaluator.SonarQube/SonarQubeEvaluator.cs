@@ -7,11 +7,9 @@ namespace TaskEvaluator.SonarQube;
 public sealed class SonarQubeEvaluator(
     ILogger<SonarQubeEvaluator> logger,
     SonarScannerApi sonarScanner,
-    Task<SonarQubeApi> sonarQubeTask)
+    SonarQubeApi sonarQube)
     : IStaticEvaluator {
     public async IAsyncEnumerable<IEvaluationResult> Evaluate(Code code, EvaluationModel evaluationModel, [EnumeratorCancellation] CancellationToken token = default) {
-        var sonarQube = await sonarQubeTask;
-
         var projectKey = Guid.NewGuid().ToString();
         if (!await sonarQube.TryCreateProject(projectKey, projectKey, token)) {
             logger.LogError("Failed to create project {ProjectKey}", projectKey);
