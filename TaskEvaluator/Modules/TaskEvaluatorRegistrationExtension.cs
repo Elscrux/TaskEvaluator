@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TaskEvaluator.Docker;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
@@ -35,6 +36,14 @@ public static class TaskEvaluatorRegistrationExtension {
 
         // Task
         services.AddTransient<TaskRunner>();
+        services.AddTransient<ITaskLoader>(provider => {
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            var taskSetSection = configuration.GetSection("TaskSet");
+            var directoryPath = taskSetSection["DirectoryPath"] ?? string.Empty;
+
+            var logger = provider.GetRequiredService<ILogger<LocalTaskLoader>>();
+            return new LocalTaskLoader(logger, directoryPath);
+        });
 
         // Evaluator
         services.AddTransient<IEvaluatorProvider, EvaluatorProvider>();
