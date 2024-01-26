@@ -1,14 +1,13 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Configuration;
 using Noggog;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Generation.GitHubCopilot;
 
 public sealed class GitHubCopilotModelApi(
     IHttpClientFactory httpClientFactory,
-    IConfiguration config,
+    GitHubCopilotConfiguration config,
     GitHubCopilotTokenProvider tokenProvider,
     GitHubCopilotPromptGenerator promptGenerator)
     : ICodeGenerator {
@@ -18,14 +17,13 @@ public sealed class GitHubCopilotModelApi(
 
         var authToken = await tokenProvider.GetAuthToken(token);
 
-        var copilotSection = config.GetSection("GitHubCopilot");
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, copilotSection["CompletionsUrl"]);
-        requestMessage.Headers.UserAgent.Add(new ProductInfoHeaderValue(copilotSection["UserAgent"] ?? throw new InvalidOperationException(), copilotSection["UserAgentVersion"]));
+        var requestMessage = new HttpRequestMessage(HttpMethod.Post, config.CompletionsUrl);
+        requestMessage.Headers.UserAgent.Add(new ProductInfoHeaderValue(config.UserAgent, config.UserAgentVersion));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
-        requestMessage.Headers.Add("Editor-Version", copilotSection["EditorVersion"]);
-        requestMessage.Headers.Add("Editor-Plugin-Version", copilotSection["EditorPluginVersion"]);
-        requestMessage.Headers.Add("Openai-Organization", copilotSection["Openai-Organization"]);
-        requestMessage.Headers.Add("Openai-Intent", copilotSection["Openai-Intent"]);
+        requestMessage.Headers.Add("Editor-Version", config.EditorVersion);
+        requestMessage.Headers.Add("Editor-Plugin-Version", config.EditorPluginVersion);
+        requestMessage.Headers.Add("Openai-Organization", config.OpenaiOrganization);
+        requestMessage.Headers.Add("Openai-Intent", config.OpenaiIntent);
 
         var gitHubCopilotApiRequest = promptGenerator.GeneratePrompt(task);
         var serialize = JsonSerializer.Serialize(gitHubCopilotApiRequest);

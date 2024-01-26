@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using TaskEvaluator.Docker;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
@@ -16,6 +17,21 @@ public static class TaskEvaluatorRegistrationExtension {
         services.AddTransient<ICodeGenerator, GitHubCopilotModelApi>();
         services.AddSingleton<GitHubCopilotTokenProvider>();
         services.AddSingleton<GitHubCopilotPromptGenerator>();
+        services.AddSingleton<GitHubCopilotConfiguration>(provider => {
+            var config = provider.GetRequiredService<IConfiguration>();
+            var copilotSection = config.GetSection("GitHubCopilot");
+            return new GitHubCopilotConfiguration(
+                copilotSection["TokenUrl"] ?? throw new InvalidDataException("GitHub Copilot: TokenUrl is not set."),
+                copilotSection["BearerToken"] ?? throw new InvalidDataException("GitHub Copilot: BearerToken is not set."),
+                copilotSection["CompletionsUrl"] ?? throw new InvalidDataException("GitHub Copilot: CompletionsUrl is not set."),
+                copilotSection["UserAgent"] ?? throw new InvalidDataException("GitHub Copilot: UserAgent is not set."),
+                copilotSection["UserAgentVersion"] ?? throw new InvalidDataException("GitHub Copilot: UserAgentVersion is not set."),
+                copilotSection["EditorVersion"] ?? throw new InvalidDataException("GitHub Copilot: EditorVersion is not set."),
+                copilotSection["EditorPluginVersion"] ?? throw new InvalidDataException("GitHub Copilot: EditorPluginVersion is not set."),
+                copilotSection["Openai-Organization"] ?? throw new InvalidDataException("GitHub Copilot: Openai-Organization is not set."),
+                copilotSection["Openai-Intent"] ?? throw new InvalidDataException("GitHub Copilot: Openai-Intent is not set.")
+            );
+        });
 
         // Task
         services.AddTransient<TaskRunner>();

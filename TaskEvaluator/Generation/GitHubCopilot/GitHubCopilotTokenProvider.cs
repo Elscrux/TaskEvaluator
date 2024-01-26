@@ -1,12 +1,11 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Configuration;
 namespace TaskEvaluator.Generation.GitHubCopilot;
 
 public sealed class GitHubCopilotTokenProvider(
     IHttpClientFactory httpClientFactory,
-    IConfiguration config) {
+    GitHubCopilotConfiguration config) {
 
     private DateTime _expirationTime = DateTime.MinValue;
     private string _token = string.Empty;
@@ -19,16 +18,11 @@ public sealed class GitHubCopilotTokenProvider(
 
     private async Task<string> GetNewToken(CancellationToken token = default) {
         using var httpClient = httpClientFactory.CreateClient();
-        var copilotSection = config.GetSection("GitHubCopilot");
-        var request = new HttpRequestMessage(HttpMethod.Get, copilotSection["TokenUrl"]);
-        request.Headers.UserAgent.Add(new ProductInfoHeaderValue(
-            copilotSection["UserAgent"] ?? throw new InvalidOperationException(),
-            copilotSection["UserAgentVersion"]));
-        request.Headers.Authorization = new AuthenticationHeaderValue(
-            "Bearer",
-            copilotSection["BearerToken"]);
-        request.Headers.Add("Editor-Version", copilotSection["EditorVersion"]);
-        request.Headers.Add("Editor-Plugin-Version", copilotSection["EditorPluginVersion"]);
+        var request = new HttpRequestMessage(HttpMethod.Get, config.TokenUrl);
+        request.Headers.UserAgent.Add(new ProductInfoHeaderValue(config.UserAgent, config.UserAgentVersion));
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", config.BearerToken);
+        request.Headers.Add("Editor-Version", config.EditorVersion);
+        request.Headers.Add("Editor-Plugin-Version", config.EditorPluginVersion);
         var response = await httpClient.SendAsync(request, token).ConfigureAwait(true);
         if (!response.IsSuccessStatusCode) {
             throw new HttpRequestException("Could not send request to get GitHub Copilot token.");
