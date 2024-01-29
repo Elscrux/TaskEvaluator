@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using TaskEvaluator.Docker;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Generation.GitHubCopilot;
 using TaskEvaluator.Runtime;
+using TaskEvaluator.Sinks;
+using TaskEvaluator.Sinks.Database;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Modules;
 
@@ -36,13 +37,11 @@ public static class TaskEvaluatorRegistrationExtension {
 
         // Task
         services.AddTransient<TaskRunner>();
-        services.AddTransient<ITaskLoader>(provider => {
+        services.AddTransient<ITaskLoader, LocalTaskLoader>();
+        services.AddSingleton<TaskLoadConfiguration>(provider => {
             var configuration = provider.GetRequiredService<IConfiguration>();
             var taskSetSection = configuration.GetSection("TaskSet");
-            var directoryPath = taskSetSection["DirectoryPath"] ?? string.Empty;
-
-            var logger = provider.GetRequiredService<ILogger<LocalTaskLoader>>();
-            return new LocalTaskLoader(logger, directoryPath);
+            return new TaskLoadConfiguration(taskSetSection["DirectoryPath"] ?? throw new InvalidDataException("TaskSet: DirectoryPath is not set."));
         });
 
         // Evaluator
@@ -55,6 +54,15 @@ public static class TaskEvaluatorRegistrationExtension {
         services.AddSingleton<IPortPool, RandomPortPool>();
         services.AddSingleton<DockerHostFactory>();
         services.AddSingleton<DockerRuntimeFactory>();
+
+        // Sink
+        services.AddSingleton<IEvaluationResultSink, EvaluationResultDatabaseSink>();
+        services.AddSingleton<EvaluationResultDatabaseSinkConfiguration>(provider => {
+            var config = provider.GetRequiredService<IConfiguration>();
+            var databaseSection = config.GetSection("Database");
+            return new EvaluationResultDatabaseSinkConfiguration(
+                databaseSection["ConnectionString"] ?? "User ID=postgres;Host=localhost;Port=5432;Password=1234;");
+        });
 
         return services;
     }

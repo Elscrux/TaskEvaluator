@@ -8,7 +8,7 @@ public sealed class BatchRunner(
     ILogger<BatchRunner> logger,
     ITaskLoader taskLoader,
     TaskRunner taskRunner,
-    IEvaluationResultSink evaluationResultSink)
+    IEnumerable<IEvaluationResultSink> evaluationResultSinks)
     : IHostedService {
 
     public Task StartAsync(CancellationToken cancellationToken) {
@@ -21,7 +21,9 @@ public sealed class BatchRunner(
             logger.LogInformation("Generating {Task}", task.CodeGenerationTask.ToString());
             await foreach (var result in taskRunner.Process(task, token)) {
                 logger.LogInformation("Evaluating {Task} | Result: {Result}", task.CodeGenerationTask.ToString(), result.ToString());
-                evaluationResultSink.Send(result);
+                foreach (var evaluationResultSink in evaluationResultSinks) {
+                    evaluationResultSink.Send(result);
+                }
             }
         });
     }

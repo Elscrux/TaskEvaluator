@@ -5,11 +5,11 @@ using TaskEvaluator.Generation;
 using TaskEvaluator.Language;
 namespace TaskEvaluator.Tasks;
 
-public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, string taskSetDirectory) : ITaskLoader {
+public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, TaskLoadConfiguration config) : ITaskLoader {
     private const string CodeMarker = "INSERT_CODE_HERE";
 
     public IEnumerable<TaskSet> Load() {
-        foreach (var languageDirectory in Directory.EnumerateDirectories(taskSetDirectory)) {
+        foreach (var languageDirectory in Directory.EnumerateDirectories(config.DirectoryPath)) {
             var languageFolder = Path.GetFileName(languageDirectory);
             if (!Enum.TryParse<ProgrammingLanguage>(languageFolder, out var language)) {
                 logger.LogWarning("Invalid Language {LanguageFolder}", languageFolder);

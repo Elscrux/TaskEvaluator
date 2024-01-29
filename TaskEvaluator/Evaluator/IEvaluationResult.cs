@@ -1,7 +1,7 @@
 ﻿namespace TaskEvaluator.Evaluator;
 
 public interface IEvaluationResult {
-    Guid Guid { get; }
+    Guid TaskId { get; }
     bool Success { get; }
     string? Context { get; }
 }

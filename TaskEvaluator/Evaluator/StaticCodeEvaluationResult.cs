@@ -1,7 +1,7 @@
 namespace TaskEvaluator.Evaluator;
 
 public sealed record StaticCodeEvaluationResult(
-    Guid Guid,
+    Guid TaskId,
     bool Success,
     string? Context,
     Severity Severity,
