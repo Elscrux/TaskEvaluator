@@ -16,6 +16,7 @@ builder.Services.AddSwaggerGen(options => options.SchemaFilter<ExampleSharpFilte
 builder.Services.AddLogging();
 builder.Services.AddHttpClient();
 builder.Services.AddHealthChecks();
+
 builder.Configuration.AddUserSecrets<TaskRunner>();
 
 builder.Services.AddTaskEvaluator();
