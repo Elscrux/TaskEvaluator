@@ -8,6 +8,7 @@ public sealed class SonarScannerApi(IHttpClientFactory httpClientFactory, ILogge
     private const string DownloadUrl = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-windows.zip";
     private const string DownloadPath = "sonar-scanner.zip";
     private const string ExtractPath = "sonar-scanner";
+    private static readonly string WorkingDirectory = Path.Combine("sonar-qube");
     private static readonly string BatPath = Path.Combine(ExtractPath, "sonar-scanner-4.6.2.2472-windows", "bin", "sonar-scanner.bat");
 
     private async Task<bool> Install() {
@@ -35,16 +36,13 @@ public sealed class SonarScannerApi(IHttpClientFactory httpClientFactory, ILogge
             return false;
         }
 
-        // todo use path pointing to the code instead
-        var workingDirectory = "working directory";
-
         var process = Process.Start(
             new ProcessStartInfo(BatPath, [
                 $"-Dsonar.host.url={url}",
                 $"-Dsonar.token={token}",
                 $"-Dsonar.projectKey={projectName}"
             ]) {
-                WorkingDirectory = workingDirectory,
+                WorkingDirectory = WorkingDirectory,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -52,7 +50,7 @@ public sealed class SonarScannerApi(IHttpClientFactory httpClientFactory, ILogge
         );
 
         if (process == null) {
-            logger.LogError("Failed to start sonar-scanner at {WorkingDirectory}", workingDirectory);
+            logger.LogError("Failed to start sonar-scanner at {WorkingDirectory}", WorkingDirectory);
             return false;
         }
 
