@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
@@ -6,6 +7,7 @@ using TaskEvaluator.Language;
 namespace TaskEvaluator.Tasks;
 
 public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, TaskLoadConfiguration config) : ITaskLoader {
+
     private const string CodeMarker = "INSERT_CODE_HERE";
 
     public IEnumerable<TaskSet> Load() {
@@ -18,11 +20,7 @@ public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, TaskLoadCon
 
             foreach (var taskDirectory in Directory.EnumerateDirectories(languageDirectory)) {
                 var taskName = Path.GetFileName(taskDirectory);
-                if (!Guid.TryParse(taskName, out var guid)) {
-                    logger.LogWarning("Invalid TaskName {TaskName}, doesn't represent Guid", taskName);
-                    continue;
-                }
-                var task = LoadTask(language, guid, taskDirectory);
+                var task = LoadTask(language, taskName, taskDirectory);
                 if (task is null) continue;
 
                 yield return task;
@@ -30,14 +28,28 @@ public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, TaskLoadCon
         }
     }
 
-    private TaskSet? LoadTask(ProgrammingLanguage language, Guid guid, string taskDirectory) {
+    private TaskSet? LoadTask(ProgrammingLanguage language, string taskName, string taskDirectory) {
+        var metadata = LoadMetadata(taskDirectory);
+
         var codeGenerationTask = LoadCodeGenerationTask(language, taskDirectory);
         if (codeGenerationTask is null) return null;
 
         var evaluationModel = LoadEvaluationModel(language, taskDirectory);
 
-        return new TaskSet(guid, codeGenerationTask, evaluationModel);
+        return new TaskSet(taskName, codeGenerationTask, evaluationModel, metadata);
     }
+
+    private Metadata LoadMetadata(string taskDirectory) {
+        var metadataPath = Path.Combine(taskDirectory, "metadata.json");
+        if (File.Exists(metadataPath)) {
+            var jsonResult = JsonSerializer.Deserialize<Metadata>(File.ReadAllText(metadataPath));
+            if (jsonResult is not null) return jsonResult;
+        }
+
+        logger.LogWarning("No valid metadata.json found in {TaskDirectory}, use default metadata instead", taskDirectory);
+        return Metadata.Default;
+    }
+
     private CodeGenerationTask? LoadCodeGenerationTask(ProgrammingLanguage language, string taskDirectory) {
         if (!LoadFile(taskDirectory, "Program", out var programPath, out var code)) return null;
 
