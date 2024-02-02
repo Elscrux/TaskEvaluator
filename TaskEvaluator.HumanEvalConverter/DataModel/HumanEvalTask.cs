@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json.Serialization;
 using Noggog;
-using TaskEvaluator.Extensions;
 namespace TaskEvaluator.HumanEvalConverter.DataModel;
 
 public sealed partial record HumanEvalTask(

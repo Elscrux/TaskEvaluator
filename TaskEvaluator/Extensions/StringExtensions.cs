@@ -1,4 +1,4 @@
-﻿namespace TaskEvaluator.Extensions;
+﻿namespace TaskEvaluator;
 
 public static class StringExtensions {
     public static string[] SplitMany(this string s, params string[] splitters) {

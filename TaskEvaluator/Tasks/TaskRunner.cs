@@ -1,6 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 using TaskEvaluator.Evaluator;
-using TaskEvaluator.Extensions;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Runtime;
 namespace TaskEvaluator.Tasks;

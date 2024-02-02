@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-namespace TaskEvaluator.Extensions;
+namespace TaskEvaluator;
 
 public static class TaskExtensions {
     public static async IAsyncEnumerable<T> AwaitAll<T>(this IEnumerable<Task<T>> tasks, [EnumeratorCancellation] CancellationToken token = default) {

@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using TaskEvaluator.Extensions;
 namespace TaskEvaluator.HumanEvalConverter.DataModel;
 
 public sealed partial record FunctionSignature(
