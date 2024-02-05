@@ -5,7 +5,6 @@ using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Modules;
 using TaskEvaluator.Runtime.Implementation.CSharp;
-using TaskEvaluator.SonarQube;
 using TaskEvaluator.Tasks;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +20,6 @@ builder.Configuration.AddUserSecrets<TaskRunner>();
 
 builder.Services.AddTaskEvaluator();
 builder.Services.AddCSharp();
-builder.Services.AddSonarQube();
 
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
