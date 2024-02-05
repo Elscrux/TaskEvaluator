@@ -13,6 +13,10 @@ In total, there are 4 major components to achieve this:
 The tool is using multiple external services that need to be set up to gain full functionality.
 There are external tools for code generation, code evaluation and data visualization.
 
+In any case, you'll first have to
+- Install Docker
+- Start Docker-Engine
+
 ### GitHub Copilot
 
 - Add the following .NET User Secrets for TaskEvaluator
@@ -39,9 +43,6 @@ There are external tools for code generation, code evaluation and data visualiza
     - Copy the Bearer Token from the console output
 
 ### SonarQube
-
-- Install Docker
-- Start Docker-Engine
 - Pull SonarQube Image
     ```bash
     docker pull sonarqube
@@ -62,6 +63,27 @@ There are external tools for code generation, code evaluation and data visualiza
         "Url": "http://localhost:9000",
         "User": "admin",
         "Password": "YOUR_NEW_PASSWORD"
+    }
+}
+```
+
+### Data Sink
+
+#### PostgreSQL Sink
+- Pull Postgres Image
+    ```bash
+    docker pull postgres
+    ```
+- Start Postgres Container
+    ```bash
+     docker run -d --name postgres -u postgres -e POSTGRES_PASSWORD=YOUR_PASSWORD -p 5432:5432 postgres
+    ```
+    - Add the following .NET User Secrets
+
+```json
+{
+    "Database": {
+        "ConnectionString": "User ID=postgres;Host=localhost;Port=5432;Password=YOUR_PASSWORD;"
     }
 }
 ```
