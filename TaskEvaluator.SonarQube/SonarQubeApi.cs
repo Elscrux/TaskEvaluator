@@ -19,9 +19,9 @@ public sealed class SonarQubeApi(HttpClient httpClient) {
         return response.IsSuccessStatusCode;
     }
 
-    public async IAsyncEnumerable<StaticCodeEvaluationResult> SearchIssues([EnumeratorCancellation] CancellationToken cancellationToken = default) {
+    public async IAsyncEnumerable<StaticCodeEvaluationResult> SearchIssues(string projectKey, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
         var response = await httpClient
-            .GetAsync("/api/issues/search", cancellationToken)
+            .GetAsync($"/api/issues/search?components={projectKey}", cancellationToken)
             .ConfigureAwait(false);
 
         response.EnsureSuccessStatusCode();

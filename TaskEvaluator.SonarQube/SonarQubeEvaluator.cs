@@ -19,7 +19,7 @@ public sealed class SonarQubeEvaluator(
         var userToken = await sonarQube.GetUserToken(projectKey, token);
         if (!await sonarScanner.Run(code, sonarQube.Url, userToken, projectKey, token)) yield break;
 
-        await foreach (var result in sonarQube.SearchIssues(token)) {
+        await foreach (var result in sonarQube.SearchIssues(projectKey, token)) {
             yield return result;
         }
     }
