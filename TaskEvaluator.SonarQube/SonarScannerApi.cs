@@ -5,11 +5,12 @@ using TaskEvaluator.Tasks;
 namespace TaskEvaluator.SonarQube;
 
 public sealed class SonarScannerApi(IHttpClientFactory httpClientFactory, ILogger<SonarScannerApi> logger) {
-    private const string DownloadUrl = "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-windows.zip";
+    private static readonly string OSTag = OperatingSystem.IsWindows() ? "windows" : "linux";
+    private static readonly string DownloadUrl = $"https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-{OSTag}.zip";
     private const string DownloadPath = "sonar-scanner.zip";
     private const string ExtractPath = "sonar-scanner";
     private static readonly string WorkingDirectory = Path.Combine("sonar-qube");
-    private static readonly string BatPath = Path.Combine(ExtractPath, "sonar-scanner-4.6.2.2472-windows", "bin", "sonar-scanner.bat");
+    private static readonly string BatPath = Path.Combine(ExtractPath, $"sonar-scanner-5.0.1.3006-{OSTag}", "bin", "sonar-scanner.bat");
 
     private async Task<bool> Install() {
         if (!File.Exists(DownloadPath)) {
