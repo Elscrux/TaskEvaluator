@@ -54,7 +54,7 @@
 
     <Target Name="PackToLanguages" AfterTargets="AfterBuild" Condition="'$(PackToLanguagesRan)' == 'false'">
         <!-- Clean up any previous packages, but delete if the folder exists, include version in check for what to remove -->
-        <Exec Command="powershell -Command &quot;ForEach ($dir in Get-ChildItem -Directory ../Languages) { if (Test-Path ../Languages/$dir/.nuget) { Remove-Item -Path ../Languages/$dir/.nuget/$(ProjectName).$(Version).nupkg -Force } }&quot;"/>
+        <Exec Command="powershell -Command &quot;ForEach ($dir in Get-ChildItem -Directory ../Languages) { $filePath = '../Languages/' + $dir + '/.nuget/' + 'TaskEvaluator.SonarQube' + '.' + '1.0.0' + '.nupkg'; if ((Test-Path ../Languages/$dir/.nuget) -and (Test-Path $filePath)) { Remove-Item -Path $filePath -Force } }&quot;"/>
         <!-- Pack to the Languages folder -->
         <Exec Command="powershell -Command &quot;ForEach ($dir in Get-ChildItem -Directory ../Languages) { dotnet pack -c Release -o ../Languages/$dir/.nuget }&quot;"/>
         <PropertyGroup>
