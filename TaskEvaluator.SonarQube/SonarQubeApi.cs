@@ -32,6 +32,8 @@ public sealed class SonarQubeApi(HttpClient httpClient) {
         }
 
         foreach (var issue in issuesSearch.Issues) {
+            if (!issue.Component.Contains("Program", StringComparison.OrdinalIgnoreCase)) continue;
+
             var severity = issue.Impacts[0].Severity switch {
                 "LOW" => Severity.Low,
                 "MEDIUM" => Severity.Medium,
