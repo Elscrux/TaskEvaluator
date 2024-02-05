@@ -1,10 +1,16 @@
 using System.Diagnostics;
 using System.IO.Compression;
 using Microsoft.Extensions.Logging;
+using TaskEvaluator.Runtime;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.SonarQube.Scanner;
 
-public sealed class BatchSonarScannerApi(IHttpClientFactory httpClientFactory, ILogger<BatchSonarScannerApi> logger) : ISonarScannerApi {
+public sealed class BatchSonarScannerApi(
+    IHttpClientFactory httpClientFactory,
+    ILogger<BatchSonarScannerApi> logger,
+    ILanguageSpecification languageSpecification)
+    : ISonarScannerApi {
+
     private static readonly string OsTag = OperatingSystem.IsWindows() ? "windows" : "linux";
     private static readonly string DownloadUrl = $"https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-{OsTag}.zip";
     private const string DownloadPath = "sonar-scanner.zip";
@@ -39,7 +45,7 @@ public sealed class BatchSonarScannerApi(IHttpClientFactory httpClientFactory, I
 
         var workingDirectory = Path.GetFullPath(WorkingDirectory);
         Directory.CreateDirectory(workingDirectory);
-        await File.WriteAllTextAsync(Path.Combine(workingDirectory, code.RootFileName), code.Body, cancellationToken);
+        await File.WriteAllTextAsync(Path.Combine(workingDirectory, languageSpecification.ProgramFileName), code.Body, cancellationToken);
 
         var process = Process.Start(
             new ProcessStartInfo(Path.GetFullPath(BatPath), [
