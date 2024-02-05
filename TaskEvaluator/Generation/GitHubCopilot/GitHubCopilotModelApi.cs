@@ -47,7 +47,7 @@ public sealed class GitHubCopilotModelApi(
             .ToList();
 
         var fullCode = task.Prefix + string.Join(string.Empty, list) + task.Suffix;
-        return new CodeGenerationResult(true, new Code(Guid.NewGuid(), fullCode, task.Language));
+        return new CodeGenerationResult(true, new Code(fullCode, task.Language));
     }
 
     private sealed class GitHubCopilotApiStreamResult {

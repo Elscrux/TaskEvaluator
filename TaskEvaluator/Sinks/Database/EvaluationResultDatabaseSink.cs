@@ -18,7 +18,7 @@ public static class DataContextExtensions {
     public static ITable<T> GetOrCreateTable<T>(this DataConnection db) where T : class {
         try {
             db.CreateTable<T>();
-        } catch (Exception e) {
+        } catch (Exception) {
             // ignored
         }
 
