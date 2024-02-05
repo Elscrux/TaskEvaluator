@@ -8,4 +8,14 @@ public sealed record StaticCodeEvaluationResult(
     string QualityAttribute,
     string QualityMetric,
     int Line,
-    Dictionary<string, object> AdditionalProperties) : IEvaluationResult;
+    Dictionary<string, object> AdditionalProperties) : IEvaluationResult {
+    public static readonly StaticCodeEvaluationResult Failure = new(
+        Guid.Empty,
+        false,
+        null,
+        Severity.Low,
+        string.Empty,
+        string.Empty,
+        -1,
+        []);
+}

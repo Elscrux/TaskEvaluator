@@ -1,9 +1,12 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Xml.Linq;
+using TaskEvaluator.Evaluator;
 using TaskEvaluator.Evaluator.UnitTest;
 using TaskEvaluator.Runtime;
+using TaskEvaluator.SonarQube;
 using TaskEvaluator.Tasks;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 namespace TaskEvaluator.Language.CSharp;
 
 public static class Program {
@@ -39,10 +42,13 @@ public static class Program {
     private static readonly string TemplateProjectDirectory = Path.Combine(WorkingDirectory, "./csharp-template-project");
     private static readonly string TestDirectory = Path.Combine(WorkingDirectory, "./tests");
 
+    public static Code Code = null!;
+
     private static void InitTemplateDirectory() {
         // input code ist stored in env variable CODE
         var code = Environment.GetEnvironmentVariable("CODE")
          ?? throw new InvalidOperationException("CODE environment variable not set");
+        Code = JsonSerializer.Deserialize<Code>(code) ?? throw new InvalidOperationException($"Failed to deserialize CODE environment variable {code}");
 
         Directory.CreateDirectory(TemplateProjectDirectory);
 
@@ -64,7 +70,12 @@ public static class Program {
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddHttpClient();
         builder.Services.AddHealthChecks();
+
+        builder.Services.AddSonarQube();
+
+        builder.Configuration.AddUserSecrets<TaskRunner>();
 
         var app = builder.Build();
 
@@ -82,7 +93,24 @@ public static class Program {
             .WithName("Unit Test")
             .WithOpenApi();
 
+        app.MapGet("/sonar-qube", RunSonarQube)
+            .WithName("Sonar Qube")
+            .WithOpenApi();
+
         app.Run();
+
+        async IAsyncEnumerable<IEvaluationResult> RunSonarQube(HttpContext c, CancellationToken token = default) {
+            Console.WriteLine("Got SonarQube");
+            var evaluatorFactory = c.RequestServices.GetRequiredService<Task<SonarQubeEvaluator?>>();
+            var evaluator = await evaluatorFactory;
+            if (evaluator == null) {
+                throw new InvalidOperationException("Failed to get SonarQubeEvaluator");
+            }
+            
+            await foreach (var evaluationResult in evaluator.Evaluate(Code, new EvaluationModel(), token)) {
+                yield return evaluationResult;
+            }
+        }
     }
 
     private static IRuntimeResult StartUnitTest(Code unitTest) {
