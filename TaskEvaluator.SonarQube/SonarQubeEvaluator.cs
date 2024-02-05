@@ -1,12 +1,13 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using TaskEvaluator.Evaluator;
+using TaskEvaluator.SonarQube.Scanner;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.SonarQube;
 
 public sealed class SonarQubeEvaluator(
     ILogger<SonarQubeEvaluator> logger,
-    SonarScannerApi sonarScanner,
+    ISonarScannerApiFactory sonarScannerApiFactory,
     SonarQubeApi sonarQube)
     : IStaticEvaluator {
     public async IAsyncEnumerable<IEvaluationResult> Evaluate(Code code, EvaluationModel evaluationModel, [EnumeratorCancellation] CancellationToken token = default) {
@@ -17,7 +18,8 @@ public sealed class SonarQubeEvaluator(
         }
 
         var userToken = await sonarQube.GetUserToken(projectKey, token);
-        if (!await sonarScanner.Run(code, sonarQube.Url, userToken, projectKey, token)) yield break;
+        var sonarScannerApi = sonarScannerApiFactory.Create(code.Language);
+        if (!await sonarScannerApi.Run(code, sonarQube.Url, userToken, projectKey, token)) yield break;
 
         await foreach (var result in sonarQube.SearchIssues(projectKey, token)) {
             yield return result;

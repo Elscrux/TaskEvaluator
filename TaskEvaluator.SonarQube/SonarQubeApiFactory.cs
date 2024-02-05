@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 namespace TaskEvaluator.SonarQube;
 
-public sealed class SonarCubeApiFactory(ILogger<SonarCubeApiFactory> logger, IHttpClientFactory httpClientFactory) {
+public sealed class SonarQubeApiFactory(ILogger<SonarQubeApiFactory> logger, IHttpClientFactory httpClientFactory) {
     public async Task<SonarQubeApi?> Create(string url, string username, string password) {
         var httpClient = httpClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri(url);

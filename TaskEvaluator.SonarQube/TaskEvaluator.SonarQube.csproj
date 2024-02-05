@@ -17,6 +17,12 @@
       <ProjectReference Include="..\TaskEvaluator\TaskEvaluator.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="Scanner\SonarScannerApiFactory.cs">
+        <DependentUpon>ISonarScannerApiFactory.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
     <PropertyGroup>
         <PackToLanguagesRan>false</PackToLanguagesRan>
     </PropertyGroup>
