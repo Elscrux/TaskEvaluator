@@ -72,9 +72,3 @@ public sealed class DockerRuntime : IRuntime {
 
     public void Dispose() => _dockerHost.Dispose();
 }
-
-public sealed class DockerRuntimeOptions {
-    public required Code Context { get; init; }
-    public required string DockerImageName { get; init; }
-    public required string ProjectFolder { get; init; }
-}

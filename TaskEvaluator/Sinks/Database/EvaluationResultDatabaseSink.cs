@@ -1,11 +1,14 @@
 using LinqToDB;
 using LinqToDB.Data;
+using Microsoft.Extensions.Options;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Evaluator.UnitTest;
 using TaskEvaluator.Sinks.Database.DataModel;
 namespace TaskEvaluator.Sinks.Database;
 
-public sealed record EvaluationResultDatabaseSinkConfiguration(string ConnectionString);
+public sealed record EvaluationResultDatabaseSinkConfiguration {
+    public required string ConnectionString { get; init; }
+}
 
 public sealed class EvaluationResultDatabase(string connectionString) : DataConnection(options => options.UsePostgreSQL(connectionString)) {
     public ITable<StaticCodeEvaluationResult> StaticCodeResults => this.GetOrCreateTable<StaticCodeEvaluationResult>();
@@ -26,9 +29,9 @@ public static class DataContextExtensions {
     }
 }
 
-public sealed class EvaluationResultDatabaseSink(EvaluationResultDatabaseSinkConfiguration config) : IEvaluationResultSink {
+public sealed class EvaluationResultDatabaseSink(IOptions<EvaluationResultDatabaseSinkConfiguration> config) : IEvaluationResultSink {
     public void Send(IEvaluationResult evaluationResult) {
-        using var db = new EvaluationResultDatabase(config.ConnectionString);
+        using var db = new EvaluationResultDatabase(config.Value.ConnectionString);
         switch (evaluationResult) {
             case StaticCodeEvaluationResult result:
                 db.StaticCodeResults.Insert(() => result);

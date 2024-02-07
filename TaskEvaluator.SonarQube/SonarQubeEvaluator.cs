@@ -25,7 +25,7 @@ public sealed class SonarQubeEvaluator(
         var userToken = await sonarQube.GetUserToken(projectKey, token);
         var sonarScannerApi = sonarScannerApiFactory.Create(code.Language);
 
-        var languageSpecification = languageFactory.GetLanguageSpecification(code.Language);
+        var languageSpecification = languageFactory.GetLanguageService(code.Language);
         languageSpecification.CreateWorkingDirectory(WorkingDirectory, code);
         if (!await sonarScannerApi.Run(WorkingDirectory, code, sonarQube.Url, userToken, projectKey, token)) yield break;
 

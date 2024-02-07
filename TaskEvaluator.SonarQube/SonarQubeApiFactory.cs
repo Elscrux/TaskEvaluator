@@ -2,11 +2,11 @@ using Microsoft.Extensions.Logging;
 namespace TaskEvaluator.SonarQube;
 
 public sealed class SonarQubeApiFactory(ILogger<SonarQubeApiFactory> logger, IHttpClientFactory httpClientFactory) {
-    public async Task<SonarQubeApi?> Create(string url, string username, string password) {
+    public async Task<SonarQubeApi?> Create(SonarQubeConfiguration configuration) {
         var httpClient = httpClientFactory.CreateClient();
-        httpClient.BaseAddress = new Uri(url);
-        if (!await Login(httpClient, username, password)) {
-            logger.LogError("Failed to login to SonarQube instance {Url}", url); 
+        httpClient.BaseAddress = new Uri(configuration.Url);
+        if (!await Login(httpClient, configuration.User, configuration.Password)) {
+            logger.LogError("Failed to login to SonarQube instance {Url}", configuration.Url); 
             return null;
         }
 

@@ -1,13 +1,14 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Options;
 using Noggog;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Generation.GitHubCopilot;
 
 public sealed class GitHubCopilotModelApi(
     IHttpClientFactory httpClientFactory,
-    GitHubCopilotConfiguration config,
+    IOptions<GitHubCopilotConfiguration> config,
     GitHubCopilotTokenProvider tokenProvider,
     GitHubCopilotPromptGenerator promptGenerator)
     : ICodeGenerator {
@@ -17,13 +18,13 @@ public sealed class GitHubCopilotModelApi(
 
         var authToken = await tokenProvider.GetAuthToken(token);
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, config.CompletionsUrl);
-        requestMessage.Headers.UserAgent.Add(new ProductInfoHeaderValue(config.UserAgent, config.UserAgentVersion));
+        var requestMessage = new HttpRequestMessage(HttpMethod.Post, config.Value.CompletionsUrl);
+        requestMessage.Headers.UserAgent.Add(new ProductInfoHeaderValue(config.Value.UserAgent, config.Value.UserAgentVersion));
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
-        requestMessage.Headers.Add("Editor-Version", config.EditorVersion);
-        requestMessage.Headers.Add("Editor-Plugin-Version", config.EditorPluginVersion);
-        requestMessage.Headers.Add("Openai-Organization", config.OpenaiOrganization);
-        requestMessage.Headers.Add("Openai-Intent", config.OpenaiIntent);
+        requestMessage.Headers.Add("Editor-Version", config.Value.EditorVersion);
+        requestMessage.Headers.Add("Editor-Plugin-Version", config.Value.EditorPluginVersion);
+        requestMessage.Headers.Add("Openai-Organization", config.Value.OpenaiOrganization);
+        requestMessage.Headers.Add("Openai-Intent", config.Value.OpenaiIntent);
 
         var gitHubCopilotApiRequest = promptGenerator.GeneratePrompt(task);
         var serialize = JsonSerializer.Serialize(gitHubCopilotApiRequest);

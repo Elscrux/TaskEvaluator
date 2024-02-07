@@ -1,11 +1,12 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Options;
 namespace TaskEvaluator.Generation.GitHubCopilot;
 
 public sealed class GitHubCopilotTokenProvider(
     IHttpClientFactory httpClientFactory,
-    GitHubCopilotConfiguration config) {
+    IOptions<GitHubCopilotConfiguration> config) {
 
     private DateTime _expirationTime = DateTime.MinValue;
     private string _token = string.Empty;
@@ -18,11 +19,11 @@ public sealed class GitHubCopilotTokenProvider(
 
     private async Task<string> GetNewToken(CancellationToken token = default) {
         using var httpClient = httpClientFactory.CreateClient();
-        var request = new HttpRequestMessage(HttpMethod.Get, config.TokenUrl);
-        request.Headers.UserAgent.Add(new ProductInfoHeaderValue(config.UserAgent, config.UserAgentVersion));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", config.BearerToken);
-        request.Headers.Add("Editor-Version", config.EditorVersion);
-        request.Headers.Add("Editor-Plugin-Version", config.EditorPluginVersion);
+        var request = new HttpRequestMessage(HttpMethod.Get, config.Value.TokenUrl);
+        request.Headers.UserAgent.Add(new ProductInfoHeaderValue(config.Value.UserAgent, config.Value.UserAgentVersion));
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", config.Value.BearerToken);
+        request.Headers.Add("Editor-Version", config.Value.EditorVersion);
+        request.Headers.Add("Editor-Plugin-Version", config.Value.EditorPluginVersion);
         var response = await httpClient.SendAsync(request, token).ConfigureAwait(true);
         if (!response.IsSuccessStatusCode) {
             throw new HttpRequestException("Could not send request to get GitHub Copilot token.");

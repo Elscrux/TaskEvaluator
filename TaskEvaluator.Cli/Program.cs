@@ -13,9 +13,9 @@ builder.Services.AddHttpClient();
 
 builder.Configuration.AddUserSecrets<TaskRunner>();
 
-builder.Services.AddTaskEvaluator();
+builder.Services.AddTaskEvaluator(builder.Configuration);
 builder.Services.AddCSharp();
-builder.Services.AddSonarQube();
+builder.Services.AddSonarQube(builder.Configuration);
 
 builder.Services.AddTransient<IHostedService, BatchRunner>();
 

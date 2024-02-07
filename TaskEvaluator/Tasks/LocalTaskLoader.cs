@@ -1,17 +1,18 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Language;
 namespace TaskEvaluator.Tasks;
 
-public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, TaskLoadConfiguration config) : ITaskLoader {
+public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, IOptions<TaskLoadConfiguration> config) : ITaskLoader {
 
     private const string CodeMarker = "INSERT_CODE_HERE";
 
     public IEnumerable<TaskSet> Load() {
-        foreach (var languageDirectory in Directory.EnumerateDirectories(config.DirectoryPath)) {
+        foreach (var languageDirectory in Directory.EnumerateDirectories(config.Value.DirectoryPath)) {
             var languageFolder = Path.GetFileName(languageDirectory);
             if (!Enum.TryParse<ProgrammingLanguage>(languageFolder, out var language)) {
                 logger.LogWarning("Invalid Language {LanguageFolder}", languageFolder);
