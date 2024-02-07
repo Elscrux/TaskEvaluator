@@ -1,21 +1,18 @@
 using System.Diagnostics;
 using System.IO.Compression;
 using Microsoft.Extensions.Logging;
-using TaskEvaluator.Runtime;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.SonarQube.Scanner;
 
 public sealed class BatchSonarScannerApi(
     IHttpClientFactory httpClientFactory,
-    ILogger<BatchSonarScannerApi> logger,
-    ILanguageSpecification languageSpecification)
+    ILogger<BatchSonarScannerApi> logger)
     : ISonarScannerApi {
 
     private static readonly string OsTag = OperatingSystem.IsWindows() ? "windows" : "linux";
     private static readonly string DownloadUrl = $"https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-{OsTag}.zip";
     private const string DownloadPath = "sonar-scanner.zip";
     private const string ExtractPath = "sonar-scanner";
-    private static readonly string WorkingDirectory = Path.Combine("sonar-qube");
     private static readonly string BatPath = Path.Combine(ExtractPath, $"sonar-scanner-5.0.1.3006-{OsTag}", "bin", "sonar-scanner.bat");
 
     private async Task<bool> Install() {
@@ -32,7 +29,7 @@ public sealed class BatchSonarScannerApi(
         return true;
     }
 
-    public async Task<bool> Run(Code code, string url, string token, string projectKey, CancellationToken cancellationToken = default) {
+    public async Task<bool> Run(string workingDirectory, Code code, string url, string token, string projectKey, CancellationToken cancellationToken = default) {
         if (!await Install()) {
             logger.LogError("Failed to install sonar-scanner");
             return false;
@@ -42,10 +39,6 @@ public sealed class BatchSonarScannerApi(
             logger.LogError("Failed to find sonar-scanner at {BatPath}", BatPath);
             return false;
         }
-
-        var workingDirectory = Path.GetFullPath(WorkingDirectory);
-        Directory.CreateDirectory(workingDirectory);
-        await File.WriteAllTextAsync(Path.Combine(workingDirectory, languageSpecification.ProgramFileName), code.Body, cancellationToken);
 
         var process = Process.Start(
             new ProcessStartInfo(Path.GetFullPath(BatPath), [

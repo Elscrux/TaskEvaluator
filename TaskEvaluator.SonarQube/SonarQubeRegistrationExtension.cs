@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TaskEvaluator.Evaluator;
+using TaskEvaluator.Runtime;
 using TaskEvaluator.SonarQube.Scanner;
 namespace TaskEvaluator.SonarQube;
 
@@ -21,7 +22,8 @@ public static class SonarQubeRegistrationExtension {
             return new SonarQubeEvaluator(
                 provider.GetRequiredService<ILogger<SonarQubeEvaluator>>(),
                 provider.GetRequiredService<ISonarScannerApiFactory>(),
-                sonarQubeApi);
+                sonarQubeApi,
+                provider.GetRequiredService<LanguageFactory>());
         });
         services.AddTransient<Task<SonarQubeEvaluator?>>(async provider => {
             var sonarQubeApi = await GetSonarQubeApi(provider);
@@ -30,7 +32,8 @@ public static class SonarQubeRegistrationExtension {
             return new SonarQubeEvaluator(
                 provider.GetRequiredService<ILogger<SonarQubeEvaluator>>(),
                 provider.GetRequiredService<ISonarScannerApiFactory>(),
-                sonarQubeApi);
+                sonarQubeApi,
+                provider.GetRequiredService<LanguageFactory>());
         });
 
         return services;
