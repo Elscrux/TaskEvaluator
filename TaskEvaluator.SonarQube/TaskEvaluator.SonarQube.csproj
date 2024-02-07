@@ -4,17 +4,10 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <IsPackable>true</IsPackable>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
-      <PackageReference Include="TaskEvaluator" Version="1.0.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\TaskEvaluator\TaskEvaluator.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -23,18 +16,8 @@
       </Compile>
     </ItemGroup>
 
-    <PropertyGroup>
-        <PackToLanguagesRan>false</PackToLanguagesRan>
-    </PropertyGroup>
-
-    <Target Name="PackToLanguages" AfterTargets="AfterBuild" Condition="'$(PackToLanguagesRan)' == 'false'">
-        <!-- Clean up any previous packages, but delete if the folder exists -->
-        <Exec Command="powershell -Command &quot;ForEach ($dir in Get-ChildItem -Directory ../Languages) { $filePath = '../Languages/' + $dir + '/.nuget/' + 'TaskEvaluator.SonarQube' + '.' + '1.0.0' + '.nupkg'; if ((Test-Path ../Languages/$dir/.nuget) -and (Test-Path $filePath)) { Remove-Item -Path $filePath -Force } }&quot;"/>
-        <!-- Pack to the Languages folder -->
-        <Exec Command="powershell -Command &quot;ForEach ($dir in Get-ChildItem -Directory ../Languages) { dotnet pack -c Release -o ../Languages/$dir/.nuget }&quot;"/>
-        <PropertyGroup>
-            <PackToLanguagesRan>true</PackToLanguagesRan>
-        </PropertyGroup>
-    </Target>
+    <ItemGroup>
+      <ProjectReference Include="..\TaskEvaluator\TaskEvaluator.csproj" />
+    </ItemGroup>
 
 </Project>

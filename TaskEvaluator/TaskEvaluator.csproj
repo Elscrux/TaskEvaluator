@@ -8,8 +8,6 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <LangVersion>preview</LangVersion>
         <OutputType>Library</OutputType>
-        <IsPackable>true</IsPackable>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <UserSecretsId>b8c442bf-cab9-48fd-8f4e-4f474db131da</UserSecretsId>
     </PropertyGroup>
 
@@ -48,17 +46,4 @@
         </Compile>
     </ItemGroup>
 
-    <PropertyGroup>
-        <PackToLanguagesRan>false</PackToLanguagesRan>
-    </PropertyGroup>
-
-    <Target Name="PackToLanguages" AfterTargets="AfterBuild" Condition="'$(PackToLanguagesRan)' == 'false'">
-        <!-- Clean up any previous packages, but delete if the folder exists, include version in check for what to remove -->
-        <Exec Command="powershell -Command &quot;ForEach ($dir in Get-ChildItem -Directory ../Languages) { $filePath = '../Languages/' + $dir + '/.nuget/' + 'TaskEvaluator.SonarQube' + '.' + '1.0.0' + '.nupkg'; if ((Test-Path ../Languages/$dir/.nuget) -and (Test-Path $filePath)) { Remove-Item -Path $filePath -Force } }&quot;"/>
-        <!-- Pack to the Languages folder -->
-        <Exec Command="powershell -Command &quot;ForEach ($dir in Get-ChildItem -Directory ../Languages) { dotnet pack -c Release -o ../Languages/$dir/.nuget }&quot;"/>
-        <PropertyGroup>
-            <PackToLanguagesRan>true</PackToLanguagesRan>
-        </PropertyGroup>
-    </Target>
 </Project>

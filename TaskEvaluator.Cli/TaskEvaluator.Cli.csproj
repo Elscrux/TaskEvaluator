@@ -10,12 +10,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     </ItemGroup>
 
@@ -26,19 +20,19 @@
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <ItemGroup>
-            <!-- Include all files in the Languages folder and its subdirectories -->
-            <LanguageFiles Include="$(SolutionDir)Languages\**\*.*" />
+            <!-- Include all files in the solution folder excluding the build files -->
+            <SolutionFiles Include="$(SolutionDir)\**\*.*" Exclude="$(SolutionDir)\**\obj\**;$(SolutionDir)\**\bin\**" />
         </ItemGroup>
 
         <!-- Create the destination directory if it doesn't exist -->
-        <MakeDir Directories="$(OutDir)\Languages" />
+        <MakeDir Directories="$(OutDir)" />
 
         <!-- Delete all files in the destination directory -->
-        <Delete Files="$(OutDir)\Languages\**\*.*" />
+        <Delete Files="$(OutDir)\**\*.*" />
 
         <!-- Copy the files to the output directory while preserving the directory structure -->
-        <Copy SourceFiles="@(LanguageFiles)"
-              DestinationFiles="@(LanguageFiles->'$(OutDir)\Languages\%(RecursiveDir)%(Filename)%(Extension)')" />
+        <Copy SourceFiles="@(SolutionFiles)"
+              DestinationFiles="@(SolutionFiles->'$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
     </Target>
 
 </Project>

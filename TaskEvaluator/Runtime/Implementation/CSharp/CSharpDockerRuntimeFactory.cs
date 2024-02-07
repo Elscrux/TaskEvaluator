@@ -6,7 +6,8 @@ public sealed class CSharpDockerRuntimeFactory(DockerRuntimeFactory dockerRuntim
         var dockerRuntimeOptions = new DockerRuntimeOptions {
             Context = code,
             DockerImageName = "task-evaluator/csharp",
-            ProjectFolder = Path.Combine(AppContext.BaseDirectory, "Languages", "TaskEvaluator.Language.CSharp")
+            DockerfilePath = Path.Combine(AppContext.BaseDirectory, "Languages", "TaskEvaluator.Language.CSharp", "Dockerfile"),
+            WorkingFolder = Path.Combine(AppContext.BaseDirectory)
         };
 
         return dockerRuntimeFactory.Create(dockerRuntimeOptions, token);

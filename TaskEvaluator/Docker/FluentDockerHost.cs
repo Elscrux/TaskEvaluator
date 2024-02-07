@@ -8,11 +8,11 @@ public sealed class FluentDockerHost(string hostname, int port) : IDockerHost {
     private readonly Uri _uri = new UriBuilder(System.Uri.UriSchemeHttp, hostname, port).Uri;
     public Uri Uri(string path) => new(_uri, path);
 
-    public Task StartContainer(string name, string projectFolder, string[] environmentVariables, CancellationToken token = default) {
+    public Task StartContainer(string name, string workingFolder, string dockerfilePath, string[] environmentVariables, CancellationToken token = default) {
         // Create image if necessary
         using var image = new Builder()
             .DefineImage(name).ReuseIfAlreadyExists()
-            .FromFile(Path.Combine(projectFolder, "Dockerfile")).WorkingFolder(projectFolder)
+            .FromFile(dockerfilePath).WorkingFolder(workingFolder)
             .ExposePorts(8080)
             .Build();
 
