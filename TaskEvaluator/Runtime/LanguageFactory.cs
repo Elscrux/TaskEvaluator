@@ -15,4 +15,11 @@ public sealed class LanguageFactory(IServiceProvider serviceProvider) {
     public Task<IRuntime> CreateRuntime(Code code, CancellationToken token = default) {
         return CreateRuntimeFactory(code.Language).Create(code, token);
     }
+
+    public ILanguageService GetLanguageSpecification(ProgrammingLanguage language) {
+        var languageSpecification = serviceProvider.GetKeyedService<ILanguageService>(language);
+        if (languageSpecification is null) throw new LanguageNotSupportedException(language);
+
+        return languageSpecification;
+    }
 }
