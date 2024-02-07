@@ -9,5 +9,5 @@ public interface ILanguageService {
     string ProgramFileName => $"Program{FileExtension}";
 
     void CreateWorkingDirectory(string workingDirectory, Code code);
-    void CreateTestDirectory(string testDirectory, Code code);
+    void CreateTestDirectory(string testDirectory, Code code, Code testCode);
 }

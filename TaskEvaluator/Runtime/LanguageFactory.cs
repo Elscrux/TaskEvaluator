@@ -16,7 +16,7 @@ public sealed class LanguageFactory(IServiceProvider serviceProvider) {
         return CreateRuntimeFactory(code.Language).Create(code, token);
     }
 
-    public ILanguageService GetLanguageSpecification(ProgrammingLanguage language) {
+    public ILanguageService GetLanguageService(ProgrammingLanguage language) {
         var languageSpecification = serviceProvider.GetKeyedService<ILanguageService>(language);
         if (languageSpecification is null) throw new LanguageNotSupportedException(language);
 
