@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Specifications\TaskEvaluator.Specification.CSharp\TaskEvaluator.Specification.CSharp.csproj" />
       <ProjectReference Include="..\TaskEvaluator\TaskEvaluator.csproj" />
       <ProjectReference Include="..\TaskEvaluator.SonarQube\TaskEvaluator.SonarQube.csproj" />
     </ItemGroup>

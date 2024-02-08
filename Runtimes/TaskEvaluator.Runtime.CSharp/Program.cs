@@ -2,12 +2,13 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
+using Microsoft.Extensions.Options;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Evaluator.UnitTest;
 using TaskEvaluator.Modules;
 using TaskEvaluator.Runtime;
-using TaskEvaluator.Runtime.Implementation.CSharp;
 using TaskEvaluator.SonarQube;
+using TaskEvaluator.Specification.CSharp;
 using TaskEvaluator.Tasks;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 namespace TaskEvaluator.Language.CSharp;
@@ -38,8 +39,10 @@ public static class Program {
         builder.Services.AddHealthChecks();
 
         builder.Services.AddTaskEvaluator(builder.Configuration);
-        builder.Services.AddCSharp();
+        builder.Services.AddLanguage<CSharpRegistration>();
         builder.Services.AddSonarQube(builder.Configuration);
+
+        builder.Services.Configure<SonarQubeConfiguration>(builder.Configuration.GetSection("SONARQUBE"));
 
         builder.Configuration.AddUserSecrets<TaskRunner>();
 
@@ -66,6 +69,16 @@ public static class Program {
         app.Run();
 
         async IAsyncEnumerable<IEvaluationResult> RunSonarQube(HttpContext c, [EnumeratorCancellation] CancellationToken token = default) {
+            var sonarqube = Environment.GetEnvironmentVariable("SONARQUBE")
+             ?? throw new InvalidOperationException("SONARQUBE environment variable not set");
+            var config = JsonSerializer.Deserialize<SonarQubeConfiguration>(sonarqube) ?? throw new InvalidOperationException($"Failed to deserialize SONARQUBE environment variable {sonarqube}");
+            Console.WriteLine(config);
+
+            var service = c.RequestServices.GetService<IOptions<SonarQubeConfiguration>>();
+            var sonarQubeConfiguration = service.Value;
+            Console.WriteLine(sonarQubeConfiguration);
+
+
             Console.WriteLine("Got SonarQube");
             var evaluatorFactory = c.RequestServices.GetRequiredService<Task<SonarQubeEvaluator?>>();
             var evaluator = await evaluatorFactory;
