@@ -19,6 +19,10 @@
       <ProjectReference Include="..\TaskEvaluator\TaskEvaluator.csproj" />
     </ItemGroup>
 
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+        <Exec Command="rmdir /s /q $(OutputPath)" />
+    </Target>
+
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <ItemGroup>
             <!-- Include all files in the solution folder excluding the build files -->
