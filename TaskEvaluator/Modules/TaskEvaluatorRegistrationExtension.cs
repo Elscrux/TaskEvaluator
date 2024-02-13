@@ -17,13 +17,13 @@ public static class TaskEvaluatorRegistrationExtension {
         services.AddTransient<ICodeGenerationProvider, InjectedCodeGenerationProvider>();
 
         // GitHub Copilot
-        services.Configure<IOptions<GitHubCopilotConfiguration>>(configuration.GetSection("GitHubCopilot"));
+        services.Configure<GitHubCopilotConfiguration>(configuration.GetSection("GitHubCopilot"));
         services.AddTransient<ICodeGenerator, GitHubCopilotModelApi>();
         services.AddSingleton<GitHubCopilotTokenProvider>();
         services.AddSingleton<GitHubCopilotPromptGenerator>();
 
         // Task
-        services.Configure<IOptions<TaskLoadConfiguration>>(configuration.GetSection("TaskSet"));
+        services.Configure<TaskLoadConfiguration>(configuration.GetSection("TaskSet"));
         services.AddTransient<TaskRunner>();
         services.AddTransient<ITaskLoader, LocalTaskLoader>();
 
@@ -39,7 +39,7 @@ public static class TaskEvaluatorRegistrationExtension {
         services.AddSingleton<DockerRuntimeFactory>();
 
         // Sink
-        services.Configure<IOptions<EvaluationResultDatabaseSinkConfiguration>>(configuration.GetSection("Database"));
+        services.Configure<EvaluationResultDatabaseSinkConfiguration>(configuration.GetSection("Database"));
         services.AddSingleton<IEvaluationResultSink, EvaluationResultDatabaseSink>();
 
         return services;
