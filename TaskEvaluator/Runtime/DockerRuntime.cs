@@ -9,12 +9,13 @@ namespace TaskEvaluator.Runtime;
 
 public sealed class DockerRuntime : IRuntime {
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly DockerRuntimeOptions _options;
     private readonly ILogger<DockerRuntime> _logger;
     private readonly IDockerHost _dockerHost;
 
     private volatile bool _initialized;
 
-    public Code Context { get; }
+    public Code Context => _options.Context;
 
     public DockerRuntime(
         ILogger<DockerRuntime> logger,
@@ -22,21 +23,30 @@ public sealed class DockerRuntime : IRuntime {
         DockerHostFactory dockerHostFactory,
         DockerRuntimeOptions options) {
         _httpClientFactory = httpClientFactory;
+        _options = options;
         _logger = logger;
-        Context = options.Context;
         _dockerHost = dockerHostFactory.Create();
-        _dockerHost.StartContainer(options.DockerImageName, options.ProjectFolder, new[] {
-                "\"CODE=" + JsonSerializer.Serialize(Context).Replace("\"", "\\\"") + "\""
-            })
+        _dockerHost.StartContainer(
+                options.DockerImageName,
+                options.WorkingFolder,
+                options.DockerfilePath,
+                [
+                    $"\"CODE={JsonSerializer.Serialize(Context).Replace("\"", "\\\"")}\"",
+                    ..options.EnvironmentVariables
+                ])
             .ContinueWith(_ => _initialized = true);
     }
 
     public Task<UnitTestRuntimeResult> UnitTest(Code unitTest, CancellationToken token = default) {
-        return CallEndpoint("unit-test", unitTest, message => new UnitTestRuntimeResult(false, message), token);
+        if (_options.UnitTestEndpoint is null) return Task.FromResult(new UnitTestRuntimeResult(false, "Unit test endpoint is not configured"));
+
+        return CallEndpoint(_options.UnitTestEndpoint, unitTest, message => new UnitTestRuntimeResult(false, message), token);
     }
 
     public Task<StaticCodeEvaluationResult> StaticCodeQualityAnalysis(CancellationToken token = default) {
-        return CallEndpoint<string, StaticCodeEvaluationResult>("sonar-qube", null, _ => StaticCodeEvaluationResult.Failure, token);
+        if (_options.StaticCodeQualityAnalysisEndpoint is null) return Task.FromResult(StaticCodeEvaluationResult.Failure);
+
+        return CallEndpoint<string, StaticCodeEvaluationResult>(_options.StaticCodeQualityAnalysisEndpoint, null, _ => StaticCodeEvaluationResult.Failure, token);
     }
 
     private async Task<TOutput> CallEndpoint<TInput, TOutput>(string endpoint, TInput? input, Func<string, TOutput> errorOutputFactory, CancellationToken token = default) {
