@@ -4,16 +4,21 @@ using TaskEvaluator.Tasks;
 namespace TaskEvaluator.SonarQube.Scanner;
 
 public sealed class DotNetSonarScannerApi(ILogger<DotNetSonarScannerApi> logger) : ISonarScannerApi {
+    public ProcessStartInfo GetShell(string command) => OperatingSystem.IsWindows()
+        ? new ProcessStartInfo("cmd", $"/c {command}")
+        : new ProcessStartInfo("/bin/bash", $"-c \"{command}\"");
+
     private async Task<bool> Install() {
         const string tool = "dotnet tool install --global dotnet-sonarscanner";
 
-        var process = Process.Start(
-            new ProcessStartInfo("cmd", $"/c {tool}") {
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-            }
-        );
+        var shell = GetShell(tool);
+        Console.WriteLine("Start using " + shell.FileName + " | " + shell.Arguments);
+
+        shell.RedirectStandardOutput = true;
+        shell.RedirectStandardError = true;
+        shell.UseShellExecute = false;
+
+        var process = Process.Start(shell);
 
         if (process == null) {
             logger.LogError("Failed to start dotnet-sonarscanner installation");
@@ -41,7 +46,7 @@ public sealed class DotNetSonarScannerApi(ILogger<DotNetSonarScannerApi> logger)
     }
 
     public async Task<bool> Run(string workingDirectory, Code code, string url, string token, string projectKey, CancellationToken cancellationToken = default) {
-        if (workingDirectory.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Any(dir => dir == "bin")) {
+        if (Array.Exists(workingDirectory.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), dir => dir == "bin")) {
             logger.LogError("Working directory {Directory} cannot be in bin directory as sonar-scanner ignores this", workingDirectory);
             return false;
         }
@@ -55,15 +60,14 @@ public sealed class DotNetSonarScannerApi(ILogger<DotNetSonarScannerApi> logger)
         const string build = "dotnet build";
         var final = $"dotnet sonarscanner end /d:sonar.token=\"{token}\"";
 
-        var process = Process.Start(
-            new ProcessStartInfo("cmd", $"/c {start} && {build} && {final}") {
-                WorkingDirectory = workingDirectory,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-            }
-        );
+        var shell = GetShell($"{start} && {build} && {final}");
 
+        shell.WorkingDirectory = workingDirectory;
+        shell.RedirectStandardOutput = true;
+        shell.RedirectStandardError = true;
+        shell.UseShellExecute = false;
+
+        var process = Process.Start(shell);
         if (process == null) {
             logger.LogError("Failed to start sonar-scanner");
             return false;

@@ -4,6 +4,7 @@ using TaskEvaluator.Api.Requests;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Modules;
+using TaskEvaluator.SonarQube;
 using TaskEvaluator.Specification.CSharp;
 using TaskEvaluator.Tasks;
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,7 @@ builder.Services.AddHealthChecks();
 builder.Configuration.AddUserSecrets<TaskRunner>();
 
 builder.Services.AddTaskEvaluator(builder.Configuration);
+builder.Services.AddSonarQube(builder.Configuration);
 builder.Services.AddLanguage<CSharpRegistration>();
 
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));

@@ -21,8 +21,9 @@ public sealed class CSharpDockerRuntimeFactory(
             UnitTestEndpoint = "unit-test",
             StaticCodeQualityAnalysisEndpoint = "sonar-qube",
             EnvironmentVariables = [
-                $"\"SONARQUBE={JsonSerializer.Serialize(sonarQubeConfig.Value).Replace("\"", "\\\"")}\""
+                $"\"SONARQUBE={JsonSerializer.Serialize(sonarQubeConfig.Value).Replace("\"", "\\\"")}\"",
             ],
+            Networks = [ "sonarqube-net" ]
         };
 
         return dockerRuntimeFactory.Create(dockerRuntimeOptions, token);

@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using Microsoft.Extensions.Options;
 using TaskEvaluator.Evaluator;
+using TaskEvaluator.Evaluator.StaticCodeAnalysis;
 using TaskEvaluator.Evaluator.UnitTest;
 using TaskEvaluator.Modules;
 using TaskEvaluator.Runtime;
@@ -19,7 +19,12 @@ public static class Program {
 
     public static Code Code = null!;
 
-    private static void InitTemplateDirectory() {
+    private static void SetupEnvironmentVariables() {
+        var path = Environment.GetEnvironmentVariable("PATH");
+        Environment.SetEnvironmentVariable("PATH", path + ":/root/.dotnet/tools");
+    }
+
+    private static void SetupCode() {
         // input code ist stored in env variable CODE
         var code = Environment.GetEnvironmentVariable("CODE")
          ?? throw new InvalidOperationException("CODE environment variable not set");
@@ -27,7 +32,8 @@ public static class Program {
     }
 
     public static void Main(string[] args) {
-        InitTemplateDirectory();
+        SetupEnvironmentVariables();
+        SetupCode();
 
         var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -42,9 +48,10 @@ public static class Program {
         builder.Services.AddLanguage<CSharpRegistration>();
         builder.Services.AddSonarQube(builder.Configuration);
 
-        builder.Services.Configure<SonarQubeConfiguration>(builder.Configuration.GetSection("SONARQUBE"));
-
-        builder.Configuration.AddUserSecrets<TaskRunner>();
+        // Manually add SonarQubeConfiguration because for some reason it doesn't work with services.Configure<>
+        var sonarQubeValue = builder.Configuration.GetSection("SONARQUBE").Value ?? throw new InvalidOperationException("Failed to get SONARQUBE configuration from environment variable");
+        var sonarQubeConfig = JsonSerializer.Deserialize<SonarQubeConfiguration>(sonarQubeValue) ?? throw new InvalidOperationException($"Failed to deserialize SONARQUBE environment variable {sonarQubeValue}");
+        builder.Services.AddSingleton<IOptions<SonarQubeConfiguration>>(new OptionsWrapper<SonarQubeConfiguration>(sonarQubeConfig));
 
         var app = builder.Build();
 
@@ -68,27 +75,19 @@ public static class Program {
 
         app.Run();
 
-        async IAsyncEnumerable<IEvaluationResult> RunSonarQube(HttpContext c, [EnumeratorCancellation] CancellationToken token = default) {
-            var sonarqube = Environment.GetEnvironmentVariable("SONARQUBE")
-             ?? throw new InvalidOperationException("SONARQUBE environment variable not set");
-            var config = JsonSerializer.Deserialize<SonarQubeConfiguration>(sonarqube) ?? throw new InvalidOperationException($"Failed to deserialize SONARQUBE environment variable {sonarqube}");
-            Console.WriteLine(config);
-
-            var service = c.RequestServices.GetService<IOptions<SonarQubeConfiguration>>();
-            var sonarQubeConfiguration = service.Value;
-            Console.WriteLine(sonarQubeConfiguration);
-
-
-            Console.WriteLine("Got SonarQube");
+        async Task<IRuntimeResult> RunSonarQube(HttpContext c, CancellationToken token = default) {
             var evaluatorFactory = c.RequestServices.GetRequiredService<Task<SonarQubeEvaluator?>>();
             var evaluator = await evaluatorFactory;
             if (evaluator == null) {
                 throw new InvalidOperationException("Failed to get SonarQubeEvaluator");
             }
 
-            await foreach (var evaluationResult in evaluator.Evaluate(Code, new EvaluationModel(), token)) {
-                yield return evaluationResult;
+            var evaluationResult = await evaluator.Evaluate(Code, new EvaluationModel(), token);
+            if (evaluationResult is StaticCodeEvaluationResult result) {
+                return new StaticCodeRuntimeResult(result);
             }
+
+            throw new InvalidOperationException($"Unexpected evaluation result type {evaluationResult.GetType()}");
         }
 
         IRuntimeResult StartUnitTest(HttpContext c, Code unitTest) {

@@ -12,7 +12,7 @@ public static class SonarQubeRegistrationExtension {
         // Sonar Scanner
         services.AddTransient<ISonarScannerApiFactory, SonarScannerApiFactory>();
         services.AddTransient<BatchSonarScannerApi>();
-        services.AddTransient<DotNetSonarScannerApi>(); 
+        services.AddTransient<DotNetSonarScannerApi>();
 
         // Sonar Qube
         services.Configure<SonarQubeConfiguration>(configuration.GetSection("SonarQube"));
@@ -42,7 +42,6 @@ public static class SonarQubeRegistrationExtension {
 
         Task<SonarQubeApi?> GetSonarQubeApi(IServiceProvider provider) {
             var sonarQubeOptions = provider.GetRequiredService<IOptions<SonarQubeConfiguration>>().Value;
-            Console.WriteLine(sonarQubeOptions);
             return provider.GetRequiredService<SonarQubeApiFactory>().Create(sonarQubeOptions);
         }
     }

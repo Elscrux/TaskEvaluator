@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using TaskEvaluator.Docker;
-using TaskEvaluator.Evaluator;
+using TaskEvaluator.Evaluator.StaticCodeAnalysis;
 using TaskEvaluator.Evaluator.UnitTest;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Runtime;
@@ -27,13 +27,12 @@ public sealed class DockerRuntime : IRuntime {
         _logger = logger;
         _dockerHost = dockerHostFactory.Create();
         _dockerHost.StartContainer(
-                options.DockerImageName,
-                options.WorkingFolder,
-                options.DockerfilePath,
-                [
-                    $"\"CODE={JsonSerializer.Serialize(Context).Replace("\"", "\\\"")}\"",
-                    ..options.EnvironmentVariables
-                ])
+                options with {
+                    EnvironmentVariables = [
+                        $"\"CODE={JsonSerializer.Serialize(Context).Replace("\"", "\\\"")}\"",
+                        ..options.EnvironmentVariables
+                    ]
+                })
             .ContinueWith(_ => _initialized = true);
     }
 
@@ -43,10 +42,10 @@ public sealed class DockerRuntime : IRuntime {
         return CallEndpoint(_options.UnitTestEndpoint, unitTest, message => new UnitTestRuntimeResult(false, message), token);
     }
 
-    public Task<StaticCodeEvaluationResult> StaticCodeQualityAnalysis(CancellationToken token = default) {
-        if (_options.StaticCodeQualityAnalysisEndpoint is null) return Task.FromResult(StaticCodeEvaluationResult.Failure);
+    public Task<StaticCodeRuntimeResult> StaticCodeQualityAnalysis(CancellationToken token = default) {
+        if (_options.StaticCodeQualityAnalysisEndpoint is null) return Task.FromResult(new StaticCodeRuntimeResult(false, "Static code quality analysis endpoint is not configured"));
 
-        return CallEndpoint<string, StaticCodeEvaluationResult>(_options.StaticCodeQualityAnalysisEndpoint, null, _ => StaticCodeEvaluationResult.Failure, token);
+        return CallEndpoint<string, StaticCodeRuntimeResult>(_options.StaticCodeQualityAnalysisEndpoint, null, message => new StaticCodeRuntimeResult(false, message), token);
     }
 
     private async Task<TOutput> CallEndpoint<TInput, TOutput>(string endpoint, TInput? input, Func<string, TOutput> errorOutputFactory, CancellationToken token = default) {

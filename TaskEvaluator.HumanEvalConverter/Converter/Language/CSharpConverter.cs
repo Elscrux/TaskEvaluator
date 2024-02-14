@@ -103,7 +103,7 @@ public sealed partial class CSharpConverter : IHumanEvalConverter {
         return $$"""
                  namespace Task;
 
-                 public class TaskClass {
+                 public static class TaskClass {
                      /// <summary>
                      /// {{documentation}}
                      /// {{helperFunctions}}

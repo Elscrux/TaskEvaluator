@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using TaskEvaluator.Evaluator;
+using TaskEvaluator.Evaluator.StaticCodeAnalysis;
 namespace TaskEvaluator.SonarQube;
 
 public sealed class SonarQubeApi(HttpClient httpClient) {
@@ -19,7 +20,7 @@ public sealed class SonarQubeApi(HttpClient httpClient) {
         return response.IsSuccessStatusCode;
     }
 
-    public async IAsyncEnumerable<StaticCodeEvaluationResult> SearchIssues(string projectKey, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
+    public async IAsyncEnumerable<StaticCodeResult> SearchIssues(string projectKey, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
         var response = await httpClient
             .GetAsync($"/api/issues/search?components={projectKey}", cancellationToken)
             .ConfigureAwait(false);
@@ -43,12 +44,10 @@ public sealed class SonarQubeApi(HttpClient httpClient) {
                 "BLOCKER" => Severity.High,
                 "CRITICAL" => Severity.High,
                 "INFO" => Severity.Low,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new InvalidOperationException()
             };
 
-            yield return new StaticCodeEvaluationResult(
-                Guid.NewGuid(),
-                true,
+            yield return new StaticCodeResult(
                 issue.Message,
                 severity,
                 issue.Impacts[0].SoftwareQuality,

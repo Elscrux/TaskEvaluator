@@ -49,7 +49,8 @@ In any case, you'll first have to
     ```
 - Start SonarQube Container
     ```bash
-    docker run -d --name sonarqube -p 9000:9000 sonarqube
+    docker network create sonarqube-net
+    docker run -d --name sonarqube -p 9000:9000 --net sonarqube-net sonarqube
     ```
     - Open [localhost:9000](http://localhost:9000)
         - Optionally set custom Environment Variable SONARQUBE_URL
@@ -60,7 +61,7 @@ In any case, you'll first have to
 ```json
 {
     "SonarQube": {
-        "Url": "http://localhost:9000",
+        "Url": "http://sonarqube:9000",
         "User": "admin",
         "Password": "YOUR_NEW_PASSWORD"
     }

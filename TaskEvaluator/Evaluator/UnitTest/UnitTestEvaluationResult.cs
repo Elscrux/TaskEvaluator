@@ -1,6 +1,6 @@
 ﻿namespace TaskEvaluator.Evaluator.UnitTest;
 
-public sealed record UnitTestEvaluationResult(Guid TaskId, bool Success, string? Context, IList<UnitTestResult> Results) : IEvaluationResult {
+public sealed record UnitTestEvaluationResult(Guid TaskId, bool Success, string? Context, IReadOnlyList<UnitTestResult> Results) : IEvaluationResult {
     public UnitTestEvaluationResult(Guid taskId, bool success, string? context) : this(
         taskId,
         success,

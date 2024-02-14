@@ -26,7 +26,7 @@ public sealed class ExampleSharpFilter : ISchemaFilter {
             nameof(CodeGenerationTask.Prefix) => new OpenApiString("""
                                                                    namespace Task;
 
-                                                                   public class TaskClass {
+                                                                   public static class TaskClass {
                                                                        /// method that calculates the weekday of a given date
                                                                        public static int GetWeekday(int year, int month, int day) {
                                                                    """),

@@ -22,4 +22,12 @@ RUN dotnet publish "TaskEvaluator.Runtime.CSharp.csproj" -c $BUILD_CONFIGURATION
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Append :/root/.dotnet/tools to the PATH environment variable to install the dotnet sonar-scanner tool
+ENV PATH="${PATH}:/root/.dotnet/tools"
+# Install java to be able to run the sonar-scanner
+RUN apt update && \
+    apt install default-jre -y 
+ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64
+
 ENTRYPOINT ["dotnet", "TaskEvaluator.Runtime.CSharp.dll"]

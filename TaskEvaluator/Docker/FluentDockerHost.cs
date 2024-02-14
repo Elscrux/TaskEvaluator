@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Ductus.FluentDocker.Builders;
 using Noggog;
+using TaskEvaluator.Runtime;
 namespace TaskEvaluator.Docker;
 
 public sealed class FluentDockerHost(string hostname, int port) : IDockerHost {
@@ -8,18 +9,20 @@ public sealed class FluentDockerHost(string hostname, int port) : IDockerHost {
     private readonly Uri _uri = new UriBuilder(System.Uri.UriSchemeHttp, hostname, port).Uri;
     public Uri Uri(string path) => new(_uri, path);
 
-    public Task StartContainer(string name, string workingFolder, string dockerfilePath, string[] environmentVariables, CancellationToken token = default) {
+    public Task StartContainer(DockerRuntimeOptions options, CancellationToken token = default) {
         // Create image if necessary
         using var image = new Builder()
-            .DefineImage(name).ReuseIfAlreadyExists()
-            .FromFile(dockerfilePath).WorkingFolder(workingFolder)
+            .DefineImage(options.DockerImageName).ReuseIfAlreadyExists()
+            .FromFile(options.DockerfilePath).WorkingFolder(options.WorkingFolder)
             .ExposePorts(8080)
             .Build();
 
         // Create container
         new Builder()
             .UseContainer()
-            .UseImage(name).WithEnvironment(environmentVariables)
+            .UseImage(options.DockerImageName)
+            .WithEnvironment(options.EnvironmentVariables)
+            .UseNetwork(options.Networks)
             .ExposePort(port, 8080)
             .WaitForHttp(Uri("health").ToString(), continuation: (r, c) => {
                 return c switch {
