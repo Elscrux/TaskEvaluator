@@ -1,0 +1,31 @@
+﻿services:
+    sonarqube:
+        image: sonarqube:latest
+        ports:
+            - 9000:9000
+        networks:
+            - sonarqube-net
+    db:
+        image: postgres:latest
+        ports:
+            - 5432:5432
+        environment:
+            POSTGRES_USER: postgres_user
+            POSTGRES_PASSWORD: postgres_password
+        secrets:
+            - postgres_user
+            - postgres_password
+    grafana:
+        image: grafana/grafana:latest
+        ports:
+            - 3000:3000
+
+networks:
+    sonarqube-net:
+        driver: bridge
+
+secrets:
+    postgres_user:
+        file: ./secrets/postgres_user.txt
+    postgres_password:
+        file: ./secrets/postgres_password.txt

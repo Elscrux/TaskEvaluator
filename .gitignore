@@ -9,3 +9,4 @@ riderModule.iml
 /_ReSharper.Caches/
 *.user
 .nuget/
+secrets/
