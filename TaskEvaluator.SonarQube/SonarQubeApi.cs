@@ -1,6 +1,5 @@
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
-using TaskEvaluator.Evaluator;
 using TaskEvaluator.Evaluator.StaticCodeAnalysis;
 namespace TaskEvaluator.SonarQube;
 

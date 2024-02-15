@@ -6,7 +6,7 @@ In total, there are 4 major components to achieve this:
 - Code Generator
 - Code Evaluator
 - Database & Data Visualization
-- Interface (Web Api, Cli or UI)
+- Interface (Web Api or Cli)
 
 ## Setup
 
@@ -54,16 +54,13 @@ In any case, you'll first have to
     ```
     - Open [localhost:9000](http://localhost:9000)
         - Optionally set custom Environment Variable SONARQUBE_URL
-    - Login (default credentials: admin/admin)
-    - Set a new password
-    - Add the following .NET User Secrets
-
+    - Add the following .NET User Secrets (use custom credentials if applicable)
 ```json
 {
     "SonarQube": {
         "Url": "http://sonarqube:9000",
         "User": "admin",
-        "Password": "YOUR_NEW_PASSWORD"
+        "Password": "admin"
     }
 }
 ```
