@@ -48,6 +48,7 @@ public sealed class SonarQubeApi(HttpClient httpClient) {
             };
 
             yield return new StaticCodeResult(
+                issue.Component,
                 issue.Message,
                 severity,
                 issue.Impacts[0].SoftwareQuality,
@@ -55,8 +56,6 @@ public sealed class SonarQubeApi(HttpClient httpClient) {
                 issue.Line,
                 new Dictionary<string, object> {
                     { "rule", issue.Rule },
-                    { "message", issue.Message },
-                    { "component", issue.Component },
                     { "project", issue.Project },
                     { "hash", issue.Hash },
                     { "effort", issue.Effort },

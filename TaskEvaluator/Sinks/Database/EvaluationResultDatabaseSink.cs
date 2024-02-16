@@ -12,10 +12,11 @@ public sealed record EvaluationResultDatabaseSinkConfiguration {
 }
 
 public sealed class EvaluationResultDatabase(string connectionString) : DataConnection(options => options.UsePostgreSQL(connectionString)) {
-    public ITable<StaticCodeEvaluationResult> StaticCodeResults => this.GetOrCreateTable<StaticCodeEvaluationResult>();
+    public ITable<DbStaticCodeAnalysisEvaluationResult> StaticCodeEvaluationResult => this.GetOrCreateTable<DbStaticCodeAnalysisEvaluationResult>();
+    public ITable<DbStaticCodeResult> StaticCodeResults => this.GetOrCreateTable<DbStaticCodeResult>();
 
-    public ITable<L2DbUnitTestEvaluationResult> UnitTestEvaluationResult => this.GetOrCreateTable<L2DbUnitTestEvaluationResult>();
-    public ITable<L2DbUnitTestResult> UnitTestResults => this.GetOrCreateTable<L2DbUnitTestResult>();
+    public ITable<DbUnitTestEvaluationResult> UnitTestEvaluationResult => this.GetOrCreateTable<DbUnitTestEvaluationResult>();
+    public ITable<DbUnitTestResult> UnitTestResults => this.GetOrCreateTable<DbUnitTestResult>();
 }
 
 public static class DataContextExtensions {
@@ -32,20 +33,39 @@ public static class DataContextExtensions {
 
 public sealed class EvaluationResultDatabaseSink(IOptions<EvaluationResultDatabaseSinkConfiguration> config) : IEvaluationResultSink {
     public void Send(IEvaluationResult evaluationResult) {
+        if (!evaluationResult.Success) return;
+
         using var db = new EvaluationResultDatabase(config.Value.ConnectionString);
         switch (evaluationResult) {
             case StaticCodeEvaluationResult result:
-                db.StaticCodeResults.Insert(() => result);
+                db.StaticCodeEvaluationResult.Insert(() => new DbStaticCodeAnalysisEvaluationResult {
+                    TaskId = result.TaskId,
+                    Success = result.Success,
+                    Context = result.Context,
+                });
+
+                foreach (var codeResult in result.Results) {
+                    db.StaticCodeResults.Insert(() => new DbStaticCodeResult {
+                        TaskId = result.TaskId,
+                        CodeId = codeResult.Id,
+                        Severity = codeResult.Severity,
+                        QualityAttribute = codeResult.QualityAttribute,
+                        QualityMetric = codeResult.QualityMetric,
+                        Line = codeResult.Line,
+                        Context = codeResult.Context,
+                    });
+                }
+
                 break;
             case UnitTestEvaluationResult result:
-                db.UnitTestEvaluationResult.Insert(() => new L2DbUnitTestEvaluationResult {
+                db.UnitTestEvaluationResult.Insert(() => new DbUnitTestEvaluationResult {
                     TaskId = result.TaskId,
                     Success = result.Success,
                     Context = result.Context
                 });
 
                 foreach (var unitTestResult in result.Results) {
-                    db.UnitTestResults.Insert(() => new L2DbUnitTestResult {
+                    db.UnitTestResults.Insert(() => new DbUnitTestResult {
                         TaskId = result.TaskId,
                         TestName = unitTestResult.TestName,
                         Outcome = unitTestResult.Outcome,

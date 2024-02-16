@@ -1,9 +1,11 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using TaskEvaluator.Api.Api;
 using TaskEvaluator.Api.Requests;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Modules;
+using TaskEvaluator.Sinks;
 using TaskEvaluator.SonarQube;
 using TaskEvaluator.Specification.CSharp;
 using TaskEvaluator.Tasks;
@@ -59,6 +61,15 @@ IAsyncEnumerable<CodeGenerationResult> GenerateCode(TaskRunner taskRunner, CodeG
     return taskRunner.Generate(request, token);
 }
 
-IAsyncEnumerable<IEvaluationResult> FullPass(TaskRunner taskRunner, TaskSet request, CancellationToken token = default) {
-    return taskRunner.Process(request, token);
+async IAsyncEnumerable<IEvaluationResult> FullPass(
+    TaskRunner taskRunner, 
+    IEnumerable<IEvaluationResultSink> sinks,
+    TaskSet request,
+    [EnumeratorCancellation] CancellationToken token = default) {
+    await foreach (var result in taskRunner.Process(request, token)) {
+        foreach (var sink in sinks) {
+            sink.Send(result);
+        }
+        yield return result;
+    }
 }

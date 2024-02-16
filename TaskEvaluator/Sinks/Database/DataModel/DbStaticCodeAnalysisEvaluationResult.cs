@@ -2,7 +2,7 @@
 using TaskEvaluator.Evaluator;
 namespace TaskEvaluator.Sinks.Database.DataModel;
 
-public sealed class L2DbUnitTestEvaluationResult : IEvaluationResult {
+public sealed class DbStaticCodeAnalysisEvaluationResult : IEvaluationResult {
     [PrimaryKey, Identity]
     public Guid TaskId { get; init; }
 
@@ -12,6 +12,6 @@ public sealed class L2DbUnitTestEvaluationResult : IEvaluationResult {
     [Column]
     public string? Context { get; init; }
 
-    [Association(ThisKey = nameof(TaskId), OtherKey = nameof(L2DbUnitTestResult.TaskId))]
-    public IList<L2DbUnitTestResult> Results { get; init; } = [];
+    [Association(ThisKey = nameof(TaskId), OtherKey = nameof(DbUnitTestResult.TaskId))]
+    public IReadOnlyList<DbStaticCodeResult> Results { get; init; } = [];
 }

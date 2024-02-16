@@ -1,6 +1,7 @@
 namespace TaskEvaluator.Evaluator.StaticCodeAnalysis;
 
 public sealed record StaticCodeResult(
+    string Id,
     string? Context,
     Severity Severity,
     string QualityAttribute,
