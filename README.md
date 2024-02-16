@@ -49,8 +49,8 @@ In any case, you'll first have to
     ```
 - Start SonarQube Container
     ```bash
-    docker network create sonarqube-net
-    docker run -d --name sonarqube -p 9000:9000 --net sonarqube-net sonarqube
+    docker network create taskevaluator_sonarqube_net
+    docker run -d --name sonarqube -p 9000:9000 --net taskevaluator_sonarqube_net sonarqube
     ```
     - Open [localhost:9000](http://localhost:9000)
         - Optionally set custom Environment Variable SONARQUBE_URL
@@ -77,7 +77,8 @@ In any case, you'll first have to
     ```
 - Start Postgres Container
     ```bash
-     docker run -d --name postgres -u postgres -e POSTGRES_PASSWORD=YOUR_PASSWORD -p 5432:5432 postgres
+    docker network create taskevaluator_postgres_net
+    docker run -d --name postgres -u postgres -e POSTGRES_PASSWORD=YOUR_PASSWORD -p 5432:5432 --net taskevaluator_postgres_net postgres
     ```
     - Add the following .NET User Secrets
 
@@ -88,6 +89,26 @@ In any case, you'll first have to
     }
 }
 ```
+
+### Visualization
+
+#### Grafana
+- Pull Grafana Image
+    ```bash
+    docker pull grafana/grafana
+    ```
+- Start Grafana Container
+    ```bash
+    docker run -d --name grafana -u grafana -p 3000:3000 --net taskevaluator_postgres_net grafana/grafana
+    ```
+- Login (default credentials: admin/admin)
+- Add a new Data Source
+    - Type: PostgreSQL
+    - Host: postgres:5432
+    - Database: postgres
+    - User: postgres
+    - Password: YOUR_PASSWORD
+    - SSL Mode: disable
 
 ## Language Support
 

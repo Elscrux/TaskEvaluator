@@ -23,7 +23,7 @@ public sealed class CSharpDockerRuntimeFactory(
             EnvironmentVariables = [
                 $"\"SONARQUBE={JsonSerializer.Serialize(sonarQubeConfig.Value).Replace("\"", "\\\"")}\"",
             ],
-            Networks = [ "sonarqube-net" ]
+            Networks = [ "taskevaluator_sonarqube_net" ]
         };
 
         return dockerRuntimeFactory.Create(dockerRuntimeOptions, token);
