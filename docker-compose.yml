@@ -21,7 +21,7 @@
             - 3000:3000
 
 networks:
-    sonarqube-net:
+    sonarqube_net:
         driver: bridge
 
 secrets:
