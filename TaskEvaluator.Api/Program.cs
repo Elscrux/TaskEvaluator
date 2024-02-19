@@ -5,6 +5,7 @@ using TaskEvaluator.Api.Requests;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Modules;
+using TaskEvaluator.Sink.PostgreSQL;
 using TaskEvaluator.Sinks;
 using TaskEvaluator.SonarQube;
 using TaskEvaluator.Specification.CSharp;
@@ -23,6 +24,7 @@ builder.Configuration.AddUserSecrets<TaskRunner>();
 
 builder.Services.AddTaskEvaluator(builder.Configuration);
 builder.Services.AddSonarQube(builder.Configuration);
+builder.Services.AddPostgreSQL(builder.Configuration);
 builder.Services.AddLanguage<CSharpRegistration>();
 
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));

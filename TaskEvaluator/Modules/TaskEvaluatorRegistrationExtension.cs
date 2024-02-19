@@ -1,13 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using TaskEvaluator.Docker;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Generation.GitHubCopilot;
 using TaskEvaluator.Runtime;
-using TaskEvaluator.Sinks;
-using TaskEvaluator.Sinks.Database;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Modules;
 
@@ -37,10 +34,6 @@ public static class TaskEvaluatorRegistrationExtension {
         services.AddSingleton<IPortPool, RandomPortPool>();
         services.AddSingleton<DockerHostFactory>();
         services.AddSingleton<DockerRuntimeFactory>();
-
-        // Sink
-        services.Configure<EvaluationResultDatabaseSinkConfiguration>(configuration.GetSection("Database"));
-        services.AddSingleton<IEvaluationResultSink, EvaluationResultDatabaseSink>();
 
         return services;
     }

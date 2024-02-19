@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Specifications\TaskEvaluator.Specification.CSharp\TaskEvaluator.Specification.CSharp.csproj" />
+      <ProjectReference Include="..\TaskEvaluator.Sink.PostgreSQL\TaskEvaluator.Sink.PostgreSQL.csproj" />
       <ProjectReference Include="..\TaskEvaluator.SonarQube\TaskEvaluator.SonarQube.csproj" />
       <ProjectReference Include="..\TaskEvaluator\TaskEvaluator.csproj" />
     </ItemGroup>

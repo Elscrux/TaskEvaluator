@@ -4,10 +4,11 @@ using Microsoft.Extensions.Options;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Evaluator.StaticCodeAnalysis;
 using TaskEvaluator.Evaluator.UnitTest;
+using TaskEvaluator.Sinks;
 using TaskEvaluator.Sinks.Database.DataModel;
-namespace TaskEvaluator.Sinks.Database;
+namespace TaskEvaluator.Sink.PostgreSQL;
 
-public sealed record EvaluationResultDatabaseSinkConfiguration {
+public sealed record PostgresSinkConfiguration {
     public required string ConnectionString { get; init; }
 }
 
@@ -31,7 +32,7 @@ public static class DataContextExtensions {
     }
 }
 
-public sealed class EvaluationResultDatabaseSink(IOptions<EvaluationResultDatabaseSinkConfiguration> config) : IEvaluationResultSink {
+public sealed class PostgresEvaluationResultSink(IOptions<PostgresSinkConfiguration> config) : IEvaluationResultSink {
     public void Send(IEvaluationResult evaluationResult) {
         if (!evaluationResult.Success) return;
 
