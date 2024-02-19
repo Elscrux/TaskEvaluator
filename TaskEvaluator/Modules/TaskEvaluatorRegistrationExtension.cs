@@ -9,7 +9,7 @@ using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Modules;
 
 public static class TaskEvaluatorRegistrationExtension {
-    public static IServiceCollection AddTaskEvaluator(this IServiceCollection services, IConfiguration configuration) {
+    public static TaskEvaluatorConfiguration AddTaskEvaluator(this IServiceCollection services, IConfiguration configuration) {
         // AI
         services.AddTransient<ICodeGenerationProvider, InjectedCodeGenerationProvider>();
 
@@ -35,6 +35,6 @@ public static class TaskEvaluatorRegistrationExtension {
         services.AddSingleton<DockerHostFactory>();
         services.AddSingleton<DockerRuntimeFactory>();
 
-        return services;
+        return new TaskEvaluatorConfiguration(services, configuration);
     }
 }

@@ -22,10 +22,11 @@ builder.Services.AddHealthChecks();
 
 builder.Configuration.AddUserSecrets<TaskRunner>();
 
-builder.Services.AddTaskEvaluator(builder.Configuration);
-builder.Services.AddSonarQube(builder.Configuration);
-builder.Services.AddPostgreSQL(builder.Configuration);
-builder.Services.AddLanguage<CSharpRegistration>();
+builder.Services.AddTaskEvaluator(builder.Configuration)
+    .Language.Add<CSharpRegistration>()
+    .Evaluator.AddSonarQube()
+    .Sink.AddLogger()
+    .Sink.AddPostgreSQL();
 
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 

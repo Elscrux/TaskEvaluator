@@ -44,9 +44,9 @@ public static class Program {
         builder.Services.AddHttpClient();
         builder.Services.AddHealthChecks();
 
-        builder.Services.AddTaskEvaluator(builder.Configuration);
-        builder.Services.AddLanguage<CSharpRegistration>();
-        builder.Services.AddSonarQube(builder.Configuration);
+        builder.Services.AddTaskEvaluator(builder.Configuration)
+            .Language.Add<CSharpRegistration>()
+            .Evaluator.AddSonarQube();
 
         // Manually add SonarQubeConfiguration because for some reason it doesn't work with services.Configure<>
         var sonarQubeValue = builder.Configuration.GetSection("SONARQUBE").Value ?? throw new InvalidOperationException("Failed to get SONARQUBE configuration from environment variable");

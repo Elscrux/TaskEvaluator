@@ -14,10 +14,11 @@ builder.Services.AddHttpClient();
 
 builder.Configuration.AddUserSecrets<TaskRunner>();
 
-builder.Services.AddTaskEvaluator(builder.Configuration);
-builder.Services.AddSonarQube(builder.Configuration);
-builder.Services.AddPostgreSQL(builder.Configuration);
-builder.Services.AddLanguage<CSharpRegistration>();
+builder.Services.AddTaskEvaluator(builder.Configuration)
+    .Language.Add<CSharpRegistration>()
+    .Evaluator.AddSonarQube()
+    .Sink.AddLogger()
+    .Sink.AddPostgreSQL();
 
 builder.Services.AddTransient<IHostedService, BatchRunner>();
 
