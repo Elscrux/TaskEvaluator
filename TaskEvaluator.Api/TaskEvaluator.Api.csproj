@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Generators\TaskEvaluator.Generator.GitHubCopilot\TaskEvaluator.Generator.GitHubCopilot.csproj" />
       <ProjectReference Include="..\Specifications\TaskEvaluator.Specification.CSharp\TaskEvaluator.Specification.CSharp.csproj" />
       <ProjectReference Include="..\TaskEvaluator.Sink.PostgreSQL\TaskEvaluator.Sink.PostgreSQL.csproj" />
       <ProjectReference Include="..\TaskEvaluator\TaskEvaluator.csproj" />

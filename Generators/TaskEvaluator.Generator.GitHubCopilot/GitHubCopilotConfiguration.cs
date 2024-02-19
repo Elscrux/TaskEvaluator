@@ -1,4 +1,4 @@
-﻿namespace TaskEvaluator.Generation.GitHubCopilot;
+﻿namespace TaskEvaluator.Generator.GitHubCopilot;
 
 public record GitHubCopilotConfiguration {
     public required string TokenUrl { get; init; }

@@ -3,8 +3,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using Noggog;
+using TaskEvaluator.Generation;
 using TaskEvaluator.Tasks;
-namespace TaskEvaluator.Generation.GitHubCopilot;
+namespace TaskEvaluator.Generator.GitHubCopilot;
 
 public sealed class GitHubCopilotModelApi(
     IHttpClientFactory httpClientFactory,

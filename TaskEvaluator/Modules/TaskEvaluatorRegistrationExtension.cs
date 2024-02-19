@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using TaskEvaluator.Docker;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
-using TaskEvaluator.Generation.GitHubCopilot;
 using TaskEvaluator.Runtime;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Modules;
@@ -12,12 +11,6 @@ public static class TaskEvaluatorRegistrationExtension {
     public static TaskEvaluatorConfiguration AddTaskEvaluator(this IServiceCollection services, IConfiguration configuration) {
         // AI
         services.AddTransient<ICodeGenerationProvider, InjectedCodeGenerationProvider>();
-
-        // GitHub Copilot
-        services.Configure<GitHubCopilotConfiguration>(configuration.GetSection("GitHubCopilot"));
-        services.AddTransient<ICodeGenerator, GitHubCopilotModelApi>();
-        services.AddSingleton<GitHubCopilotTokenProvider>();
-        services.AddSingleton<GitHubCopilotPromptGenerator>();
 
         // Task
         services.Configure<TaskLoadConfiguration>(configuration.GetSection("TaskSet"));

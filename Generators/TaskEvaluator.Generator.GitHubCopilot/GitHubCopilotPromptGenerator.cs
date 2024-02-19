@@ -1,7 +1,8 @@
-﻿using TaskEvaluator.Generation.GitHubCopilot.Model;
+﻿using TaskEvaluator.Generation;
+using TaskEvaluator.Generator.GitHubCopilot.Model;
 using TaskEvaluator.Language;
 using Tiktoken;
-namespace TaskEvaluator.Generation.GitHubCopilot;
+namespace TaskEvaluator.Generator.GitHubCopilot;
 
 public sealed class GitHubCopilotPromptGenerator {
     public static readonly Encoding Encoding = Encoding.Get(Encodings.Cl100KBase);

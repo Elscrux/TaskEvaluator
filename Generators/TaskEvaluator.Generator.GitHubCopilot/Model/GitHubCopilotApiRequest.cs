@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-namespace TaskEvaluator.Generation.GitHubCopilot.Model;
+namespace TaskEvaluator.Generator.GitHubCopilot.Model;
 
 public class GitHubCopilotApiRequest {
     [JsonPropertyName("prompt")] public required string Prompt { get; init; }

@@ -2,7 +2,7 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
-namespace TaskEvaluator.Generation.GitHubCopilot;
+namespace TaskEvaluator.Generator.GitHubCopilot;
 
 public sealed class GitHubCopilotTokenProvider(
     IHttpClientFactory httpClientFactory,

@@ -45,4 +45,8 @@
         </Compile>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Generation\GitHubCopilot\" />
+    </ItemGroup>
+
 </Project>

@@ -4,6 +4,7 @@ using TaskEvaluator.Api.Api;
 using TaskEvaluator.Api.Requests;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
+using TaskEvaluator.Generator.GitHubCopilot;
 using TaskEvaluator.Modules;
 using TaskEvaluator.Sink.PostgreSQL;
 using TaskEvaluator.Sinks;
@@ -24,6 +25,7 @@ builder.Configuration.AddUserSecrets<TaskRunner>();
 
 builder.Services.AddTaskEvaluator(builder.Configuration)
     .Language.Add<CSharpRegistration>()
+    .Generator.AddGitHubCopilot()
     .Evaluator.AddSonarQube()
     .Sink.AddLogger()
     .Sink.AddPostgreSQL();
