@@ -5,6 +5,7 @@ using TaskEvaluator.Api.Requests;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Generator.GitHubCopilot;
+using TaskEvaluator.Generator.Tabby;
 using TaskEvaluator.Modules;
 using TaskEvaluator.Sink.PostgreSQL;
 using TaskEvaluator.Sinks;
@@ -26,6 +27,7 @@ builder.Configuration.AddUserSecrets<TaskRunner>();
 builder.Services.AddTaskEvaluator(builder.Configuration)
     .Language.Add<CSharpRegistration>()
     .Generator.AddGitHubCopilot()
+    .Generator.AddTabby()
     .Evaluator.AddSonarQube()
     .Sink.AddLogger()
     .Sink.AddPostgreSQL();
@@ -71,8 +73,9 @@ async IAsyncEnumerable<FinalResult> FullPass(
     IEnumerable<IFinalResultSink> sinks,
     TaskSet request,
     [EnumeratorCancellation] CancellationToken token = default) {
+    var sinksList = sinks.ToList();
     await foreach (var result in taskRunner.Process(request, token)) {
-        foreach (var sink in sinks) {
+        foreach (var sink in sinksList) {
             sink.Send(result);
         }
         yield return result;

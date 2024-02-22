@@ -20,7 +20,6 @@ In any case, you'll first have to
 ### GitHub Copilot
 
 - Add the following .NET User Secrets for TaskEvaluator
-
 ```json
 {
     "GitHubCopilot": {
@@ -41,6 +40,28 @@ In any case, you'll first have to
     - Run this [python script](https://github.com/aaamoon/copilot-gpt4-service/blob/master/shells/get_copilot_token.py)
     - Connect with GitHub Account
     - Copy the Bearer Token from the console output
+
+## Tabby
+- Pull Tabby Image
+    ```bash
+    docker pull tabbyml/tabby
+    ```
+- Add the following .NET User Secrets for TaskEvaluator
+```json
+{
+    "GitHubCopilot": {
+        "CompletionsUrl": "http://localhost:8080/v1/completions"
+    }
+}
+```
+- Start Tabby Container (when running on GPU with CUDA support)
+    ```bash
+    docker run -it --gpus all -p 8080:8080 -v $HOME/.tabby:/data tabbyml/tabby serve --model TabbyML/StarCoder-1B --device cuda
+    ```
+- Start Tabby Container (when running on CPU)
+    ```bash
+    docker run --entrypoint /opt/tabby/bin/tabby-cpu -it -p 8080:8080 -v $HOME/.tabby:/data tabbyml/tabby serve --model TabbyML/StarCoder-1B
+    ```
 
 ### SonarQube
 - Pull SonarQube Image

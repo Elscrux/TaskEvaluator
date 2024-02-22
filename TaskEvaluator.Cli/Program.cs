@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TaskEvaluator.Cli;
 using TaskEvaluator.Generator.GitHubCopilot;
+using TaskEvaluator.Generator.Tabby;
 using TaskEvaluator.Modules;
 using TaskEvaluator.Sink.PostgreSQL;
 using TaskEvaluator.SonarQube;
@@ -18,6 +19,7 @@ builder.Configuration.AddUserSecrets<TaskRunner>();
 builder.Services.AddTaskEvaluator(builder.Configuration)
     .Language.Add<CSharpRegistration>()
     .Generator.AddGitHubCopilot()
+    .Generator.AddTabby()
     .Evaluator.AddSonarQube()
     .Sink.AddLogger()
     .Sink.AddPostgreSQL();

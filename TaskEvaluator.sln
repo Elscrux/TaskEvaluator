@@ -27,9 +27,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.Sink.PostgreS
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Generators", "Generators", "{56C7FB47-801C-4A3F-A6EA-79D949BA2212}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.Generator.StarCoder", "Generators\TaskEvaluator.Generator.StarCoder\TaskEvaluator.Generator.StarCoder.csproj", "{E9BB08EB-CC8F-4430-A64F-75683261A2B6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.Generator.GitHubCopilot", "Generators\TaskEvaluator.Generator.GitHubCopilot\TaskEvaluator.Generator.GitHubCopilot.csproj", "{42D05B07-9E78-49A0-AD19-19DDBBFC0DC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.Generator.Tabby", "Generators\TaskEvaluator.Generator.Tabby\TaskEvaluator.Generator.Tabby.csproj", "{27AB8249-3A64-44BA-9793-4B544082F657}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,19 +69,19 @@ Global
 		{244B3D38-0E22-4B2B-A4DC-65A8EF4FAE3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{244B3D38-0E22-4B2B-A4DC-65A8EF4FAE3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{244B3D38-0E22-4B2B-A4DC-65A8EF4FAE3F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E9BB08EB-CC8F-4430-A64F-75683261A2B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E9BB08EB-CC8F-4430-A64F-75683261A2B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E9BB08EB-CC8F-4430-A64F-75683261A2B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E9BB08EB-CC8F-4430-A64F-75683261A2B6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{42D05B07-9E78-49A0-AD19-19DDBBFC0DC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{42D05B07-9E78-49A0-AD19-19DDBBFC0DC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42D05B07-9E78-49A0-AD19-19DDBBFC0DC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42D05B07-9E78-49A0-AD19-19DDBBFC0DC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27AB8249-3A64-44BA-9793-4B544082F657}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27AB8249-3A64-44BA-9793-4B544082F657}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27AB8249-3A64-44BA-9793-4B544082F657}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27AB8249-3A64-44BA-9793-4B544082F657}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{127D034B-CC40-468E-BE25-7462BA26D47D} = {1E6FFEC3-0DC1-415A-86B2-F772C3ADE5CE}
 		{44734574-E7F2-411F-8A8B-F3E612177932} = {26854194-B6C2-437A-90C8-6B4C6B9CBD0A}
-		{E9BB08EB-CC8F-4430-A64F-75683261A2B6} = {56C7FB47-801C-4A3F-A6EA-79D949BA2212}
 		{42D05B07-9E78-49A0-AD19-19DDBBFC0DC1} = {56C7FB47-801C-4A3F-A6EA-79D949BA2212}
+		{27AB8249-3A64-44BA-9793-4B544082F657} = {56C7FB47-801C-4A3F-A6EA-79D949BA2212}
 	EndGlobalSection
 EndGlobal
