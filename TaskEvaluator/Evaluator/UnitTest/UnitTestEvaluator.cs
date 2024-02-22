@@ -4,7 +4,7 @@ namespace TaskEvaluator.Evaluator.UnitTest;
 
 public sealed class UnitTestEvaluator(IRuntime runtime) : IRuntimeEvaluator {
     public async Task<IEvaluationResult> Evaluate(Code code, EvaluationModel evaluationModel, CancellationToken token = default) {
-        if (evaluationModel.UnitTests is null) return new UnitTestEvaluationResult(code.Guid, false, "No unit tests provided.");
+        if (evaluationModel.UnitTests is null) return UnitTestEvaluationResult.Failure(code.Guid, string.Empty, "No unit tests provided.");
 
         var runtimeResult = await runtime.UnitTest(evaluationModel.UnitTests, token);
 

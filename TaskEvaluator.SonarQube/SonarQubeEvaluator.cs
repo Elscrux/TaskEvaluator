@@ -19,7 +19,7 @@ public sealed class SonarQubeEvaluator(
         var projectKey = Guid.NewGuid().ToString();
         if (!await sonarQube.TryCreateProject(projectKey, projectKey, token)) {
             logger.LogError("Failed to create project {ProjectKey}", projectKey);
-            return new StaticCodeEvaluationResult(code.Guid, false, $"Failed to create project {projectKey}", []);
+            return StaticCodeEvaluationResult.Failure(code.Guid, "SonarQube", $"Failed to create project {projectKey}");
         }
 
         var userToken = await sonarQube.GetUserToken(projectKey, token);
@@ -29,14 +29,14 @@ public sealed class SonarQubeEvaluator(
         languageSpecification.CreateWorkingDirectory(WorkingDirectory, code);
         if (!await sonarScannerApi.Run(WorkingDirectory, code, sonarQube.Url, userToken, projectKey, token)) {
             logger.LogError("Failed to run sonar-scanner for project {ProjectKey}", projectKey);
-            return new StaticCodeEvaluationResult(code.Guid, false, $"Failed to run sonar-scanner for project {projectKey}", []);
+            return StaticCodeEvaluationResult.Failure(code.Guid, "SonarQube", $"Failed to run sonar-scanner for project {projectKey}");
         }
 
         try {
             var issues = await sonarQube.SearchIssues(projectKey, token).ToListAsync(token);
-            return new StaticCodeEvaluationResult(code.Guid, true, null, issues);
+            return StaticCodeEvaluationResult.Successful(code.Guid, "SonarQube", null, issues);
         } catch (Exception e) {
-            return new StaticCodeEvaluationResult(code.Guid, false, e.Message, []);
+            return StaticCodeEvaluationResult.Failure(code.Guid, "SonarQube", e.Message);
         }
     }
 }

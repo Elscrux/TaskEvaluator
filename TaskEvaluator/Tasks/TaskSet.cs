@@ -3,17 +3,17 @@ using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
 namespace TaskEvaluator.Tasks;
 
-public sealed record Metadata(
+public sealed record TaskMetadata(
     [property: JsonPropertyName("id")] Guid Id,
     [property: JsonPropertyName("isHumanEval")]
     bool IsHumanEval = false,
     [property: JsonPropertyName("definesCustomTypes")]
     bool DefinesCustomTypes = false) {
-    public static Metadata Default { get; } = new(Guid.NewGuid());
+    public static TaskMetadata Default { get; } = new(Guid.NewGuid());
 }
 
 public sealed record TaskSet(
     string Name,
     CodeGenerationTask CodeGenerationTask,
     EvaluationModel EvaluationModel,
-    Metadata Metadata);
+    TaskMetadata TaskMetadata);

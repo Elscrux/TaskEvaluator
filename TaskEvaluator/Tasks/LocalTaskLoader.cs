@@ -40,15 +40,15 @@ public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, IOptions<Ta
         return new TaskSet(taskName, codeGenerationTask, evaluationModel, metadata);
     }
 
-    private Metadata LoadMetadata(string taskDirectory) {
+    private TaskMetadata LoadMetadata(string taskDirectory) {
         var metadataPath = Path.Combine(taskDirectory, "metadata.json");
         if (File.Exists(metadataPath)) {
-            var jsonResult = JsonSerializer.Deserialize<Metadata>(File.ReadAllText(metadataPath));
+            var jsonResult = JsonSerializer.Deserialize<TaskMetadata>(File.ReadAllText(metadataPath));
             if (jsonResult is not null) return jsonResult;
         }
 
         logger.LogWarning("No valid metadata.json found in {TaskDirectory}, use default metadata instead", taskDirectory);
-        return Metadata.Default;
+        return TaskMetadata.Default;
     }
 
     private CodeGenerationTask? LoadCodeGenerationTask(ProgrammingLanguage language, string taskDirectory) {

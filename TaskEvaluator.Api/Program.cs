@@ -66,9 +66,9 @@ IAsyncEnumerable<CodeGenerationResult> GenerateCode(TaskRunner taskRunner, CodeG
     return taskRunner.Generate(request, token);
 }
 
-async IAsyncEnumerable<IEvaluationResult> FullPass(
+async IAsyncEnumerable<FinalResult> FullPass(
     TaskRunner taskRunner, 
-    IEnumerable<IEvaluationResultSink> sinks,
+    IEnumerable<IFinalResultSink> sinks,
     TaskSet request,
     [EnumeratorCancellation] CancellationToken token = default) {
     await foreach (var result in taskRunner.Process(request, token)) {

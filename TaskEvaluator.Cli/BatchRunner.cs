@@ -8,7 +8,7 @@ public sealed class BatchRunner(
     ILogger<BatchRunner> logger,
     ITaskLoader taskLoader,
     TaskRunner taskRunner,
-    IEnumerable<IEvaluationResultSink> evaluationResultSinks)
+    IEnumerable<IFinalResultSink> evaluationResultSinks)
     : IHostedService {
 
     public Task StartAsync(CancellationToken cancellationToken) {

@@ -37,6 +37,7 @@ public sealed class TaskRunner(
             await foreach (var evaluationResult in Evaluate(codeGenerationResult.Code, taskSet.EvaluationModel, token)) {
                 yield return evaluationResult;
             }
+    public async IAsyncEnumerable<FinalResult> Process(TaskSet taskSet, [EnumeratorCancellation] CancellationToken token = default) {
         }
     }
 }

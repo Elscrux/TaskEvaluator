@@ -1,10 +1,10 @@
 ﻿using LinqToDB.Mapping;
 using TaskEvaluator.Evaluator.UnitTest;
-namespace TaskEvaluator.Sinks.Database.DataModel;
+namespace TaskEvaluator.Sink.PostgreSQL.DataModel;
 
 public sealed class DbUnitTestResult {
     [PrimaryKey(1), Identity]
-    public Guid TaskId { get; init; }
+    public Guid CodeId { get; init; }
 
     [PrimaryKey(2), Identity]
     public string TestName { get; init; } = string.Empty;

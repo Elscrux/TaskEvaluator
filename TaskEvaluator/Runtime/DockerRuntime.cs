@@ -37,15 +37,15 @@ public sealed class DockerRuntime : IRuntime {
     }
 
     public Task<UnitTestRuntimeResult> UnitTest(Code unitTest, CancellationToken token = default) {
-        if (_options.UnitTestEndpoint is null) return Task.FromResult(new UnitTestRuntimeResult(false, "Unit test endpoint is not configured"));
+        if (_options.UnitTestEndpoint is null) return Task.FromResult(UnitTestRuntimeResult.Failure("Unit test endpoint is not configured"));
 
-        return CallEndpoint(_options.UnitTestEndpoint, unitTest, message => new UnitTestRuntimeResult(false, message), token);
+        return CallEndpoint(_options.UnitTestEndpoint, unitTest, UnitTestRuntimeResult.Failure, token);
     }
 
     public Task<StaticCodeRuntimeResult> StaticCodeQualityAnalysis(CancellationToken token = default) {
-        if (_options.StaticCodeQualityAnalysisEndpoint is null) return Task.FromResult(new StaticCodeRuntimeResult(false, "Static code quality analysis endpoint is not configured"));
+        if (_options.StaticCodeQualityAnalysisEndpoint is null) return Task.FromResult(StaticCodeRuntimeResult.Failure("Static code quality analysis endpoint is not configured"));
 
-        return CallEndpoint<string, StaticCodeRuntimeResult>(_options.StaticCodeQualityAnalysisEndpoint, null, message => new StaticCodeRuntimeResult(false, message), token);
+        return CallEndpoint<string, StaticCodeRuntimeResult>(_options.StaticCodeQualityAnalysisEndpoint, null, StaticCodeRuntimeResult.Failure, token);
     }
 
     private async Task<TOutput> CallEndpoint<TInput, TOutput>(string endpoint, TInput? input, Func<string, TOutput> errorOutputFactory, CancellationToken token = default) {

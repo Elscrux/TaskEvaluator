@@ -10,7 +10,7 @@ public sealed class SinkConfig(TaskEvaluatorConfiguration config, IServiceCollec
     public IConfiguration Configuration { get; set; } = configuration;
 
     public TaskEvaluatorConfiguration AddLogger() {
-        Services.AddTransient<IEvaluationResultSink, LoggerEvaluationResultSink>();
+        Services.AddTransient<IFinalResultSink, LoggerFinalResultSink>();
         return Config;
     }
 }

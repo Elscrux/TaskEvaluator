@@ -108,7 +108,7 @@ public static class Program {
             });
 
             if (process == null) {
-                return new UnitTestRuntimeResult(false, "Failed to start dotnet test");
+                return UnitTestRuntimeResult.Failure("Failed to start dotnet test");
             }
 
             // read the output
@@ -122,7 +122,7 @@ public static class Program {
             var trxPath = Path.Combine(jobFolder, "TestResults", "results.trx");
 
             // return plain output if trx file is not found
-            if (!File.Exists(trxPath)) return new UnitTestRuntimeResult(process.ExitCode == 0, output + error);
+            if (!File.Exists(trxPath)) return UnitTestRuntimeResult.Failure(output + error);
 
             // parse the test results
             var testResults = ParseTestResults(trxPath).ToList();
@@ -130,7 +130,7 @@ public static class Program {
                 Console.WriteLine($"Test: {r.TestName}, Outcome: {r.Outcome}, Duration: {r.Duration}");
             }
 
-            return new UnitTestRuntimeResult(process.ExitCode == 0, output + error, testResults);
+            return UnitTestRuntimeResult.Successful(output + error, "Unit Test", testResults);
         }
     }
 

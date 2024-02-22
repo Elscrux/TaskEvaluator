@@ -6,7 +6,8 @@ namespace TaskEvaluator.Evaluator;
 [JsonDerivedType(typeof(StaticCodeEvaluationResult))]
 [JsonDerivedType(typeof(UnitTestEvaluationResult))]
 public interface IEvaluationResult {
-    Guid TaskId { get; }
+    Guid CodeId { get; }
     bool Success { get; }
+    string Evaluator { get; }
     string? Context { get; }
 }

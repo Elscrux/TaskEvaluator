@@ -32,7 +32,7 @@ public sealed class GitHubCopilotModelApi(
         requestMessage.Content = new StringContent(serialize);
         var responseMessage = await httpClient.SendAsync(requestMessage, token);
         if (!responseMessage.IsSuccessStatusCode) {
-            throw new HttpRequestException("Could not send request to GitHub Copilot.");
+            return CodeGenerationResult.Failure("GitHub Copilot");
         }
 
         var fullContent = await responseMessage.Content
@@ -49,7 +49,7 @@ public sealed class GitHubCopilotModelApi(
             .ToList();
 
         var fullCode = task.Prefix + string.Join(string.Empty, list) + task.Suffix;
-        return new CodeGenerationResult(true, new Code(fullCode, task.Language));
+        return CodeGenerationResult.Successful(new Code(fullCode, task.Language), "GitHub Copilot");
     }
 
     private sealed class GitHubCopilotApiStreamResult {

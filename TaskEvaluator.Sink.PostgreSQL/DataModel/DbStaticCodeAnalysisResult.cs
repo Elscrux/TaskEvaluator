@@ -1,13 +1,13 @@
 ﻿using LinqToDB.Mapping;
 using TaskEvaluator.Evaluator.StaticCodeAnalysis;
-namespace TaskEvaluator.Sinks.Database.DataModel;
+namespace TaskEvaluator.Sink.PostgreSQL.DataModel;
 
-public sealed class DbStaticCodeResult {
+public sealed class DbStaticCodeAnalysisResult {
     [PrimaryKey(1), Identity]
-    public Guid TaskId { get; init; }
+    public Guid CodeId { get; init; }
 
     [PrimaryKey(2), Identity]
-    public string CodeId { get; init; } = string.Empty;
+    public string CodeAnalysisId { get; init; } = string.Empty;
 
     [Column, NotNull]
     public Severity Severity { get; init; }
