@@ -46,6 +46,7 @@ public sealed class CSharpService : ILanguageService {
           """;
 
     public ProgrammingLanguage Language => ProgrammingLanguage.CSharp;
+    public string LanguageId => "csharp";
     public string FileExtension => ".cs";
     public string LineCommentSymbol => "//";
 

@@ -4,6 +4,7 @@ namespace TaskEvaluator.Runtime;
 
 public interface ILanguageService {
     ProgrammingLanguage Language { get; }
+    string LanguageId { get; }
     string FileExtension { get; }
     string LineCommentSymbol { get; }
     string ProgramFileName => $"Program{FileExtension}";
