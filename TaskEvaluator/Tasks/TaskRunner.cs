@@ -32,12 +32,22 @@ public sealed class TaskRunner(
         await foreach (var result in tasks.AwaitAll(token)) yield return result;
     }
 
-    public async IAsyncEnumerable<IEvaluationResult> Process(TaskSet taskSet, [EnumeratorCancellation] CancellationToken token = default) {
-        await foreach (var codeGenerationResult in Generate(taskSet.CodeGenerationTask, token)) {
-            await foreach (var evaluationResult in Evaluate(codeGenerationResult.Code, taskSet.EvaluationModel, token)) {
-                yield return evaluationResult;
-            }
     public async IAsyncEnumerable<FinalResult> Process(TaskSet taskSet, [EnumeratorCancellation] CancellationToken token = default) {
+        var listAsync = await Generate(taskSet.CodeGenerationTask, token)
+            .Where(result => result.Success)
+            .Select(codeGenerationResult => {
+                return Task.Run(async () => {
+                    var successfulRevaluationResults = await Evaluate(codeGenerationResult.Code, taskSet.EvaluationModel, token)
+                        .Where(result => result.Success)
+                        .ToListAsync(token);
+
+                    return new FinalResult(codeGenerationResult, successfulRevaluationResults);
+                }, token);
+            })
+            .ToListAsync(token);
+
+        await foreach (var finalResult in listAsync.AwaitAll(token)) {
+            yield return finalResult;
         }
     }
 }
