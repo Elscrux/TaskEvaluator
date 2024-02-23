@@ -24,13 +24,19 @@
         secrets:
             - postgres_user
             - postgres_password
+        networks:
+            - postgres_net
     grafana:
         image: grafana/grafana:latest
         ports:
             - 3000:3000
+        networks:
+            - postgres_net
 
 networks:
     sonarqube_net:
+        driver: bridge
+    postgres_net:
         driver: bridge
 
 secrets:
