@@ -32,7 +32,7 @@ public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, IOptions<Ta
     private TaskSet? LoadTask(ProgrammingLanguage language, string taskName, string taskDirectory) {
         var metadata = LoadMetadata(taskDirectory);
 
-        var codeGenerationTask = LoadCodeGenerationTask(language, taskDirectory);
+        var codeGenerationTask = LoadCodeGenerationTask(metadata, language, taskDirectory);
         if (codeGenerationTask is null) return null;
 
         var evaluationModel = LoadEvaluationModel(language, taskDirectory);
@@ -51,7 +51,7 @@ public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, IOptions<Ta
         return TaskMetadata.Default;
     }
 
-    private CodeGenerationTask? LoadCodeGenerationTask(ProgrammingLanguage language, string taskDirectory) {
+    private CodeGenerationTask? LoadCodeGenerationTask(TaskMetadata metadata, ProgrammingLanguage language, string taskDirectory) {
         if (!LoadFile(taskDirectory, "Program", out var programPath, out var code)) return null;
 
         var sections = code.Split(CodeMarker);
@@ -63,7 +63,7 @@ public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, IOptions<Ta
                 logger.LogWarning("Multiple CodeMarkers found in {ProgramPath}", programPath);
                 return null;
             default:
-                return new CodeGenerationTask(sections[0], sections[1], language);
+                return new CodeGenerationTask(metadata.TaskId, sections[0], sections[1], language);
         }
     }
 

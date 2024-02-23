@@ -7,6 +7,9 @@ public sealed class DbCodeGenerationResult {
     public Guid CodeId { get; init; }
 
     [Column]
+    public Guid TaskId { get; init; }
+
+    [Column]
     public string Body { get; init; } = string.Empty;
 
     [Column]

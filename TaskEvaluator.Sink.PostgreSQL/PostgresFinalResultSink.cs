@@ -53,6 +53,7 @@ public sealed class PostgresFinalResultSink(
 
         db.CodeGenerationResults.Insert(() => new DbCodeGenerationResult {
             CodeId = finalResult.CodeGenerationResult.Code.Guid,
+            TaskId = finalResult.CodeGenerationResult.TaskId,
             Body = finalResult.CodeGenerationResult.Code.Body,
             Language = finalResult.CodeGenerationResult.Code.Language,
             Generator = finalResult.CodeGenerationResult.Generator,

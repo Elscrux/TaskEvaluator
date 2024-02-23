@@ -1,11 +1,16 @@
-﻿using TaskEvaluator.Language;
+﻿using TaskEvaluator.Generation;
+using TaskEvaluator.Language;
 namespace TaskEvaluator.Tasks;
 
 public sealed record Code {
-    public Code(string Body, ProgrammingLanguage Language) {
-        this.Language = Language;
-        this.Body = Body.Replace("\r\n", "\n");
+    public Code(string body, ProgrammingLanguage language) {
+        Language = language;
+        Body = body.Replace("\r\n", "\n");
     }
+
+    public Code(CodeGenerationTask task, string generatedCode) : this(
+        task.Prefix + generatedCode + task.Suffix,
+        task.Language) {}
 
     public Guid Guid { get; init; } = Guid.NewGuid();
     public string Body { get; init; }

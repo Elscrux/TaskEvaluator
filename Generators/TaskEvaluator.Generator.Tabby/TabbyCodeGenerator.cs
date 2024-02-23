@@ -35,10 +35,9 @@ public class TabbyCodeGenerator(
             .ReadFromJsonAsync<TabbyApiResponse>(token)
             .ConfigureAwait(false);
 
-        if (tabbyApiResponse is null) return CodeGenerationResult.Failure("Tabby");
+        if (tabbyApiResponse is null) return CodeGenerationResult.Failure(task, "Tabby");
 
-        var fullCode = task.Prefix + string.Join(string.Empty, tabbyApiResponse.Choices[0].Text) + task.Suffix;
-        return CodeGenerationResult.Successful(new Code(fullCode, task.Language), "Tabby");
+        return CodeGenerationResult.Successful(task, new Code(task, tabbyApiResponse.Choices[0].Text), "Tabby");
     }
 
     public TabbyApiRequest GetRequest(CodeGenerationTask task) {

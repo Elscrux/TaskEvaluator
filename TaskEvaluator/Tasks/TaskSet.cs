@@ -4,7 +4,7 @@ using TaskEvaluator.Generation;
 namespace TaskEvaluator.Tasks;
 
 public sealed record TaskMetadata(
-    [property: JsonPropertyName("id")] Guid Id,
+    [property: JsonPropertyName("id")] Guid TaskId,
     [property: JsonPropertyName("isHumanEval")]
     bool IsHumanEval = false,
     [property: JsonPropertyName("definesCustomTypes")]
