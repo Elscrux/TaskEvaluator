@@ -18,12 +18,13 @@ public sealed class CSharpDockerRuntimeFactory(
                 "TaskEvaluator.Runtime.CSharp",
                 "Dockerfile"),
             WorkingFolder = Path.Combine(AppContext.BaseDirectory),
+            SyntaxValidationEndpoint = "syntax-validation",
             UnitTestEndpoint = "unit-test",
             StaticCodeQualityAnalysisEndpoint = "sonar-qube",
             EnvironmentVariables = [
                 $"\"SONARQUBE={JsonSerializer.Serialize(sonarQubeConfig.Value).Replace("\"", "\\\"")}\"",
             ],
-            Networks = [ "taskevaluator_sonarqube_net" ]
+            Networks = ["taskevaluator_sonarqube_net"],
         };
 
         return dockerRuntimeFactory.Create(dockerRuntimeOptions, token);

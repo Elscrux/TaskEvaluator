@@ -4,6 +4,7 @@ using System.Xml.Linq;
 using Microsoft.Extensions.Options;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Evaluator.StaticCodeAnalysis;
+using TaskEvaluator.Evaluator.SyntaxValidation;
 using TaskEvaluator.Evaluator.UnitTest;
 using TaskEvaluator.Modules;
 using TaskEvaluator.Runtime;
@@ -65,6 +66,10 @@ public static class Program {
 
         app.MapHealthChecks("/health");
 
+        app.MapPost("/syntax-validation", ValidateSyntax)
+            .WithName("Syntax Validation")
+            .WithOpenApi();
+
         app.MapPost("/unit-test", StartUnitTest)
             .WithName("Unit Test")
             .WithOpenApi();
@@ -88,6 +93,39 @@ public static class Program {
             }
 
             throw new InvalidOperationException($"Unexpected evaluation result type {evaluationResult.GetType()}");
+        }
+
+        SyntaxValidationRuntimeResult ValidateSyntax(HttpContext c) {
+            // create a new job folder with a unique name (guid)
+            var languageFactory = c.RequestServices.GetRequiredService<LanguageFactory>();
+            var languageService = languageFactory.GetLanguageService(ProgrammingLanguage.CSharp);
+            var jobFolder = Path.Combine(TestDirectory, Guid.NewGuid().ToString());
+            languageService.CreateWorkingDirectory(jobFolder, Code);
+
+            // run the job via dotnet test
+            var process = Process.Start(new ProcessStartInfo {
+                FileName = "dotnet",
+                Arguments = "build .",
+                WorkingDirectory = jobFolder,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+            });
+
+            if (process == null) {
+                return SyntaxValidationRuntimeResult.Failure("Failed to start dotnet build");
+            }
+
+            // read the output
+            var output = process.StandardOutput.ReadToEnd();
+            var error = process.StandardError.ReadToEnd();
+
+            // wait for the process to exit
+            process.WaitForExit();
+
+            return process.ExitCode == 0
+                ? SyntaxValidationRuntimeResult.CodeValid("Compiler", output + error)
+                : SyntaxValidationRuntimeResult.CodeInvalid("Compiler", output + error);
         }
 
         IRuntimeResult StartUnitTest(HttpContext c, Code unitTest) {

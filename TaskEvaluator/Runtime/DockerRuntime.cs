@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using TaskEvaluator.Docker;
 using TaskEvaluator.Evaluator.StaticCodeAnalysis;
+using TaskEvaluator.Evaluator.SyntaxValidation;
 using TaskEvaluator.Evaluator.UnitTest;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Runtime;
@@ -34,6 +35,12 @@ public sealed class DockerRuntime : IRuntime {
                     ]
                 })
             .ContinueWith(_ => _initialized = true);
+    }
+
+    public Task<SyntaxValidationRuntimeResult> SyntaxValidation(CancellationToken token = default) {
+        if (_options.SyntaxValidationEndpoint is null) return Task.FromResult(SyntaxValidationRuntimeResult.Failure("Unit test endpoint is not configured"));
+
+        return CallEndpoint<string, SyntaxValidationRuntimeResult>(_options.SyntaxValidationEndpoint, null, SyntaxValidationRuntimeResult.Failure, token);
     }
 
     public Task<UnitTestRuntimeResult> UnitTest(Code unitTest, CancellationToken token = default) {

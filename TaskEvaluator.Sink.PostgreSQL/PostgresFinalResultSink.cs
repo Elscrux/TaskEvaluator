@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Evaluator.StaticCodeAnalysis;
+using TaskEvaluator.Evaluator.SyntaxValidation;
 using TaskEvaluator.Evaluator.UnitTest;
 using TaskEvaluator.Sink.PostgreSQL.DataModel;
 using TaskEvaluator.Sinks;
@@ -22,6 +23,8 @@ public sealed class ResultsDatabase(string connectionString) : DataConnection(op
 
     public ITable<DbUnitTestEvaluationResult> UnitTestEvaluationResult => this.GetOrCreateTable<DbUnitTestEvaluationResult>();
     public ITable<DbUnitTestResult> UnitTestResults => this.GetOrCreateTable<DbUnitTestResult>();
+
+    public ITable<DbSyntaxValidationResult> SyntaxValidationResults => this.GetOrCreateTable<DbSyntaxValidationResult>();
 }
 
 public static class DataContextExtensions {
@@ -99,6 +102,16 @@ public sealed class PostgresFinalResultSink(
                         Duration = unitTestResult.Duration
                     });
                 }
+
+                break;
+            case SyntaxValidationResult result:
+                db.SyntaxValidationResults.Insert(() => new DbSyntaxValidationResult {
+                    CodeId = result.CodeId,
+                    Success = result.Success,
+                    Evaluator = result.Evaluator,
+                    Context = result.Context,
+                    SyntaxValid = result.SyntaxValid,
+                });
 
                 break;
         }
