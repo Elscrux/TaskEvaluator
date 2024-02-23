@@ -3,6 +3,8 @@ using TaskEvaluator.Language;
 namespace TaskEvaluator.Tasks;
 
 public sealed record Code {
+    public Code() : this(string.Empty, ProgrammingLanguage.CSharp) {}
+
     public Code(string body, ProgrammingLanguage language) {
         Language = language;
         Body = body.Replace("\r\n", "\n");
