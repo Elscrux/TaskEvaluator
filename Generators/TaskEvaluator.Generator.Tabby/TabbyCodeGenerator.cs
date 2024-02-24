@@ -5,15 +5,17 @@ using Microsoft.Extensions.Options;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Generator.Tabby.Model;
 using TaskEvaluator.Runtime;
-using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Generator.Tabby;
 
-public class TabbyCodeGenerator(
+public sealed class TabbyCodeGenerator(
     ILogger<TabbyCodeGenerator> logger,
     IHttpClientFactory httpClientFactory,
     IOptions<TabbyConfiguration> config,
     LanguageFactory languageFactory)
     : ICodeGenerator {
+
+    private readonly Random _random = new();
+
     public async Task<CodeGenerationResult> Send(CodeGenerationTask task, CancellationToken token = default) {
         var tabbyApiRequest = GetRequest(task);
 
@@ -37,7 +39,7 @@ public class TabbyCodeGenerator(
 
         if (tabbyApiResponse is null) return CodeGenerationResult.Failure(task, "Tabby");
 
-        return CodeGenerationResult.Successful(task, new Code(task, tabbyApiResponse.Choices[0].Text), "Tabby");
+        return CodeGenerationResult.Successful(task, tabbyApiResponse.Choices[0].Text, "Tabby");
     }
 
     public TabbyApiRequest GetRequest(CodeGenerationTask task) {
@@ -45,6 +47,7 @@ public class TabbyCodeGenerator(
 
         return new TabbyApiRequest {
             Language = languageService.LanguageId,
+            Seed = _random.Next(),
             Segments = new TabbyApiRequest.Segment {
                 Prefix = task.Prefix,
                 Suffix = task.Suffix

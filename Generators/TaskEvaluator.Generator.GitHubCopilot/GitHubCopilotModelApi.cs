@@ -48,7 +48,7 @@ public sealed class GitHubCopilotModelApi(
             .Select(x => x.Choices?.FirstOrDefault()?.Text)
             .ToList();
 
-        return CodeGenerationResult.Successful(task, new Code(task, string.Join(string.Empty, list)), "GitHub Copilot");
+        return CodeGenerationResult.Successful(task, string.Join(string.Empty, list), "GitHub Copilot");
     }
 
     private sealed class GitHubCopilotApiStreamResult {
