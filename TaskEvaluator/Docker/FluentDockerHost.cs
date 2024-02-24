@@ -4,18 +4,13 @@ using Noggog;
 using TaskEvaluator.Runtime;
 namespace TaskEvaluator.Docker;
 
-public sealed class FluentDockerHost(string hostname, int port) : IDockerHost {
+public sealed class FluentDockerHost(FluentDockerImageCreator imageCreator, string hostname, int port) : IDockerHost {
     private readonly DisposableBucket _disposableBucket = new();
     private readonly Uri _uri = new UriBuilder(System.Uri.UriSchemeHttp, hostname, port).Uri;
     public Uri Uri(string path) => new(_uri, path);
 
-    public Task StartContainer(DockerRuntimeOptions options, CancellationToken token = default) {
-        // Create image if necessary
-        using var image = new Builder()
-            .DefineImage(options.DockerImageName).ReuseIfAlreadyExists()
-            .FromFile(options.DockerfilePath).WorkingFolder(options.WorkingFolder)
-            .ExposePorts(8080)
-            .Build();
+    public async Task StartContainer(DockerRuntimeOptions options, CancellationToken token = default) {
+        await imageCreator.CreateImage(options);
 
         // Create container
         new Builder()
@@ -34,8 +29,6 @@ public sealed class FluentDockerHost(string hostname, int port) : IDockerHost {
             .Build()
             .DisposeWith(this)
             .Start();
-
-        return Task.CompletedTask;
     }
 
     public void Add(IDisposable disposable) => _disposableBucket.Add(disposable);
