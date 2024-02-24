@@ -5,11 +5,15 @@ using Microsoft.Extensions.Options;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Language;
+using TaskEvaluator.Runtime;
 namespace TaskEvaluator.Tasks;
 
-public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, IOptions<TaskLoadConfiguration> config) : ITaskLoader {
+public sealed class LocalTaskLoader(
+    LanguageFactory languageFactory,
+    ILogger<LocalTaskLoader> logger,
+    IOptions<TaskLoadConfiguration> config) : ITaskLoader {
 
-    private const string CodeMarker = "INSERT_CODE_HERE";
+    private string CodeMarker(ILanguageService languageService) => languageService.LineCommentSymbol + "INSERT_CODE_HERE";
 
     public IEnumerable<TaskSet> Load() {
         foreach (var languageDirectory in Directory.EnumerateDirectories(config.Value.DirectoryPath)) {
@@ -19,9 +23,10 @@ public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, IOptions<Ta
                 continue;
             }
 
+            var languageService = languageFactory.GetLanguageService(language);
             foreach (var taskDirectory in Directory.EnumerateDirectories(languageDirectory)) {
                 var taskName = Path.GetFileName(taskDirectory);
-                var task = LoadTask(language, taskName, taskDirectory);
+                var task = LoadTask(languageService, taskName, taskDirectory);
                 if (task is null) continue;
 
                 yield return task;
@@ -29,13 +34,13 @@ public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, IOptions<Ta
         }
     }
 
-    private TaskSet? LoadTask(ProgrammingLanguage language, string taskName, string taskDirectory) {
+    private TaskSet? LoadTask(ILanguageService languageService, string taskName, string taskDirectory) {
         var metadata = LoadMetadata(taskDirectory);
 
-        var codeGenerationTask = LoadCodeGenerationTask(metadata, language, taskDirectory);
+        var codeGenerationTask = LoadCodeGenerationTask(metadata, languageService, taskDirectory);
         if (codeGenerationTask is null) return null;
 
-        var evaluationModel = LoadEvaluationModel(language, taskDirectory);
+        var evaluationModel = LoadEvaluationModel(languageService, taskDirectory);
 
         return new TaskSet(taskName, codeGenerationTask, evaluationModel, metadata);
     }
@@ -51,10 +56,10 @@ public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, IOptions<Ta
         return TaskMetadata.Default;
     }
 
-    private CodeGenerationTask? LoadCodeGenerationTask(TaskMetadata metadata, ProgrammingLanguage language, string taskDirectory) {
+    private CodeGenerationTask? LoadCodeGenerationTask(TaskMetadata metadata, ILanguageService languageService, string taskDirectory) {
         if (!LoadFile(taskDirectory, "Program", out var programPath, out var code)) return null;
 
-        var sections = code.Split(CodeMarker);
+        var sections = code.Split(CodeMarker(languageService));
         switch (sections.Length) {
             case < 2:
                 logger.LogWarning("No CodeMarker found in {ProgramPath}", programPath);
@@ -63,13 +68,13 @@ public sealed class LocalTaskLoader(ILogger<LocalTaskLoader> logger, IOptions<Ta
                 logger.LogWarning("Multiple CodeMarkers found in {ProgramPath}", programPath);
                 return null;
             default:
-                return new CodeGenerationTask(metadata.TaskId, sections[0], sections[1], language);
+                return new CodeGenerationTask(metadata.TaskId, sections[0], sections[1], languageService.Language);
         }
     }
 
-    private EvaluationModel LoadEvaluationModel(ProgrammingLanguage language, string taskDirectory) {
+    private EvaluationModel LoadEvaluationModel(ILanguageService languageService, string taskDirectory) {
         return LoadFile(taskDirectory, "UnitTest", out _, out var unitTest)
-            ? new EvaluationModel(new Code(unitTest, language))
+            ? new EvaluationModel(new Code(unitTest, languageService.Language))
             : new EvaluationModel();
     }
 
