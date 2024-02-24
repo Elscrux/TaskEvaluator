@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.Generator.Git
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.Generator.Tabby", "Generators\TaskEvaluator.Generator.Tabby\TaskEvaluator.Generator.Tabby.csproj", "{27AB8249-3A64-44BA-9793-4B544082F657}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEvaluator.Avalonia", "TaskEvaluator.Avalonia\TaskEvaluator.Avalonia.csproj", "{C8AEA064-A822-4043-94C6-DF4F9D1CF7FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{27AB8249-3A64-44BA-9793-4B544082F657}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27AB8249-3A64-44BA-9793-4B544082F657}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27AB8249-3A64-44BA-9793-4B544082F657}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8AEA064-A822-4043-94C6-DF4F9D1CF7FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8AEA064-A822-4043-94C6-DF4F9D1CF7FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8AEA064-A822-4043-94C6-DF4F9D1CF7FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8AEA064-A822-4043-94C6-DF4F9D1CF7FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{127D034B-CC40-468E-BE25-7462BA26D47D} = {1E6FFEC3-0DC1-415A-86B2-F772C3ADE5CE}

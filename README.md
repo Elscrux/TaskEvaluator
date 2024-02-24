@@ -6,7 +6,7 @@ In total, there are 4 major components to achieve this:
 - Code Generator
 - Code Evaluator
 - Database & Data Visualization
-- Interface (Web Api or Cli)
+- Interface (App, Web Api or Cli)
 
 ## Setup
 
