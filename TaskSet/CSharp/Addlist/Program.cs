@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     /// Given a non-empty list of integers lst. add the even elements that are at odd indices.. 
     /// 

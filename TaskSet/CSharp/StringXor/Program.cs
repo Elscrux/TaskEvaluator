@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Input are two strings a and b consisting only of 1s and 0s. Perform binary XOR on these inputs and return result also as a string. 
     /// 

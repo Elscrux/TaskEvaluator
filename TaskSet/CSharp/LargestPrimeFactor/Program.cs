@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     /// Return the largest prime factor of n. Assume n > 1 and is not a prime. 
     /// 

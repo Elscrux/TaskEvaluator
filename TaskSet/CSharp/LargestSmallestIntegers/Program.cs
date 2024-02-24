@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Create a function that returns a tuple (a, b), where 'a' is the largest of negative integers, and 'b' is the smallest of positive integers in a list. If there is no negative or positive integers, return them as null. 
     /// 

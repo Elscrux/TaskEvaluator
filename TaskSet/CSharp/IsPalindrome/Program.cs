@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Checks if given string is a palindrome 
     /// 

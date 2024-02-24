@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Return a greatest common divisor of two integers a and b 
     /// 

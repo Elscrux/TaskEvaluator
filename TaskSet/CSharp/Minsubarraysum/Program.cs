@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Given an array of integers nums, find the minimum sum of any non-empty sub-array of nums. 
     /// 

@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     /// Return 2^n modulo p (be aware of numerics). 
     /// 

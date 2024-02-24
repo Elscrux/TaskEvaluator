@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Given a string s, count the number of uppercase vowels in even indices.  
     /// 

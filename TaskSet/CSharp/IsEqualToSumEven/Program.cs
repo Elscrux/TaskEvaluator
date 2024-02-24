@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     /// Evaluate whether the given number n can be written as the sum of exactly 4 positive even numbers 
     /// 

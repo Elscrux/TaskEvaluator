@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     /// Complete the function that takes two integers and returns  the product of their unit digits. Assume the input is always valid. 
     /// 

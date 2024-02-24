@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Given a string, find out how many distinct characters (regardless of case) does it consist of 
     /// 

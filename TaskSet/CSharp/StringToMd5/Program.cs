@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Given a string 'text', return its md5 hash equivalent string. If 'text' is an empty string, return null. 
     /// 

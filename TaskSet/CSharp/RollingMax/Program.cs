@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  From a given list of integers, generate a list of rolling maximum element found until given moment in the sequence. 
     /// 

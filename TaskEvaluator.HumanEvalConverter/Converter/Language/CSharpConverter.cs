@@ -11,25 +11,25 @@ public sealed partial class CSharpConverter : IHumanEvalConverter {
 
     private string ConvertType(string typeStr) {
         // List[int] => List<int>
-        if (typeStr.StartsWith("List[")) {
+        if (typeStr.StartsWith("List[", StringComparison.OrdinalIgnoreCase)) {
             var innerType = typeStr[5..^1];
             return $"List<{ConvertType(innerType)}>";
         }
 
         // Dict[int, int] => Dictionary<int, int>
-        if (typeStr.StartsWith("Dict[")) {
+        if (typeStr.StartsWith("Dict[", StringComparison.OrdinalIgnoreCase)) {
             var innerTypes = typeStr[5..^1].Split(", ");
             return $"Dictionary<{string.Join(", ", innerTypes.Select(ConvertType))}>";
         }
 
         // Tuple[int, int] => (int, int)
-        if (typeStr.StartsWith("Tuple[")) {
+        if (typeStr.StartsWith("Tuple[", StringComparison.OrdinalIgnoreCase)) {
             var innerTypes = typeStr[6..^1].Split(", ");
             typeStr = $"({string.Join(", ", innerTypes.Select(ConvertType))})";
         }
 
         // Optional[int] => int?
-        if (typeStr.StartsWith("Optional[")) {
+        if (typeStr.StartsWith("Optional[", StringComparison.OrdinalIgnoreCase)) {
             var innerType = typeStr[9..^1];
             typeStr = $"{ConvertType(innerType)}?";
         }
@@ -48,7 +48,7 @@ public sealed partial class CSharpConverter : IHumanEvalConverter {
     private string ConvertVariableName(string name) => "@" + name;
 
     private string GetDefaultValue(string type) {
-        if (type.StartsWith("List<")) {
+        if (type.StartsWith("List<", StringComparison.OrdinalIgnoreCase)) {
             return $"new List<{type[5..^1]}>()";
         }
 
@@ -123,11 +123,12 @@ public sealed partial class CSharpConverter : IHumanEvalConverter {
                 var input = ConvertValueSimple(u.Input.Replace("\'", "\""));
                 var compareValue = ConvertValue(u.CompareValue, ConvertType(dataSetTask.FunctionSignature.ReturnType));
                 var assertion = u.Success ? "Equal" : "NotEqual";
+                var precision = u.Precision is null ? string.Empty : $", {u.Precision}";
                 return $$"""
                              [Fact]
                              public void Test_{{i}}() {
                                  var result = TaskClass.{{functionName}}({{input}});
-                                 Assert.{{assertion}}({{compareValue}}, result);
+                                 Assert.{{assertion}}({{compareValue}}, result{{precision}});
                              }
                          """;
             })
@@ -144,7 +145,7 @@ public sealed partial class CSharpConverter : IHumanEvalConverter {
     }
     private string ConvertValue(string value, string type) {
         // Handle dictionaries {"a": 1, "b": 1, "c": 1, "d": 1, "g": 1} => new Dictionary<string, int> { {"a", 1}, ... }
-        if (type.StartsWith("Dictionary<")) {
+        if (type.StartsWith("Dictionary<", StringComparison.OrdinalIgnoreCase)) {
             var innerTypes = type[11..^1].Split(", ");
             var keyType = innerTypes[0];
             var valueType = innerTypes[1];

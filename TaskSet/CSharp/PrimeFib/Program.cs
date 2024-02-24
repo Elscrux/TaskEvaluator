@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  prime_fib returns n-th number that is a Fibonacci number and it's also prime. 
     /// 

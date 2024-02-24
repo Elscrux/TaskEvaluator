@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Return a string containing space-delimited numbers starting from 0 upto n inclusive. 
     /// 

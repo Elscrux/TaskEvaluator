@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     /// Given a positive integer N, return the total sum of its digits in binary.  
     /// 

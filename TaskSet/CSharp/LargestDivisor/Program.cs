@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  For a given number n, find the largest number that divides n evenly, smaller than n 
     /// 

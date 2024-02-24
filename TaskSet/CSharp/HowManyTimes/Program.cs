@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Find how many times a given substring can be found in the original string. Count overlaping cases. 
     /// 

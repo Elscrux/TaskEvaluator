@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     /// Given an integer. return a tuple that has the number of even and odd digits respectively.  
     /// 

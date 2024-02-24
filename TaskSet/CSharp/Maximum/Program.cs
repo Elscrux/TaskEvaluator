@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Given an array arr of integers and a positive integer k, return a sorted list  of length k with the maximum k numbers in arr. 
     /// 

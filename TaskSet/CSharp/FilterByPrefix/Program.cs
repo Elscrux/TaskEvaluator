@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Filter an input list of strings only for ones that start with a given prefix. 
     /// 

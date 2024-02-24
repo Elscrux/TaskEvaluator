@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Write a function that accepts two lists of strings and returns the list that has  total number of chars in the all strings of the list less than the other list. if the two lists have the same number of chars, return the first list. 
     /// 

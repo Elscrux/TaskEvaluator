@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  From a list of integers, remove all elements that occur more than once. Keep order of elements left the same as in the input. 
     /// 

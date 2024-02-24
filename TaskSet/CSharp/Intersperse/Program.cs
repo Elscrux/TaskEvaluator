@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  Insert a number 'delimeter' between every two consecutive elements of input list `numbers' 
     /// 

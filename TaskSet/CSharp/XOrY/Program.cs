@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     /// A simple program which should return the value of x if n is  a prime number and should return the value of y otherwise. 
     /// 

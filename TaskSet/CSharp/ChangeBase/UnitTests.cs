@@ -31,4 +31,18 @@ public class Test_ChangeBase {
         var result = TaskClass.ChangeBase(8, 2);
         Assert.Equal("1000", result);
     }
+
+    [Fact]
+    public void Test_5() {
+        var result = TaskClass.ChangeBase(7, 2);
+        Assert.Equal("111", result);
+    }
+
+    [Fact]
+    public void Test_6() {
+		foreach(var i in Enumerable.Range(2, 8)) {
+			var result = TaskClass.ChangeBase(i, i + 1);
+			Assert.Equal(i.ToString(), result);
+		}
+    }
 }

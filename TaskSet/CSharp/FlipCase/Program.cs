@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     ///  For a given string, flip lowercase characters to uppercase and uppercase to lowercase. 
     /// 

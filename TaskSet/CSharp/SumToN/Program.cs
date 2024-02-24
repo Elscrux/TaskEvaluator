@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     /// sum_to_n is a function that sums numbers from 1 to n. 
     /// 

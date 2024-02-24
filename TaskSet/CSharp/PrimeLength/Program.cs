@@ -1,6 +1,6 @@
 namespace Task;
 
-public class TaskClass {
+public static class TaskClass {
     /// <summary>
     /// Write a function that takes a string and returns True if the string length is a prime number or False otherwise 
     /// 
