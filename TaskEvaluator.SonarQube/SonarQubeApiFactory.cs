@@ -6,7 +6,7 @@ public sealed class SonarQubeApiFactory(ILogger<SonarQubeApiFactory> logger, IHt
         var httpClient = httpClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri(configuration.Url);
         if (!await Login(httpClient, configuration.User, configuration.Password)) {
-            logger.LogError("Failed to login to SonarQube instance {Url}", configuration.Url); 
+            logger.LogError("Failed to login to SonarQube instance {Url}", configuration.Url);
             return null;
         }
 

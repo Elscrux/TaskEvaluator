@@ -25,13 +25,13 @@ public sealed partial record FunctionSignature(
             [var sig, var d, var r] => (sig, d, r),
             _ => throw new ArgumentException("Prompt must contain exactly three paragraphs separated by escaped single quotes newlines.")
         };
-        
+
         // split documentation by >>>, the first one is the actual doc, the rest is a list of examples
         var (documentation, examples) = rest.SplitMany(">>>", "For example:", "Examples:", "Example:", "Examples", "Example") switch {
-            [var d, ..var e] => (d.Replace("\n   ", string.Empty).Replace("\n", string.Empty), e),
+            [var d, .. var e] => (d.Replace("\n   ", string.Empty).Replace("\n", string.Empty), e),
             _ => throw new ArgumentException("Documentation must contain at least one example.")
         };
-        
+
         var match = ParseRegex().Match(signatureStr);
         if (!match.Success) {
             throw new ArgumentException("Failed to parse function signature.");
@@ -61,7 +61,7 @@ public sealed partial record FunctionSignature(
                 parameterBuilder.Append(c);
             }
         }
-        
+
         parameterList.Add(parameterBuilder.ToString());
 
         var @params = parameterList

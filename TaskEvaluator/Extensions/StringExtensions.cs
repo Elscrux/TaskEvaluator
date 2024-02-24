@@ -4,7 +4,7 @@ public static class StringExtensions {
     public static string[] SplitMany(this string s, params string[] splitters) {
         string[] seed = [s];
         return splitters
-            .Aggregate(seed, (current, splitter) 
+            .Aggregate(seed, (current, splitter)
                 => current
                     .SelectMany(r => r.Split(splitter))
                     .ToArray());

@@ -1,6 +1,5 @@
 ﻿using TaskEvaluator.Generation;
 using TaskEvaluator.Generator.GitHubCopilot.Model;
-using TaskEvaluator.Language;
 using TaskEvaluator.Runtime;
 using Tiktoken;
 namespace TaskEvaluator.Generator.GitHubCopilot;

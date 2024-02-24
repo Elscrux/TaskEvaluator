@@ -69,7 +69,7 @@ IAsyncEnumerable<CodeGenerationResult> GenerateCode(TaskRunner taskRunner, CodeG
 }
 
 async IAsyncEnumerable<FinalResult> FullPass(
-    TaskRunner taskRunner, 
+    TaskRunner taskRunner,
     IEnumerable<IFinalResultSink> sinks,
     TaskSet request,
     [EnumeratorCancellation] CancellationToken token = default) {

@@ -15,7 +15,7 @@ public sealed partial class CSharpConverter : IHumanEvalConverter {
             var innerType = typeStr[5..^1];
             return $"List<{ConvertType(innerType)}>";
         }
-        
+
         // Dict[int, int] => Dictionary<int, int>
         if (typeStr.StartsWith("Dict[")) {
             var innerTypes = typeStr[5..^1].Split(", ");
