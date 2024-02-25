@@ -34,11 +34,28 @@
     </UserControl.Styles>
 
     <DockPanel>
-        <Button DockPanel.Dock="Top"
-                IsVisible="{Binding !Tasks}"
-                Content="Load results from Database"
-                Command="{Binding LoadFromDatabase}"/>
-        
+        <StackPanel DockPanel.Dock="Top"
+                    Spacing="5">
+            <Button IsVisible="{Binding !Tasks}"
+                    Content="Load results from Database"
+                    Command="{Binding LoadFromDatabase}"/>
+
+            <StackPanel Orientation="Horizontal"
+                        Spacing="5">
+                <Button IsVisible="{Binding !Tasks}"
+                        Content="Run All"
+                        Command="{Binding RunAll}"/>
+
+                <TextBlock Text="Run in parallel:"
+                           VerticalAlignment="Center"/>
+                <NumericUpDown x:Name="Parallelism"
+                               Value="{Binding Parallelism}"
+                               Minimum="1"
+                               Maximum="100"
+                               FormatString="N0"/>
+            </StackPanel>
+        </StackPanel>
+
         <TreeView ItemsSource="{Binding Tasks}">
             <TreeView.DataTemplates>
                 <TreeDataTemplate DataType="viewModels:ITaskVM"
