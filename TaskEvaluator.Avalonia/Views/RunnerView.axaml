@@ -34,6 +34,11 @@
     </UserControl.Styles>
 
     <DockPanel>
+        <Button DockPanel.Dock="Top"
+                IsVisible="{Binding !Tasks}"
+                Content="Load results from Database"
+                Command="{Binding LoadFromDatabase}"/>
+        
         <TreeView ItemsSource="{Binding Tasks}">
             <TreeView.DataTemplates>
                 <TreeDataTemplate DataType="viewModels:ITaskVM"

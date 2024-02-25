@@ -13,6 +13,9 @@ public sealed class DbCodeGenerationResult {
     public string Body { get; init; } = string.Empty;
 
     [Column]
+    public string GeneratedPart { get; init; } = string.Empty;
+
+    [Column]
     public ProgrammingLanguage Language { get; init; }
 
     [Column]

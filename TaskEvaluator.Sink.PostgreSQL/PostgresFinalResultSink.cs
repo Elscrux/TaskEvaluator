@@ -6,6 +6,7 @@ using TaskEvaluator.Evaluator;
 using TaskEvaluator.Evaluator.StaticCodeAnalysis;
 using TaskEvaluator.Evaluator.SyntaxValidation;
 using TaskEvaluator.Evaluator.UnitTest;
+using TaskEvaluator.Generation;
 using TaskEvaluator.Sink.PostgreSQL.DataModel;
 using TaskEvaluator.Sinks;
 using TaskEvaluator.Tasks;
@@ -61,6 +62,81 @@ public sealed class PostgresFinalResultSink(
 
         foreach (var evaluationResult in finalResult.EvaluationResults) {
             StoreEvaluationResult(db, evaluationResult);
+        }
+    }
+
+    public IEnumerable<FinalResult> Retrieve() {
+        using var db = new ResultsDatabase(config.Value.ConnectionString);
+        if (db is null) throw new InvalidOperationException("Database is null");
+
+        var codeGenerationResults = db.CodeGenerationResults
+            .Select(x => new CodeGenerationResult(
+                x.TaskId,
+                true,
+                new Code(x.CodeId, x.Body, x.Language),
+                x.GeneratedPart,
+                x.Generator
+            ))
+            .ToList();
+
+        var syntaxValidationResults = db.SyntaxValidationResults
+            .Select(x => new SyntaxValidationResult(
+                x.CodeId,
+                x.Success,
+                x.Evaluator,
+                x.Context,
+                x.SyntaxValid
+            ))
+            .ToList();
+
+        var unitTestEvaluationResults = db.UnitTestEvaluationResult
+            .Select(x => new UnitTestEvaluationResult(
+                x.CodeId,
+                x.Success,
+                x.Evaluator,
+                x.Context,
+                db.UnitTestResults
+                    .Where(z => z.CodeId == x.CodeId)
+                    .Select(z => new UnitTestResult(
+                        z.TestName,
+                        z.Outcome,
+                        z.Duration
+                    ))
+                    .ToList()
+            ))
+            .ToList();
+
+        var staticCodeEvaluationResults = db.StaticCodeEvaluationResult
+            .Select(x => new StaticCodeEvaluationResult(
+                x.CodeId,
+                x.Success,
+                x.Evaluator,
+                x.Context,
+                db.StaticCodeResults
+                    .Where(z => z.CodeId == x.CodeId)
+                    .Select(z => new StaticCodeResult(
+                        z.CodeAnalysisId,
+                        z.Context,
+                        z.Severity,
+                        z.QualityAttribute,
+                        z.QualityMetric,
+                        z.Line,
+                        new Dictionary<string, object>()
+                    ))
+                    .ToList()
+            ))
+            .ToList();
+
+        var evaluationResults = syntaxValidationResults
+            .Concat<IEvaluationResult>(unitTestEvaluationResults)
+            .Concat(staticCodeEvaluationResults).ToList();
+
+        foreach (var result in codeGenerationResults) {
+            var rightResults = evaluationResults
+                .Where(x => result.Code.Guid == x.CodeId)
+                .ToList();
+
+            yield return new FinalResult(result, rightResults);
         }
     }
 
