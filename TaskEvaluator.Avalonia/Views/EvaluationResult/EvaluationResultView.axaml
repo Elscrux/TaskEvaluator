@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:TaskEvaluator.Avalonia.Controls"
+             xmlns:viewModels="clr-namespace:TaskEvaluator.Avalonia.ViewModels"
+             xmlns:syntaxValidation="clr-namespace:TaskEvaluator.Evaluator.SyntaxValidation;assembly=TaskEvaluator"
+             xmlns:evaluationResult="clr-namespace:TaskEvaluator.Avalonia.Views.EvaluationResult"
+             xmlns:unitTest="clr-namespace:TaskEvaluator.Evaluator.UnitTest;assembly=TaskEvaluator"
+             xmlns:staticCodeAnalysis="clr-namespace:TaskEvaluator.Evaluator.StaticCodeAnalysis;assembly=TaskEvaluator"
+             xmlns:converters="clr-namespace:TaskEvaluator.Avalonia.Converters"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="50"
+             x:Class="TaskEvaluator.Avalonia.Views.EvaluationResult.EvaluationResultView"
+             x:CompileBindings="True" x:DataType="viewModels:IEvaluationResultVM">
+    <Design.DataContext>
+        <viewModels:DesignEvaluationResultVM/>
+    </Design.DataContext>
+
+    <controls:ToggleView
+        Toggle="{Binding Result, Converter={x:Static ObjectConverters.IsNull}}">
+        <controls:ToggleView.Enabled>
+            <Button Classes="LoadSpinner"/>
+        </controls:ToggleView.Enabled>
+
+        <controls:ToggleView.Disabled>
+            <StackPanel Orientation="Horizontal"
+                        Spacing="10"
+                        ToolTip.Tip="{Binding Result.Context}">
+                <TextBlock Text="{Binding Result.Evaluator}"
+                           Width="125"
+                           Foreground="{Binding Result.Success, Converter={x:Static converters:BoolConverter.ToBrush}}"/>
+
+                <controls:ToggleView Toggle="{Binding Result.Success}">
+                    <controls:ToggleView.Enabled>
+                        <ContentControl Content="{Binding Result}">
+                            <ContentControl.DataTemplates>
+                                <DataTemplate DataType="syntaxValidation:SyntaxValidationResult">
+                                    <evaluationResult:SyntaxValidationResultView/>
+                                </DataTemplate>
+                                <DataTemplate DataType="unitTest:UnitTestEvaluationResult">
+                                    <evaluationResult:UnitTestEvaluationResultView/>
+                                </DataTemplate>
+                                <DataTemplate DataType="staticCodeAnalysis:StaticCodeEvaluationResult">
+                                    <evaluationResult:StaticCodeEvaluationResultView/>
+                                </DataTemplate>
+                            </ContentControl.DataTemplates>
+                        </ContentControl>
+                    </controls:ToggleView.Enabled>
+
+                    <controls:ToggleView.Disabled>
+                        <TextBlock Text="Failed to run"
+                                   Foreground="Red"/>
+                    </controls:ToggleView.Disabled>
+                </controls:ToggleView>
+            </StackPanel>
+        </controls:ToggleView.Disabled>
+    </controls:ToggleView>
+</UserControl>

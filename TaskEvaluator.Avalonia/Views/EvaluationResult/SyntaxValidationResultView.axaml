@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:TaskEvaluator.Avalonia.Controls"
+             xmlns:syntaxValidation="clr-namespace:TaskEvaluator.Evaluator.SyntaxValidation;assembly=TaskEvaluator"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TaskEvaluator.Avalonia.Views.EvaluationResult.SyntaxValidationResultView"
+             x:CompileBindings="True" x:DataType="syntaxValidation:SyntaxValidationResult">
+    <controls:ToggleView Toggle="{Binding SyntaxValid}">
+        <controls:ToggleView.Enabled>
+            <TextBlock Foreground="Green"
+                       Text="Syntax is valid!"/>
+        </controls:ToggleView.Enabled>
+        <controls:ToggleView.Disabled>
+            <TextBlock Foreground="Red"
+                       Text="Syntax is invalid!"/>
+        </controls:ToggleView.Disabled>
+    </controls:ToggleView>
+</UserControl>

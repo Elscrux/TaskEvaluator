@@ -6,10 +6,8 @@
              xmlns:avalonia="https://github.com/projektanker/icons.avalonia"
              xmlns:avaloniaProgressRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
              xmlns:controls="clr-namespace:TaskEvaluator.Avalonia.Controls"
-             xmlns:syntaxValidation="clr-namespace:TaskEvaluator.Evaluator.SyntaxValidation;assembly=TaskEvaluator"
-             xmlns:staticCodeAnalysis="clr-namespace:TaskEvaluator.Evaluator.StaticCodeAnalysis;assembly=TaskEvaluator"
-             xmlns:unitTest="clr-namespace:TaskEvaluator.Evaluator.UnitTest;assembly=TaskEvaluator"
-             xmlns:converters="clr-namespace:TaskEvaluator.Avalonia.Converters"
+             xmlns:evaluationResult="clr-namespace:TaskEvaluator.Avalonia.Views.EvaluationResult"
+             xmlns:codeGenerationResult="clr-namespace:TaskEvaluator.Avalonia.Views.CodeGenerationResult"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TaskEvaluator.Avalonia.Views.RunnerView"
              x:CompileBindings="True" x:DataType="viewModels:IRunnerVM">
@@ -35,196 +33,52 @@
         </Style>
     </UserControl.Styles>
 
-    <TreeView ItemsSource="{Binding Tasks}">
-        <TreeView.DataTemplates>
-            <TreeDataTemplate DataType="viewModels:ITaskVM"
-                              ItemsSource="{Binding GenerationResults}">
-                <StackPanel Orientation="Horizontal"
-                            Spacing="10">
-                    <controls:ToggleView Toggle="{Binding IsBusy}"
-                                         Width="76"
-                                         HorizontalContentAlignment="Left">
-                        <controls:ToggleView.Enabled>
-                            <Button HorizontalAlignment="Center"
-                                    Classes="LoadSpinner"/>
-                        </controls:ToggleView.Enabled>
+    <DockPanel>
+        <TreeView ItemsSource="{Binding Tasks}">
+            <TreeView.DataTemplates>
+                <TreeDataTemplate DataType="viewModels:ITaskVM"
+                                  ItemsSource="{Binding GenerationResults}">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="10">
+                        <controls:ToggleView Toggle="{Binding IsBusy}"
+                                             Width="76"
+                                             HorizontalContentAlignment="Left">
+                            <controls:ToggleView.Enabled>
+                                <Button HorizontalAlignment="Center"
+                                        Classes="LoadSpinner"/>
+                            </controls:ToggleView.Enabled>
 
-                        <controls:ToggleView.Disabled>
-                            <StackPanel Orientation="Horizontal"
-                                        IsVisible="{Binding !GenerationResults.Count}">
-                                <Button avalonia:Attached.Icon="fa-solid fa-play"
-                                        Classes="Transparent"
-                                        Click="Expand"
-                                        Command="{Binding RunCodeGeneration}"
-                                        Foreground="Green"/>
-
-                                <Button avalonia:Attached.Icon="fa-solid fa-forward"
-                                        Classes="Transparent"
-                                        Click="Expand"
-                                        Command="{Binding RunAll}"
-                                        Foreground="Green"/>
-                            </StackPanel>
-                        </controls:ToggleView.Disabled>
-                    </controls:ToggleView>
-
-                    <TextBlock Text="{Binding Name}"/>
-                </StackPanel>
-            </TreeDataTemplate>
-
-            <TreeDataTemplate DataType="viewModels:ICodeGenerationResultVM" ItemsSource="{Binding EvaluationResults}">
-                <controls:ToggleView Toggle="{Binding Result, Converter={x:Static ObjectConverters.IsNull}}">
-                    <controls:ToggleView.Enabled>
-                        <Button IsVisible="{Binding Result, Converter={x:Static ObjectConverters.IsNull}}"
-                                Classes="LoadSpinner"/>
-                    </controls:ToggleView.Enabled>
-
-                    <controls:ToggleView.Disabled>
-                        <StackPanel Orientation="Horizontal"
-                                    Spacing="10"
-                                    ToolTip.Tip="{Binding Result.Code.Body}">
-                            <controls:ToggleView Toggle="{Binding IsBusy}"
-                                                 IsVisible="{Binding !EvaluationResults.Count}">
-                                <controls:ToggleView.Enabled>
-                                    <Button HorizontalAlignment="Center"
-                                            Classes="LoadSpinner"/>
-                                </controls:ToggleView.Enabled>
-
-                                <controls:ToggleView.Disabled>
-                                    <Button IsVisible="{Binding}"
-                                            avalonia:Attached.Icon="fa-solid fa-play"
+                            <controls:ToggleView.Disabled>
+                                <StackPanel Orientation="Horizontal"
+                                            IsVisible="{Binding !GenerationResults.Count}">
+                                    <Button avalonia:Attached.Icon="fa-solid fa-play"
                                             Classes="Transparent"
                                             Click="Expand"
-                                            Command="{Binding RunEvaluation}"
+                                            Command="{Binding RunCodeGeneration}"
                                             Foreground="Green"/>
-                                </controls:ToggleView.Disabled>
-                            </controls:ToggleView>
 
-                            <TextBlock Text="{Binding Result.Generator}"
-                                       Foreground="{Binding Result.Success, Converter={x:Static converters:BoolConverter.ToBrush}}"/>
-                        </StackPanel>
-                    </controls:ToggleView.Disabled>
-                </controls:ToggleView>
-            </TreeDataTemplate>
+                                    <Button avalonia:Attached.Icon="fa-solid fa-forward"
+                                            Classes="Transparent"
+                                            Click="Expand"
+                                            Command="{Binding RunAll}"
+                                            Foreground="Green"/>
+                                </StackPanel>
+                            </controls:ToggleView.Disabled>
+                        </controls:ToggleView>
 
-            <DataTemplate DataType="viewModels:IEvaluationResultVM">
-                <controls:ToggleView
-                    Toggle="{Binding Result, Converter={x:Static ObjectConverters.IsNull}}">
-                    <controls:ToggleView.Enabled>
-                        <Button Classes="LoadSpinner"/>
-                    </controls:ToggleView.Enabled>
+                        <TextBlock Text="{Binding Name}"/>
+                    </StackPanel>
+                </TreeDataTemplate>
 
-                    <controls:ToggleView.Disabled>
-                        <StackPanel Orientation="Horizontal"
-                                    Spacing="10"
-                                    ToolTip.Tip="{Binding Result.Context}">
-                            <TextBlock Text="{Binding Result.Evaluator}"
-                                       Width="125"
-                                       Foreground="{Binding Result.Success, Converter={x:Static converters:BoolConverter.ToBrush}}"/>
+                <TreeDataTemplate DataType="viewModels:ICodeGenerationResultVM"
+                                  ItemsSource="{Binding EvaluationResults}">
+                    <codeGenerationResult:CodeGenerationResultView/>
+                </TreeDataTemplate>
 
-                            <controls:ToggleView Toggle="{Binding Result.Success}">
-                                <controls:ToggleView.Enabled>
-
-                                    <ContentControl Content="{Binding Result}">
-                                        <ContentControl.DataTemplates>
-                                            <DataTemplate DataType="syntaxValidation:SyntaxValidationResult">
-                                                <controls:ToggleView Toggle="{Binding SyntaxValid}">
-                                                    <controls:ToggleView.Enabled>
-                                                        <TextBlock Foreground="Green"
-                                                                   Text="Syntax is valid!"/>
-                                                    </controls:ToggleView.Enabled>
-                                                    <controls:ToggleView.Disabled>
-                                                        <TextBlock Foreground="Red"
-                                                                   Text="Syntax is invalid!"/>
-                                                    </controls:ToggleView.Disabled>
-                                                </controls:ToggleView>
-                                            </DataTemplate>
-                                            <DataTemplate DataType="unitTest:UnitTestEvaluationResult">
-                                                <Button>
-                                                    <Button.Content>
-                                                        <TextBlock
-                                                            Foreground="{Binding Results, Converter={x:Static converters:UnitTestResultListConverter.ToBrush}}">
-                                                            <TextBlock.Inlines>
-                                                                <Run Text="{Binding Results, Converter={x:Static converters:UnitTestResultListConverter.CountSuccess}}"/>
-                                                                <Run Text="/"/>
-                                                                <Run Text="{Binding Results.Count}"/>
-                                                                <Run Text=" Unit Test Results"/>
-                                                            </TextBlock.Inlines>
-                                                        </TextBlock>
-                                                    </Button.Content>
-                                                    <Button.Flyout>
-                                                        <Flyout>
-                                                            <DataGrid ItemsSource="{Binding Results}"
-                                                                      IsReadOnly="True">
-                                                                <DataGrid.Columns>
-                                                                    <DataGridTextColumn
-                                                                        Header="Name"
-                                                                        Binding="{Binding TestName}"/>
-                                                                    <DataGridTemplateColumn Header="Outcome">
-                                                                        <DataTemplate
-                                                                            DataType="unitTest:UnitTestResult">
-                                                                            <TextBlock Text="{Binding Outcome}"
-                                                                                Foreground="{Binding Outcome, Converter={x:Static converters:UnitTestOutcomeConverter.ToBrush}}"/>
-                                                                        </DataTemplate>
-                                                                    </DataGridTemplateColumn>
-                                                                    <DataGridTextColumn
-                                                                        Header="Duration"
-                                                                        Binding="{Binding Duration}"/>
-                                                                </DataGrid.Columns>
-                                                            </DataGrid>
-                                                        </Flyout>
-                                                    </Button.Flyout>
-                                                </Button>
-                                            </DataTemplate>
-                                            <DataTemplate DataType="staticCodeAnalysis:StaticCodeEvaluationResult">
-                                                <Button>
-                                                    <Button.Content>
-                                                        <TextBlock
-                                                            Foreground="{Binding !Results.Count, Converter={x:Static converters:BoolConverter.ToBrush}}">
-                                                            <TextBlock.Inlines>
-                                                                <Run Text="{Binding Results.Count}"/>
-                                                                <Run Text=" Code Smells"/>
-                                                            </TextBlock.Inlines>
-                                                        </TextBlock>
-                                                    </Button.Content>
-                                                    <Button.Flyout>
-                                                        <Flyout>
-                                                            <DataGrid ItemsSource="{Binding Results}"
-                                                                      IsReadOnly="True">
-                                                                <DataGrid.Columns>
-                                                                    <DataGridTextColumn
-                                                                        Header="Id"
-                                                                        Binding="{Binding Id}"/>
-                                                                    <DataGridTextColumn
-                                                                        Header="Line"
-                                                                        Binding="{Binding Line}"/>
-                                                                    <DataGridTextColumn
-                                                                        Header="Severity"
-                                                                        Binding="{Binding Severity}"/>
-                                                                    <DataGridTextColumn
-                                                                        Header="Attribute"
-                                                                        Binding="{Binding QualityAttribute}"/>
-                                                                    <DataGridTextColumn
-                                                                        Header="Metric"
-                                                                        Binding="{Binding QualityMetric}"/>
-                                                                </DataGrid.Columns>
-                                                            </DataGrid>
-                                                        </Flyout>
-                                                    </Button.Flyout>
-                                                </Button>
-                                            </DataTemplate>
-                                        </ContentControl.DataTemplates>
-                                    </ContentControl>
-                                </controls:ToggleView.Enabled>
-
-                                <controls:ToggleView.Disabled>
-                                    <TextBlock Text="Failed to run"
-                                               Foreground="Red"/>
-                                </controls:ToggleView.Disabled>
-                            </controls:ToggleView>
-                        </StackPanel>
-                    </controls:ToggleView.Disabled>
-                </controls:ToggleView>
-            </DataTemplate>
-        </TreeView.DataTemplates>
-    </TreeView>
+                <DataTemplate DataType="viewModels:IEvaluationResultVM">
+                    <evaluationResult:EvaluationResultView/>
+                </DataTemplate>
+            </TreeView.DataTemplates>
+        </TreeView>
+    </DockPanel>
 </UserControl>
