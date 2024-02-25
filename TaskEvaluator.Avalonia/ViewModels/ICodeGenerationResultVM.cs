@@ -1,16 +1,19 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using DynamicData.Binding;
+using Noggog;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Language;
 using TaskEvaluator.Runtime;
+using TaskEvaluator.Sinks;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Avalonia.ViewModels;
 
@@ -22,24 +25,31 @@ public interface ICodeGenerationResultVM {
 }
 
 public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM {
-    private readonly ICodeGenerator _codeGenerator;
+    private readonly TaskRetry _taskRetry;
     private readonly TaskSet _taskSet;
+    private readonly ICodeGenerator _codeGenerator;
     private readonly LanguageFactory _languageFactory;
     private readonly IEvaluatorProvider _evaluatorProvider;
+    private readonly List<IFinalResultSink> _resultSinks;
 
     [Reactive] public bool IsBusy { get; set; }
     [Reactive] public CodeGenerationResult? Result { get; set; }
     public IObservableCollection<IEvaluationResultVM> EvaluationResults { get; } = new ObservableCollectionExtended<IEvaluationResultVM>();
     public ReactiveCommand<Unit, Task> RunEvaluation { get; }
 
-    public CodeGenerationResultVM(ICodeGenerator codeGenerator,
+    public CodeGenerationResultVM(
+        IEnumerable<IFinalResultSink> finalResultSinks,
         TaskSet taskSet,
+        TaskRetry taskRetry,
+        ICodeGenerator codeGenerator,
         LanguageFactory languageFactory,
         IEvaluatorProvider evaluatorProvider) {
-        _codeGenerator = codeGenerator;
         _taskSet = taskSet;
+        _taskRetry = taskRetry;
+        _codeGenerator = codeGenerator;
         _languageFactory = languageFactory;
         _evaluatorProvider = evaluatorProvider;
+        _resultSinks = finalResultSinks.ToList();
         RunEvaluation = ReactiveCommand.CreateRunInBackground(async () => {
             if (Result is null) return;
 
@@ -47,39 +57,64 @@ public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM 
         });
     }
 
-    public async Task<CodeGenerationResult> Generate(CancellationToken token = default) {
-        var result = await _codeGenerator.Send(_taskSet.CodeGenerationTask, token);
+    public async Task<CodeGenerationResult> Generate(CodeGenerationTask codeGenerationTask, CancellationToken token = default) {
+        var result = await _codeGenerator.Send(codeGenerationTask, token);
         Dispatcher.UIThread.Post(() => Result = result);
 
         return result;
     }
 
-    public async Task GenerateAndEvaluate(CancellationToken token = default) {
-        var result = await Generate(token);
+    public async Task<FinalResult> GenerateAndEvaluate(CancellationToken token = default) {
+        var result = await Generate(_taskSet.CodeGenerationTask, token);
 
-        await Evaluate(result, token);
+        return await Evaluate(result, token);
     }
 
-    public async Task Evaluate(CodeGenerationResult result, CancellationToken token = default) {
+    public async Task<FinalResult> Evaluate(CodeGenerationResult result, CancellationToken token = default) {
         Dispatcher.UIThread.Post(() => IsBusy = true);
 
-        using var runtime = await _languageFactory.CreateRuntime(result.Code, token);
+        var usedInitialResult = false;
+        var finalResults = await _taskRetry.Try(_taskSet, async task => {
+            if (usedInitialResult) {
+                result = await Generate(task, token);
+            } else {
+                usedInitialResult = true;
+            }
 
-        var evaluators = await _evaluatorProvider
-            .GetEvaluators(_taskSet.EvaluationModel, runtime)
-            .ToListAsync(token);
+            using var runtime = await _languageFactory.CreateRuntime(result.Code, token);
 
-        var enumerable = evaluators
-            .Select(evaluator => {
-                var evaluationResultVM = new EvaluationResultVM(evaluator, result.Code, _taskSet.EvaluationModel);
-                Dispatcher.UIThread.Post(() => EvaluationResults.Add(evaluationResultVM));
-                return evaluationResultVM.Evaluate(token);
-            });
+            var evaluators = await _evaluatorProvider
+                .GetEvaluators(_taskSet.EvaluationModel, runtime)
+                .ToListAsync(token);
 
-        await Task.WhenAll(enumerable);
+            var enumerable = evaluators
+                .Select(async evaluator => {
+                    var evaluationResultVM = new EvaluationResultVM(evaluator, result.Code, _taskSet.EvaluationModel);
+                    Dispatcher.UIThread.Post(() => EvaluationResults.Add(evaluationResultVM));
+                    return await evaluationResultVM.Evaluate(token);
+                });
+
+            var evaluationResults = await Task.WhenAll(enumerable);
+            var finalResult = new FinalResult(result, evaluationResults.NotNull().ToList());
+
+            foreach (var sink in _resultSinks) {
+                sink.Send(finalResult);
+            }
+
+            return [finalResult];
+        });
 
         Dispatcher.UIThread.Post(() => IsBusy = false);
+
+        return finalResults[0];
     }
+}
+
+public sealed class FinishedCodeGenerationResultVM(FinalResult finalResult) : ViewModel, ICodeGenerationResultVM {
+    [Reactive] public bool IsBusy { get; set; }
+    [Reactive] public CodeGenerationResult? Result { get; set; } = finalResult.CodeGenerationResult;
+    public IObservableCollection<IEvaluationResultVM> EvaluationResults { get; } = new ObservableCollectionExtended<IEvaluationResultVM>(finalResult.EvaluationResults.Select(result => new FinishedEvaluationResultVM(result)));
+    public ReactiveCommand<Unit, Task> RunEvaluation { get; } = ReactiveCommand.Create(() => Task.CompletedTask);
 }
 
 public sealed class DesignCodeGenerationResultVM(string generator) : ICodeGenerationResultVM {

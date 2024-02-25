@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
@@ -8,14 +6,12 @@ using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using TaskEvaluator.Evaluator;
 using TaskEvaluator.Generation;
-using TaskEvaluator.Runtime;
-using TaskEvaluator.Sinks;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Avalonia.ViewModels;
 
 public interface ITaskVM {
+    TaskSet TaskSet { get; }
     string Name { get; }
     IObservableCollection<ICodeGenerationResultVM> GenerationResults { get; }
     [Reactive] public bool IsBusy { get; set; }
@@ -24,20 +20,19 @@ public interface ITaskVM {
 }
 
 public sealed class TaskVM : ViewModel, ITaskVM {
-    private readonly TaskSet _taskSet;
+    public TaskSet TaskSet { get; }
 
-    public string Name => _taskSet.Name;
+    public string Name => TaskSet.Name;
     public IObservableCollection<ICodeGenerationResultVM> GenerationResults { get; } = new ObservableCollectionExtended<ICodeGenerationResultVM>();
     [Reactive] public bool IsBusy { get; set; }
     public ReactiveCommand<Unit, Task> RunCodeGeneration { get; }
     public ReactiveCommand<Unit, Task> RunAll { get; }
 
     public TaskVM(
-        LanguageFactory languageFactory,
-        IEvaluatorProvider evaluatorProvider,
+        TaskEvaluatorVMFactory taskEvaluatorVMFactory,
         ICodeGenerationProvider codeGenerationProvider,
         TaskSet taskSet) {
-        _taskSet = taskSet;
+        TaskSet = taskSet;
 
         RunCodeGeneration = ReactiveCommand.CreateRunInBackground(async () => {
             Dispatcher.UIThread.Post(() => IsBusy = true);
@@ -45,9 +40,9 @@ public sealed class TaskVM : ViewModel, ITaskVM {
             var codeGeneration = codeGenerationProvider
                 .GetGenerators()
                 .Select(codeGenerator => {
-                    var resultVM = new CodeGenerationResultVM(codeGenerator, taskSet, languageFactory, evaluatorProvider);
+                    var resultVM = taskEvaluatorVMFactory.CodeGenerationResultVM(taskSet, codeGenerator);
                     Dispatcher.UIThread.Post(() => GenerationResults.Add(resultVM));
-                    return resultVM.Generate();
+                    return resultVM.Generate(taskSet.CodeGenerationTask);
                 })
                 .ToList();
 
@@ -62,7 +57,7 @@ public sealed class TaskVM : ViewModel, ITaskVM {
             var codeGeneration = codeGenerationProvider
                 .GetGenerators()
                 .Select(codeGenerator => {
-                    var resultVM = new CodeGenerationResultVM(codeGenerator, taskSet, languageFactory, evaluatorProvider);
+                    var resultVM = taskEvaluatorVMFactory.CodeGenerationResultVM(taskSet, codeGenerator);
                     Dispatcher.UIThread.Post(() => GenerationResults.Add(resultVM));
                     return resultVM.GenerateAndEvaluate();
                 })
@@ -76,6 +71,7 @@ public sealed class TaskVM : ViewModel, ITaskVM {
 }
 
 public sealed class DesignTaskVM : ViewModel, ITaskVM {
+    public TaskSet TaskSet => null!;
     public string Name { get; }
     public bool IsBusy { get; set; }
     public ReactiveCommand<Unit, Task> RunCodeGeneration { get; }

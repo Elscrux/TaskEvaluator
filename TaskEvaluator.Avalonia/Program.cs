@@ -40,6 +40,7 @@ public static class Program {
 
         builder.Services.AddTransient<MainWindowVM>();
         builder.Services.AddTransient<RunnerVM>();
+        builder.Services.AddTransient<TaskEvaluatorVMFactory>();
 
         var host = builder.Build();
 

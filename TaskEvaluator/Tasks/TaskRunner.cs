@@ -6,6 +6,7 @@ namespace TaskEvaluator.Tasks;
 
 public sealed class TaskRunner(
     LanguageFactory languageFactory,
+    TaskRetry retry,
     IEvaluatorProvider evaluatorProvider,
     ICodeGenerationProvider codeGenerationProvider) {
 
@@ -33,20 +34,24 @@ public sealed class TaskRunner(
     }
 
     public async IAsyncEnumerable<FinalResult> Process(TaskSet taskSet, [EnumeratorCancellation] CancellationToken token = default) {
-        var listAsync = await Generate(taskSet.CodeGenerationTask, token)
-            .Where(result => result.Success)
-            .Select(codeGenerationResult => {
-                return Task.Run(async () => {
-                    var successfulRevaluationResults = await Evaluate(codeGenerationResult.Code, taskSet.EvaluationModel, token)
-                        .Where(result => result.Success)
-                        .ToListAsync(token);
+        var finalResults = await retry.Try(taskSet, async task => {
+            var tasks = await Generate(task, token)
+                .Where(result => result.Success)
+                .Select(codeGenerationResult => {
+                    return Task.Run(async () => {
+                        var successfulRevaluationResults = await Evaluate(codeGenerationResult.Code, taskSet.EvaluationModel, token)
+                            .Where(result => result.Success)
+                            .ToListAsync(token);
 
-                    return new FinalResult(codeGenerationResult, successfulRevaluationResults);
-                }, token);
-            })
-            .ToListAsync(token);
+                        return new FinalResult(codeGenerationResult, successfulRevaluationResults);
+                    }, token);
+                })
+                .ToListAsync(token);
 
-        await foreach (var finalResult in listAsync.AwaitAll(token)) {
+            return await Task.WhenAll(tasks);
+        });
+
+        foreach (var finalResult in finalResults) {
             yield return finalResult;
         }
     }

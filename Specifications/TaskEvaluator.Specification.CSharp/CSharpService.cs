@@ -1,4 +1,6 @@
-﻿using TaskEvaluator.Language;
+﻿using TaskEvaluator.Evaluator.SyntaxValidation;
+using TaskEvaluator.Generation;
+using TaskEvaluator.Language;
 using TaskEvaluator.Runtime;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Specification.CSharp;
@@ -69,5 +71,13 @@ public sealed class CSharpService : ILanguageService {
 
         var testPath = Path.Combine(testDirectory, "UnitTest.cs");
         File.WriteAllText(testPath, testCode.Body);
+    }
+
+    public string GetSyntaxErrorHint(CodeGenerationResult codeGenerationResult, SyntaxValidationResult syntaxValidationResult) {
+        if (syntaxValidationResult.Context != null && syntaxValidationResult.Context.Contains("end-of-file expected", StringComparison.OrdinalIgnoreCase)) {
+            return "Ensure that you don't add too many curly braces at the end";
+        }
+
+        return string.Empty;
     }
 }

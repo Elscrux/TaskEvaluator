@@ -1,4 +1,6 @@
-﻿using TaskEvaluator.Language;
+﻿using TaskEvaluator.Evaluator.SyntaxValidation;
+using TaskEvaluator.Generation;
+using TaskEvaluator.Language;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Runtime;
 
@@ -11,4 +13,5 @@ public interface ILanguageService {
 
     void CreateWorkingDirectory(string workingDirectory, Code code);
     void CreateTestDirectory(string testDirectory, Code code, Code testCode);
+    string GetSyntaxErrorHint(CodeGenerationResult codeGenerationResult, SyntaxValidationResult syntaxValidationResult);
 }

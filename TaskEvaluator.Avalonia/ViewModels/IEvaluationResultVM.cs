@@ -11,20 +11,23 @@ namespace TaskEvaluator.Avalonia.ViewModels;
 
 public interface IEvaluationResultVM {
     IEvaluationResult? Result { get; set; }
-    EvaluationModel EvaluationModel { get; }
+}
+
+public sealed class FinishedEvaluationResultVM(IEvaluationResult result) : ViewModel, IEvaluationResultVM {
+    [Reactive] public IEvaluationResult? Result { get; set; } = result;
 }
 
 public sealed class EvaluationResultVM(IEvaluator evaluator, Code code, EvaluationModel evaluationModel) : ViewModel, IEvaluationResultVM {
     [Reactive] public IEvaluationResult? Result { get; set; }
-    public EvaluationModel EvaluationModel { get; } = evaluationModel;
 
-    public async Task Evaluate(CancellationToken token = default) {
-        var result = await evaluator.Evaluate(code, EvaluationModel, token);
+    public async Task<IEvaluationResult> Evaluate(CancellationToken token = default) {
+        var result = await evaluator.Evaluate(code, evaluationModel, token);
         Dispatcher.UIThread.Post(() => Result = result);
+        return result;
     }
 }
 
 public sealed class DesignEvaluationResultVM(string evaluator) : ViewModel, IEvaluationResultVM {
+    public DesignEvaluationResultVM() : this("Evaluator") {}
     public IEvaluationResult? Result { get; set; } = new SyntaxValidationResult(Guid.NewGuid(), Random.Shared.Next(0, 2) == 1, evaluator, null, true);
-    public EvaluationModel EvaluationModel { get; } = new(new Code(string.Empty, ProgrammingLanguage.CSharp));
 }

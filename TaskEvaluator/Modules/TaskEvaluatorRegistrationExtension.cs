@@ -15,6 +15,7 @@ public static class TaskEvaluatorRegistrationExtension {
         // Task
         services.Configure<TaskLoadConfiguration>(configuration.GetSection("TaskSet"));
         services.AddTransient<TaskRunner>();
+        services.AddTransient<TaskRetry>();
         services.AddTransient<ITaskLoader, LocalTaskLoader>();
 
         // Evaluator
