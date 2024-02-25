@@ -146,19 +146,27 @@ Currently, the tool only supports C# as a programming language.
 
 - The directory should have the following structure:
   - [Language]
-    - [TaskGuid]
+    - [TestName]
       - File including the name "Program" for the source code
       - File including the name "UnitTest" for the unit tests
+      - metadata.json with additional information
+        - Example:
+      ```json
+      {
+          "id": "112c5a6e-0e7c-4e49-b699-8e2be2e24e4a",
+          "isHumanEval": true
+      }
+      ```
 - 
 - Here an example
     - CSharp
-        - 4c79b244-f3f5-420a-b60f-4a3ac1b53952
+        - Test1
             - Program.cs
             - UnitTests.cs
-        - eb48e72b-599d-45d2-a472-f50ca4cb955c
+        - Test2
             - Program.cs
             - UnitTest
-        - 747ddfa6-a303-4b2d-8dd7-ddacf4482412
+        - Test3
             - MyProgram
             - UnitTests
         - ...
