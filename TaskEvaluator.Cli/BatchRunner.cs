@@ -11,21 +11,22 @@ public sealed class BatchRunner(
     IEnumerable<IFinalResultSink> evaluationResultSinks)
     : IHostedService {
 
+    private readonly IList<IFinalResultSink> _evaluationResultSinks = evaluationResultSinks.ToList();
+
     public Task StartAsync(CancellationToken cancellationToken) {
         logger.LogInformation("Started");
 
         logger.LogInformation("Loading Tasks");
         var taskSet = taskLoader.Load();
 
-        return Parallel.ForEachAsync(taskSet, cancellationToken, async (task, token) => {
+        return taskSet.AwaitAll(async task => {
             logger.LogInformation("Generating {Task}", task.CodeGenerationTask.ToString());
-            await foreach (var result in taskRunner.Process(task, token)) {
-                logger.LogInformation("Evaluating {Task} | Result: {Result}", task.CodeGenerationTask.ToString(), result.ToString());
-                foreach (var evaluationResultSink in evaluationResultSinks) {
+            await foreach (var result in taskRunner.Process(task, cancellationToken)) {
+                foreach (var evaluationResultSink in _evaluationResultSinks) {
                     evaluationResultSink.Send(result);
                 }
             }
-        });
+        }, 5, cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken) {
