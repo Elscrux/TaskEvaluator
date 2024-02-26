@@ -8,5 +8,5 @@ public sealed record SyntaxValidationResult(Guid CodeId, bool Success, string Ev
         runtimeResult.Context,
         runtimeResult.SyntaxValid) {}
 
-    public bool IsValid() => SyntaxValid;
+    public bool IsValid() => Success && SyntaxValid;
 }

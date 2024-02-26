@@ -20,5 +20,5 @@ public sealed record StaticCodeEvaluationResult(
         staticCodeRuntimeResult.Context,
         staticCodeRuntimeResult.Results) {}
 
-    public bool IsValid() => Results.Count == 0;
+    public bool IsValid() => Success && Results.Count == 0;
 }
