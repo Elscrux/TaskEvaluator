@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
@@ -18,10 +19,11 @@ using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Avalonia.ViewModels;
 
 public interface ICodeGenerationResultVM {
+    IObservable<TaskState> EvaluationCompleted { get; }
     bool IsBusy { get; set; }
     CodeGenerationResult? Result { get; set; }
     IObservableCollection<IEvaluationResultVM> EvaluationResults { get; }
-    public ReactiveCommand<Unit, Task> RunEvaluation { get; }
+    ReactiveCommand<Unit, Task> RunEvaluation { get; }
 }
 
 public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM {
@@ -32,9 +34,11 @@ public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM 
     private readonly IEvaluatorProvider _evaluatorProvider;
     private readonly List<IFinalResultSink> _resultSinks;
 
+    public IObservable<TaskState> EvaluationCompleted { get; }
     [Reactive] public bool IsBusy { get; set; }
     [Reactive] public CodeGenerationResult? Result { get; set; }
     public IObservableCollection<IEvaluationResultVM> EvaluationResults { get; } = new ObservableCollectionExtended<IEvaluationResultVM>();
+    private IObservableCollection<IEvaluationResultVM> _latestResults { get; } = new ObservableCollectionExtended<IEvaluationResultVM>();
     public ReactiveCommand<Unit, Task> RunEvaluation { get; }
 
     public CodeGenerationResultVM(
@@ -50,6 +54,19 @@ public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM 
         _languageFactory = languageFactory;
         _evaluatorProvider = evaluatorProvider;
         _resultSinks = finalResultSinks.ToList();
+        EvaluationCompleted = _latestResults
+            .ObserveCollectionChanges()
+            .Select(_ => {
+                if (_latestResults.Count == 0) return Observable.Return(TaskState.NotStarted);
+
+                return _latestResults
+                    .Select(x => x.EvaluationCompleted)
+                    .CombineLatest()
+                    .Select(x => x.Merge());
+            })
+            .Switch()
+            .StartWith(TaskState.NotStarted);
+
         RunEvaluation = ReactiveCommand.CreateRunInBackground(async () => {
             if (Result is null) return;
 
@@ -87,10 +104,15 @@ public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM 
                 .GetEvaluators(_taskSet.EvaluationModel, runtime)
                 .ToListAsync(token);
 
+            Dispatcher.UIThread.Post(() => _latestResults.Clear());
+
             var enumerable = evaluators
                 .Select(async evaluator => {
                     var evaluationResultVM = new EvaluationResultVM(evaluator, result.Code, _taskSet.EvaluationModel);
-                    Dispatcher.UIThread.Post(() => EvaluationResults.Add(evaluationResultVM));
+                    Dispatcher.UIThread.Post(() => {
+                        _latestResults.Add(evaluationResultVM);
+                        EvaluationResults.Add(evaluationResultVM);
+                    });
                     return await evaluationResultVM.Evaluate(token);
                 });
 
@@ -111,6 +133,7 @@ public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM 
 }
 
 public sealed class FinishedCodeGenerationResultVM(FinalResult finalResult) : ViewModel, ICodeGenerationResultVM {
+    public IObservable<TaskState> EvaluationCompleted { get; } = Observable.Return(TaskState.Success);
     [Reactive] public bool IsBusy { get; set; }
     [Reactive] public CodeGenerationResult? Result { get; set; } = finalResult.CodeGenerationResult;
     public IObservableCollection<IEvaluationResultVM> EvaluationResults { get; } = new ObservableCollectionExtended<IEvaluationResultVM>(finalResult.EvaluationResults.Select(result => new FinishedEvaluationResultVM(result)));
@@ -118,6 +141,7 @@ public sealed class FinishedCodeGenerationResultVM(FinalResult finalResult) : Vi
 }
 
 public sealed class DesignCodeGenerationResultVM(string generator) : ICodeGenerationResultVM {
+    public IObservable<TaskState> EvaluationCompleted { get; } = Observable.Return(TaskState.Success);
     public bool IsBusy { get; set; }
     public CodeGenerationResult? Result { get; set; } = new(
         Guid.NewGuid(),
