@@ -17,4 +17,6 @@ public sealed class DbStaticCodeAnalysisEvaluationResult : IEvaluationResult {
 
     [Association(ThisKey = nameof(CodeId), OtherKey = nameof(DbUnitTestResult.CodeId))]
     public IReadOnlyList<DbStaticCodeAnalysisResult> Results { get; init; } = [];
+
+    public bool IsValid() => true;
 }

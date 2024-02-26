@@ -19,4 +19,6 @@ public sealed record StaticCodeEvaluationResult(
         staticCodeRuntimeResult.Evaluator,
         staticCodeRuntimeResult.Context,
         staticCodeRuntimeResult.Results) {}
+
+    public bool IsValid() => Results.Count == 0;
 }

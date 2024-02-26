@@ -11,4 +11,6 @@ public sealed record UnitTestEvaluationResult(Guid CodeId, bool Success, string 
         unitTestRuntimeResult.Evaluator,
         unitTestRuntimeResult.Context,
         unitTestRuntimeResult.Results) {}
+
+    public bool IsValid() => Results.All(x => x.Outcome == UnitTestOutcome.Passed);
 }

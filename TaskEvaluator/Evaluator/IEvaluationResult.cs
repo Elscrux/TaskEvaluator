@@ -12,4 +12,6 @@ public interface IEvaluationResult {
     bool Success { get; }
     string Evaluator { get; }
     string? Context { get; }
+
+    bool IsValid();
 }

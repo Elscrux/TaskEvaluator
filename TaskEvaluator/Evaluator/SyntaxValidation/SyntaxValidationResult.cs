@@ -7,4 +7,6 @@ public sealed record SyntaxValidationResult(Guid CodeId, bool Success, string Ev
         runtimeResult.Evaluator,
         runtimeResult.Context,
         runtimeResult.SyntaxValid) {}
+
+    public bool IsValid() => SyntaxValid;
 }

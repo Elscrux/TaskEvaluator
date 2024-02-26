@@ -17,4 +17,6 @@ public sealed class DbUnitTestEvaluationResult : IEvaluationResult {
 
     [Association(ThisKey = nameof(CodeId), OtherKey = nameof(DbUnitTestResult.CodeId))]
     public IList<DbUnitTestResult> Results { get; init; } = [];
+
+    public bool IsValid() => true;
 }

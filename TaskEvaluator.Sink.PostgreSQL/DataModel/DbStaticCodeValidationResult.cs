@@ -17,4 +17,6 @@ public sealed class DbSyntaxValidationResult : IEvaluationResult {
 
     [Column, NotNull]
     public bool SyntaxValid { get; init; }
+
+    public bool IsValid() => true;
 }
