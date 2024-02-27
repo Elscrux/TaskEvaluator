@@ -2,6 +2,8 @@
 namespace TaskEvaluator.Generator.GitHubCopilot.Model;
 
 public class GitHubCopilotApiRequest {
+    public const int TotalTokenLimit = 16382;
+
     [JsonPropertyName("prompt")] public required string Prompt { get; init; }
     [JsonPropertyName("suffix")] public required string Suffix { get; init; }
     [JsonPropertyName("max_tokens")] public int MaxTokens { get; init; } = 5000;
