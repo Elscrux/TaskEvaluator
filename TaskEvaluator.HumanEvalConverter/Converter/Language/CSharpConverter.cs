@@ -94,23 +94,28 @@ public sealed partial class CSharpConverter : IHumanEvalConverter {
     }
 
     public string GetProgram(DataSetTask dataSetTask) {
-        var helperFunctions = dataSetTask.HelperFunctions.Count > 0
-            ? "These helper functions are available: " + string.Join(", ", dataSetTask.HelperFunctions.Select(ToFunction))
-            : string.Empty;
+        var functions = dataSetTask.HelperFunctions.Append(dataSetTask.FunctionSignature)
+            .Select(function => {
+                var functionSignature = ToFunction(function);
+                var documentation = function.Documentation.Replace("None", "null");
+                return $$"""
+                             /// <summary>
+                             /// {{documentation}}
+                             /// </summary>
+                             public static {{functionSignature}} {
+                                 //INSERT_CODE_HERE
+                             }
+                         """;
+            })
+            .ToList();
 
-        var documentation = dataSetTask.FunctionSignature.Documentation.Replace("None", "null");
+        var functionsString = string.Join("\n\n", functions);
 
         return $$"""
                  namespace Task;
 
                  public static class TaskClass {
-                     /// <summary>
-                     /// {{documentation}}
-                     /// {{helperFunctions}}
-                     /// </summary>
-                     public static {{ToFunction(dataSetTask.FunctionSignature)}} {
-                         //INSERT_CODE_HERE
-                     }
+                 {{functionsString}}
                  }
                  """;
     }

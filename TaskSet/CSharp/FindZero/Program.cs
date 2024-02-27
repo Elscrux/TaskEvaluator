@@ -8,4 +8,12 @@ public static class TaskClass {
     public static double FindZero(List<double> @xs) {
         //INSERT_CODE_HERE
     }
+
+    /// <summary>
+    /// Evaluates polynomial with coefficients xs at point x.
+    /// </summary>
+    /// <returns>xs[0] + xs[1] * x + xs[1] * x^2 + .... xs[n] * x^n</returns>
+    public static double Poly(List<double> @xs, double @x) {
+        return xs.Select((coeff, i) => coeff * Math.Pow(x, i)).Sum();
+    }
 }

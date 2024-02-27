@@ -8,4 +8,11 @@ public static class TaskClass {
     public static string DecodeShift(string @s) {
         //INSERT_CODE_HERE
     }
+
+    /// <summary>
+    /// returns encoded string by shifting every character by 5 in the alphabet.
+    /// </summary>
+    public static string EncodeShift(string @s) {
+        return string.Join(string.Empty, s.Select(ch => (char)(((ch + 5 - 'a') % 26) + 'a')));
+    }
 }
