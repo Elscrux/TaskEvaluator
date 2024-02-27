@@ -9,6 +9,6 @@ public class TaskClass {
     /// <param name="day">day of the date</param>
     /// <returns>weekday where 0 is Monday, 6 is Sunday</returns>    
     public static int GetWeekday(int year, int month, int day) {
-        INSERT_CODE_HERE
+        //INSERT_CODE_HERE
     }
 }
