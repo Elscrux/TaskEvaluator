@@ -69,7 +69,10 @@ public sealed class TaskRetry(
                         .ToList();
 
                     if (failedTests.Count > 0) {
-                        return "Keep these test cases in mind:\n" + string.Join("\n\n", set.EvaluationModel.UnitTests);
+                        return "Keep these test cases in mind, they failed:\n"
+                          + string.Join("\n", failedTests.Select(x => x.TestName))
+                          + "\n\nHere are the unit tests:\n"
+                          + string.Join("\n\n", set.EvaluationModel.UnitTests);
                     }
                     break;
                 default:
