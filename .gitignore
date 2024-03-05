@@ -10,3 +10,4 @@ riderModule.iml
 *.user
 .nuget/
 secrets/
+.env

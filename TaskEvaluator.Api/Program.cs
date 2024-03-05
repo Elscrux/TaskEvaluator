@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using DotNetEnv.Configuration;
 using TaskEvaluator.Api.Api;
 using TaskEvaluator.Api.Requests;
 using TaskEvaluator.Evaluator;
@@ -23,6 +24,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddHealthChecks();
 
 builder.Configuration.AddUserSecrets<TaskRunner>();
+builder.Configuration.AddDotNetEnv("../.env");
 
 builder.Services.AddTaskEvaluator(builder.Configuration)
     .Language.Add<CSharpRegistration>()
