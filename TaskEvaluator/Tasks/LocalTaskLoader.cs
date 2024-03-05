@@ -53,7 +53,9 @@ public sealed class LocalTaskLoader(
         }
 
         logger.LogWarning("No valid metadata.json found in {TaskDirectory}, use default metadata instead", taskDirectory);
-        return TaskMetadata.Default;
+        var newMetadata = TaskMetadata.Default;
+        File.WriteAllText(metadataPath, JsonSerializer.Serialize(newMetadata));
+        return newMetadata;
     }
 
     private CodeGenerationTask? LoadCodeGenerationTask(TaskMetadata metadata, ILanguageService languageService, string taskDirectory) {
