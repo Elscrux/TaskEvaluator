@@ -49,7 +49,7 @@ In any case, you'll first have to
 - Add the following .NET User Secrets for TaskEvaluator
 ```json
 {
-    "GitHubCopilot": {
+    "Tabby": {
         "CompletionsUrl": "http://localhost:8080/v1/completions"
     }
 }
