@@ -9,7 +9,7 @@ public sealed record TaskMetadata(
     bool IsHumanEval = false,
     [property: JsonPropertyName("definesCustomTypes")]
     bool DefinesCustomTypes = false) {
-    public static TaskMetadata Default { get; } = new(Guid.NewGuid());
+    public static TaskMetadata Default => new(Guid.NewGuid());
 }
 
 public sealed record TaskSet(

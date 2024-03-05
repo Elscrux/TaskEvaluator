@@ -163,11 +163,14 @@ Currently, the tool only supports C# as a programming language.
         - Test1
             - Program.cs
             - UnitTests.cs
+            - metadata.json
         - Test2
             - Program.cs
             - UnitTest
+            - metadata.json
         - Test3
             - MyProgram
             - UnitTests
+            // No metadata.json - default values will be used
         - ...
     - ...
