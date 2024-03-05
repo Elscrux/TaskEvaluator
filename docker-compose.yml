@@ -1,6 +1,5 @@
 ﻿services:
     tabby:
-        restart: always
         image: tabbyml/tabby
         entrypoint: /opt/tabby/bin/tabby-cpu
         command: serve --model TabbyML/StarCoder-1B
