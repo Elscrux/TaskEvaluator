@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,6 +21,7 @@ public sealed class TabbyCodeGenerator(
         var tabbyApiRequest = GetRequest(task);
 
         var httpClient = httpClientFactory.CreateClient();
+        var startTime = Stopwatch.GetTimestamp();
         var response = await httpClient
             .PostAsJsonAsync(config.Value.CompletionsUrl, tabbyApiRequest, token)
             .ConfigureAwait(false);
@@ -30,6 +32,7 @@ public sealed class TabbyCodeGenerator(
                 .PostAsJsonAsync(config.Value.CompletionsUrl, tabbyApiRequest, token)
                 .ConfigureAwait(false);
         }
+        var elapsedTime = Stopwatch.GetElapsedTime(startTime);
 
         response.EnsureSuccessStatusCode();
 
@@ -37,9 +40,9 @@ public sealed class TabbyCodeGenerator(
             .ReadFromJsonAsync<TabbyApiResponse>(token)
             .ConfigureAwait(false);
 
-        if (tabbyApiResponse is null) return CodeGenerationResult.Failure(task, "Tabby");
+        if (tabbyApiResponse is null) return CodeGenerationResult.Failure(task, "Tabby", elapsedTime);
 
-        return CodeGenerationResult.Successful(task, tabbyApiResponse.Choices[0].Text, "Tabby");
+        return CodeGenerationResult.Successful(task, tabbyApiResponse.Choices[0].Text, "Tabby", elapsedTime);
     }
 
     public TabbyApiRequest GetRequest(CodeGenerationTask task) {

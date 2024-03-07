@@ -58,6 +58,7 @@ public sealed class PostgresFinalResultSink(
             Body = finalResult.CodeGenerationResult.Code.Body,
             Language = finalResult.CodeGenerationResult.Code.Language,
             Generator = finalResult.CodeGenerationResult.Generator,
+            GenerationTimeMilliseconds = finalResult.CodeGenerationResult.GenerationTime.Milliseconds,
         });
 
         foreach (var evaluationResult in finalResult.EvaluationResults) {
@@ -75,7 +76,8 @@ public sealed class PostgresFinalResultSink(
                 true,
                 new Code(x.CodeId, x.Body, x.Language),
                 x.GeneratedPart,
-                x.Generator
+                x.Generator,
+                TimeSpan.FromMilliseconds(x.GenerationTimeMilliseconds)
             ))
             .ToList();
 

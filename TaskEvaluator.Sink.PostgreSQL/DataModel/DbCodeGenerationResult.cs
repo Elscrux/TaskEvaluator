@@ -20,4 +20,7 @@ public sealed class DbCodeGenerationResult {
 
     [Column]
     public string Generator { get; set; } = string.Empty;
+
+    [Column]
+    public int GenerationTimeMilliseconds { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Diagnostics;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
@@ -30,9 +31,11 @@ public sealed class GitHubCopilotModelApi(
         var gitHubCopilotApiRequest = promptGenerator.GeneratePrompt(task);
         var serialize = JsonSerializer.Serialize(gitHubCopilotApiRequest);
         requestMessage.Content = new StringContent(serialize);
+        var startTime = Stopwatch.GetTimestamp();
         var responseMessage = await httpClient.SendAsync(requestMessage, token);
+        var elapsedTime = Stopwatch.GetElapsedTime(startTime);
         if (!responseMessage.IsSuccessStatusCode) {
-            return CodeGenerationResult.Failure(task, "GitHub Copilot");
+            return CodeGenerationResult.Failure(task, "GitHub Copilot", elapsedTime);
         }
 
         var fullContent = await responseMessage.Content
@@ -48,7 +51,7 @@ public sealed class GitHubCopilotModelApi(
             .Select(x => x.Choices?.FirstOrDefault()?.Text)
             .ToList();
 
-        return CodeGenerationResult.Successful(task, string.Join(string.Empty, list), "GitHub Copilot");
+        return CodeGenerationResult.Successful(task, string.Join(string.Empty, list), "GitHub Copilot", elapsedTime);
     }
 
     private sealed class GitHubCopilotApiStreamResult {

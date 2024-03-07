@@ -150,7 +150,8 @@ public sealed class DesignCodeGenerationResultVM(string generator) : ICodeGenera
             new CodeGenerationTask(Guid.NewGuid(), string.Empty, string.Empty, ProgrammingLanguage.CSharp),
             string.Empty),
         string.Empty,
-        generator);
+        generator,
+        TimeSpan.FromSeconds(1));
     public IObservableCollection<IEvaluationResultVM> EvaluationResults { get; }
         = new ObservableCollectionExtended<IEvaluationResultVM>(
             Enumerable.Range(0, 2)
