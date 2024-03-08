@@ -29,7 +29,7 @@
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <ItemGroup>
             <!-- Include all files in the solution folder excluding the build files -->
-            <SolutionFiles Include="$(SolutionDir)\**\*.*" Exclude="$(SolutionDir)\**\obj\**;$(SolutionDir)\**\bin\**" />
+            <SolutionFiles Include="$(SolutionDir)\**\*.*" Exclude="$(SolutionDir)\**\obj\**;$(SolutionDir)\**\bin\**;$(SolutionDir)\.idea\**;$(SolutionDir)\.git\**" />
         </ItemGroup>
 
         <!-- Create the destination directory if it doesn't exist -->
