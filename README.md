@@ -131,7 +131,7 @@ Detailed explanations for the setup of the individual Docker containers.
 - Login (default credentials: admin/admin)
 - Add a new Data Source
     - Type: PostgreSQL
-    - Host: postgres:5432
+    - Host: taskevaluator-db-1:5432
     - Database: postgres
     - User: postgres
     - Password: YOUR_PASSWORD
