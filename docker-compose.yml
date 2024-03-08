@@ -18,11 +18,8 @@
         ports:
             - 5432:5432
         environment:
-            POSTGRES_USER_FILE: /run/secrets/postgres_user
-            POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
-        secrets:
-            - postgres_user
-            - postgres_password
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
         networks:
             - postgres_net
     grafana:
@@ -37,9 +34,3 @@ networks:
         driver: bridge
     postgres_net:
         driver: bridge
-
-secrets:
-    postgres_user:
-        file: ./secrets/postgres_user.txt
-    postgres_password:
-        file: ./secrets/postgres_password.txt

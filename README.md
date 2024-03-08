@@ -16,6 +16,15 @@ There are external tools for code generation, code evaluation and data visualiza
 In any case, you'll first have to
 - Install Docker
 - Start Docker-Engine
+- Copy .env.example to .env and fill the commented out variables (see the individual sections below for more information)
+- Start the Docker Containers with
+    ```bash
+    docker-compose up -d
+    ```
+
+## Manual Setup
+
+Detailed explanations for the setup of the individual Docker containers.
 
 ### GitHub Copilot
 
