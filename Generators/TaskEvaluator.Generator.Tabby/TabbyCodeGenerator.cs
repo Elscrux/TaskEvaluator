@@ -17,6 +17,8 @@ public sealed class TabbyCodeGenerator(
 
     private readonly Random _random = new();
 
+    public string Identifier => "Tabby";
+
     public async Task<CodeGenerationResult> Send(CodeGenerationTask task, CancellationToken token = default) {
         var tabbyApiRequest = GetRequest(task);
 
@@ -40,9 +42,9 @@ public sealed class TabbyCodeGenerator(
             .ReadFromJsonAsync<TabbyApiResponse>(token)
             .ConfigureAwait(false);
 
-        if (tabbyApiResponse is null) return CodeGenerationResult.Failure(task, "Tabby", elapsedTime);
+        if (tabbyApiResponse is null) return CodeGenerationResult.Failure(task, Identifier, elapsedTime);
 
-        return CodeGenerationResult.Successful(task, tabbyApiResponse.Choices[0].Text, "Tabby", elapsedTime);
+        return CodeGenerationResult.Successful(task, tabbyApiResponse.Choices[0].Text, Identifier, elapsedTime);
     }
 
     public TabbyApiRequest GetRequest(CodeGenerationTask task) {

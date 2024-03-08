@@ -12,6 +12,8 @@ public sealed class RetryCodeGenerator<T>(
     private const int MaxRetries = 5;
     private readonly ICodeGenerator _codeGenerator = serviceProvider.GetRequiredService<T>();
 
+    public string Identifier => _codeGenerator.Identifier;
+
     public async Task<CodeGenerationResult> Send(CodeGenerationTask task, CancellationToken token = default) {
         var result = await _codeGenerator.Send(task, token);
         for (var i = 0; i < MaxRetries && ShouldRetry(result); i++) {
