@@ -78,6 +78,7 @@ public sealed class TaskVM : ViewModel, ITaskVM {
 
             var codeGeneration = codeGenerationProvider
                 .GetGenerators()
+                .Where(x => GenerationResults.All(y => y.Result?.Generator != x.Identifier))
                 .Select(codeGenerator => {
                     var resultVM = taskEvaluatorVMFactory.CodeGenerationResultVM(taskSet, codeGenerator);
                     Dispatcher.UIThread.Post(() => GenerationResults.Add(resultVM));
