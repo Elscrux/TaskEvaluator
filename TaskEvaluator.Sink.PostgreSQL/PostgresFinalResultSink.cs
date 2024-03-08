@@ -58,6 +58,7 @@ public sealed class PostgresFinalResultSink(
             Body = finalResult.CodeGenerationResult.Code.Body,
             Language = finalResult.CodeGenerationResult.Code.Language,
             Generator = finalResult.CodeGenerationResult.Generator,
+            GeneratedPart = finalResult.CodeGenerationResult.GeneratedPart,
             GenerationTimeMilliseconds = finalResult.CodeGenerationResult.GenerationTime.Milliseconds,
             RetryCount = finalResult.CodeGenerationResult.RetryCount,
         });
