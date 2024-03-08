@@ -91,9 +91,9 @@ public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM 
         Dispatcher.UIThread.Post(() => IsBusy = true);
 
         var usedInitialResult = false;
-        var finalResults = await _taskRetry.Try(_taskSet, async task => {
+        var finalResults = await _taskRetry.Try(_taskSet, async x => {
             if (usedInitialResult) {
-                result = await Generate(task, token);
+                result = await Generate(x.Task, token) with { RetryCount = x.CurrentTry };
             } else {
                 usedInitialResult = true;
             }

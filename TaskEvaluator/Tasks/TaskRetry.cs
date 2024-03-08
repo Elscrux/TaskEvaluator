@@ -13,12 +13,12 @@ public sealed class TaskRetry(
     LanguageFactory languageFactory) {
     private const int DefaultTries = 3;
 
-    public async Task<IReadOnlyList<FinalResult>> Try(TaskSet taskSet, Func<CodeGenerationTask, Task<IReadOnlyList<FinalResult>>> retryFunction) {
+    public async Task<IReadOnlyList<FinalResult>> Try(TaskSet taskSet, Func<(int CurrentTry, CodeGenerationTask Task), Task<IReadOnlyList<FinalResult>>> retryFunction) {
         var set = taskSet;
         var languageService = languageFactory.GetLanguageService(taskSet.CodeGenerationTask.Language);
 
         for (var i = 0; i < DefaultTries; i++) {
-            var results = await retryFunction(taskSet.CodeGenerationTask);
+            var results = await retryFunction((i, taskSet.CodeGenerationTask));
             var hint = results
                 .Select(GetFirstHint)
                 .NotNull()

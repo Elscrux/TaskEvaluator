@@ -23,4 +23,7 @@ public sealed class DbCodeGenerationResult {
 
     [Column]
     public int GenerationTimeMilliseconds { get; set; }
+
+    [Column]
+    public int RetryCount { get; set; }
 }

@@ -59,6 +59,7 @@ public sealed class PostgresFinalResultSink(
             Language = finalResult.CodeGenerationResult.Code.Language,
             Generator = finalResult.CodeGenerationResult.Generator,
             GenerationTimeMilliseconds = finalResult.CodeGenerationResult.GenerationTime.Milliseconds,
+            RetryCount = finalResult.CodeGenerationResult.RetryCount,
         });
 
         foreach (var evaluationResult in finalResult.EvaluationResults) {
@@ -77,7 +78,8 @@ public sealed class PostgresFinalResultSink(
                 new Code(x.CodeId, x.Body, x.Language),
                 x.GeneratedPart,
                 x.Generator,
-                TimeSpan.FromMilliseconds(x.GenerationTimeMilliseconds)
+                TimeSpan.FromMilliseconds(x.GenerationTimeMilliseconds),
+                x.RetryCount
             ))
             .ToList();
 

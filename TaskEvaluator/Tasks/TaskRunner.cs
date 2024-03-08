@@ -34,11 +34,12 @@ public sealed class TaskRunner(
     }
 
     public async IAsyncEnumerable<FinalResult> Process(TaskSet taskSet, [EnumeratorCancellation] CancellationToken token = default) {
-        var finalResults = await retry.Try(taskSet, async task => {
-            var tasks = await Generate(task, token)
+        var finalResults = await retry.Try(taskSet, async x => {
+            var tasks = await Generate(x.Task, token)
                 .Where(result => result.Success)
                 .Select(codeGenerationResult => {
                     return Task.Run(async () => {
+                        codeGenerationResult = codeGenerationResult with { RetryCount = x.CurrentTry };
                         var successfulRevaluationResults = await Evaluate(codeGenerationResult.Code, taskSet.EvaluationModel, token)
                             .Where(result => result.Success)
                             .ToListAsync(token);
