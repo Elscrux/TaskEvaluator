@@ -1,5 +1,6 @@
 using LinqToDB;
 using LinqToDB.Data;
+using LinqToDB.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TaskEvaluator.Evaluator;
@@ -17,6 +18,15 @@ public sealed record PostgresSinkConfiguration {
 }
 
 public sealed class ResultsDatabase(string connectionString) : DataConnection(options => options.UsePostgreSQL(connectionString)) {
+    public IEnumerable<IExpressionQuery> GetTables() {
+        yield return CodeGenerationResults;
+        yield return StaticCodeResults;
+        yield return StaticCodeEvaluationResult;
+        yield return UnitTestResults;
+        yield return UnitTestEvaluationResult;
+        yield return SyntaxValidationResults;
+    } 
+
     public ITable<DbCodeGenerationResult> CodeGenerationResults => this.GetOrCreateTable<DbCodeGenerationResult>();
 
     public ITable<DbStaticCodeAnalysisEvaluationResult> StaticCodeEvaluationResult => this.GetOrCreateTable<DbStaticCodeAnalysisEvaluationResult>();
@@ -40,15 +50,26 @@ public static class DataContextExtensions {
     }
 }
 
-public sealed class PostgresFinalResultSink(
-    ILogger<PostgresFinalResultSink> logger,
-    IOptions<PostgresSinkConfiguration> config)
-    : IFinalResultSink {
+public sealed class PostgresFinalResultSink : IFinalResultSink {
+    private readonly ILogger<PostgresFinalResultSink> _logger;
+    private readonly IOptions<PostgresSinkConfiguration> _config;
+
+    public PostgresFinalResultSink(ILogger<PostgresFinalResultSink> logger,
+        IOptions<PostgresSinkConfiguration> config) {
+        _logger = logger;
+        _config = config;
+
+        using var db = new ResultsDatabase(_config.Value.ConnectionString);
+        foreach (var unused in db.GetTables()) {
+            // Ensure that the tables are created
+        }
+    }
+
     public void Send(FinalResult finalResult) {
-        using var db = new ResultsDatabase(config.Value.ConnectionString);
+        using var db = new ResultsDatabase(_config.Value.ConnectionString);
 
         if (db.CodeGenerationResults.Any(x => x.CodeId == finalResult.CodeGenerationResult.Code.Guid)) {
-            logger.LogWarning("Code with id {CodeId} already exists in the database, aborting insertion", finalResult.CodeGenerationResult.Code.Guid);
+            _logger.LogWarning("Code with id {CodeId} already exists in the database, aborting insertion", finalResult.CodeGenerationResult.Code.Guid);
             return;
         }
 
@@ -69,7 +90,7 @@ public sealed class PostgresFinalResultSink(
     }
 
     public IEnumerable<FinalResult> Retrieve() {
-        using var db = new ResultsDatabase(config.Value.ConnectionString);
+        using var db = new ResultsDatabase(_config.Value.ConnectionString);
         if (db is null) throw new InvalidOperationException("Database is null");
 
         var codeGenerationResults = db.CodeGenerationResults
