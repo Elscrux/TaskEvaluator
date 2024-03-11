@@ -50,6 +50,11 @@ public sealed class TaskRetry(
 
         string? GetHint(CodeGenerationResult codeGenerationResult, IEvaluationResult result) {
             if (!result.Success) {
+                if (result.Context != null && result.Context.Contains("HttpClient.Timeout")) {
+                    return "Timeout reached, possibly there is an infinite loop in the code.\n\n"
+                      + codeGenerationResult.Code.Body;
+                }
+
                 return "Failed to evaluate code:\n" + result.Context;
             }
 
