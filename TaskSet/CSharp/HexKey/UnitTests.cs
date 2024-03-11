@@ -40,7 +40,7 @@ public class Test_HexKey {
 
     [Fact]
     public void Test_6() {
-        var result = TaskClass.HexKey([]);
+        var result = TaskClass.HexKey("");
         Assert.Equal(0, result);
     }
 }

@@ -8,4 +8,12 @@ public static class TaskClass {
     public static string MakePalindrome(string @string) {
         //INSERT_CODE_HERE
     }
+
+    /// <summary>
+    ///  Checks if given string is a palindrome 
+    /// 
+    /// </summary>
+    public static bool IsPalindrome(string @text) {
+        return @text.Equals(new string(@text.ToCharArray().Reverse().ToArray()));
+    }
 }
