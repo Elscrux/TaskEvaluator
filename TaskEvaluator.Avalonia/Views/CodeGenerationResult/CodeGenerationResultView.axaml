@@ -11,23 +11,21 @@
              x:CompileBindings="True" x:DataType="viewModels:ICodeGenerationResultVM">
     <controls:ToggleView Toggle="{Binding Result, Converter={x:Static ObjectConverters.IsNull}}">
         <controls:ToggleView.Enabled>
-            <Button IsVisible="{Binding Result, Converter={x:Static ObjectConverters.IsNull}}"
-                    Classes="LoadSpinner"/>
+            <Button Classes="LoadSpinner"/>
         </controls:ToggleView.Enabled>
 
         <controls:ToggleView.Disabled>
             <StackPanel Orientation="Horizontal"
                         Spacing="10"
                         ToolTip.Tip="{Binding Result.Code.Body}">
-                <controls:ToggleView Toggle="{Binding IsBusy}"
-                                     IsVisible="{Binding !EvaluationResults.Count}">
+                <controls:ToggleView Toggle="{Binding EvaluationCompleted^, Converter={x:Static converters:TaskStateConverter.IsRunning}}">
                     <controls:ToggleView.Enabled>
                         <Button HorizontalAlignment="Center"
                                 Classes="LoadSpinner"/>
                     </controls:ToggleView.Enabled>
 
                     <controls:ToggleView.Disabled>
-                        <Button IsVisible="{Binding}"
+                        <Button IsVisible="{Binding !EvaluationResults.Count}"
                                 avalonia:Attached.Icon="fa-solid fa-play"
                                 Classes="Transparent"
                                 Click="Expand"
@@ -37,7 +35,7 @@
                 </controls:ToggleView>
 
                 <TextBlock Text="{Binding Result.Generator}"
-                           Foreground="{Binding Result.Success, Converter={x:Static converters:BoolConverter.ToBrush}}"/>
+                           Foreground="{Binding EvaluationCompleted^, Converter={x:Static converters:TaskStateConverter.ToBrush}}"/>
             </StackPanel>
         </controls:ToggleView.Disabled>
     </controls:ToggleView>

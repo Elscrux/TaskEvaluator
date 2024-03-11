@@ -14,6 +14,7 @@ public static class TaskStateExtensions {
         if (states.Any(s => s == TaskState.Fail)) return TaskState.Fail;
         if (states.Any(s => s == TaskState.Running)) return TaskState.Running;
         if (states.All(s => s == TaskState.Success)) return TaskState.Success;
+        if (states.Any(s => s == TaskState.Success)) return TaskState.Running;
 
         return TaskState.NotStarted;
     }

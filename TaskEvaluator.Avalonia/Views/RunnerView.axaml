@@ -63,7 +63,7 @@
                                   ItemsSource="{Binding GenerationResults}">
                     <StackPanel Orientation="Horizontal"
                                 Spacing="10">
-                        <controls:ToggleView Toggle="{Binding IsBusy}"
+                        <controls:ToggleView Toggle="{Binding CurrentState^, Converter={x:Static converters:TaskStateConverter.IsRunning}}"
                                              Width="76"
                                              HorizontalContentAlignment="Left">
                             <controls:ToggleView.Enabled>

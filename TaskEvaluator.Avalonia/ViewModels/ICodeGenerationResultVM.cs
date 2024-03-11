@@ -20,7 +20,6 @@ namespace TaskEvaluator.Avalonia.ViewModels;
 
 public interface ICodeGenerationResultVM {
     IObservable<TaskState> EvaluationCompleted { get; }
-    bool IsBusy { get; set; }
     CodeGenerationResult? Result { get; set; }
     IObservableCollection<IEvaluationResultVM> EvaluationResults { get; }
     ReactiveCommand<Unit, Task> RunEvaluation { get; }
@@ -35,10 +34,9 @@ public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM 
     private readonly List<IFinalResultSink> _resultSinks;
 
     public IObservable<TaskState> EvaluationCompleted { get; }
-    [Reactive] public bool IsBusy { get; set; }
     [Reactive] public CodeGenerationResult? Result { get; set; }
     public IObservableCollection<IEvaluationResultVM> EvaluationResults { get; } = new ObservableCollectionExtended<IEvaluationResultVM>();
-    private IObservableCollection<IEvaluationResultVM> _latestResults { get; } = new ObservableCollectionExtended<IEvaluationResultVM>();
+    private readonly IObservableCollection<IEvaluationResultVM> _latestResults = new ObservableCollectionExtended<IEvaluationResultVM>();
     public ReactiveCommand<Unit, Task> RunEvaluation { get; }
 
     public CodeGenerationResultVM(
@@ -57,12 +55,18 @@ public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM 
         EvaluationCompleted = _latestResults
             .ObserveCollectionChanges()
             .Select(_ => {
-                if (_latestResults.Count == 0) return Observable.Return(TaskState.NotStarted);
+                if (EvaluationResults.Count == 0) return Observable.Return(TaskState.NotStarted);
+                if (_latestResults.Count == 0) return Observable.Return(TaskState.Running);
 
                 return _latestResults
                     .Select(x => x.EvaluationCompleted)
                     .CombineLatest()
-                    .Select(x => x.Merge());
+                    .Select(x => {
+                        var taskState = x.Merge();
+                        if (taskState == TaskState.NotStarted) return TaskState.Running;
+
+                        return taskState;
+                    });
             })
             .Switch()
             .StartWith(TaskState.NotStarted);
@@ -88,8 +92,6 @@ public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM 
     }
 
     public async Task<FinalResult> Evaluate(CodeGenerationResult result, CancellationToken token = default) {
-        Dispatcher.UIThread.Post(() => IsBusy = true);
-
         var usedInitialResult = false;
         var finalResults = await _taskRetry.Try(_taskSet, async x => {
             if (usedInitialResult) {
@@ -110,8 +112,8 @@ public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM 
                 .Select(async evaluator => {
                     var evaluationResultVM = new EvaluationResultVM(evaluator, result.Code, _taskSet.EvaluationModel);
                     Dispatcher.UIThread.Post(() => {
-                        _latestResults.Add(evaluationResultVM);
                         EvaluationResults.Add(evaluationResultVM);
+                        _latestResults.Add(evaluationResultVM);
                     });
                     return await evaluationResultVM.Evaluate(token);
                 });
@@ -126,15 +128,12 @@ public sealed class CodeGenerationResultVM : ViewModel, ICodeGenerationResultVM 
             return [finalResult];
         });
 
-        Dispatcher.UIThread.Post(() => IsBusy = false);
-
         return finalResults[0];
     }
 }
 
 public sealed class FinishedCodeGenerationResultVM(FinalResult finalResult) : ViewModel, ICodeGenerationResultVM {
     public IObservable<TaskState> EvaluationCompleted { get; } = Observable.Return(TaskState.Success);
-    [Reactive] public bool IsBusy { get; set; }
     [Reactive] public CodeGenerationResult? Result { get; set; } = finalResult.CodeGenerationResult;
     public IObservableCollection<IEvaluationResultVM> EvaluationResults { get; } = new ObservableCollectionExtended<IEvaluationResultVM>(finalResult.EvaluationResults.Select(result => new FinishedEvaluationResultVM(result)));
     public ReactiveCommand<Unit, Task> RunEvaluation { get; } = ReactiveCommand.Create(() => Task.CompletedTask);
@@ -142,7 +141,6 @@ public sealed class FinishedCodeGenerationResultVM(FinalResult finalResult) : Vi
 
 public sealed class DesignCodeGenerationResultVM(string generator) : ICodeGenerationResultVM {
     public IObservable<TaskState> EvaluationCompleted { get; } = Observable.Return(TaskState.Success);
-    public bool IsBusy { get; set; }
     public CodeGenerationResult? Result { get; set; } = new(
         Guid.NewGuid(),
         Random.Shared.Next(0, 2) == 1,

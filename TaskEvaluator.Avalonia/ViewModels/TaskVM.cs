@@ -7,7 +7,6 @@ using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using TaskEvaluator.Generation;
 using TaskEvaluator.Tasks;
 namespace TaskEvaluator.Avalonia.ViewModels;
@@ -17,7 +16,6 @@ public interface ITaskVM {
     string Name { get; }
 
     IObservableCollection<ICodeGenerationResultVM> GenerationResults { get; }
-    [Reactive] public bool IsBusy { get; set; }
     IObservable<TaskState> CurrentState { get; }
     ReactiveCommand<Unit, Task> RunCodeGeneration { get; }
     ReactiveCommand<Unit, Task> RunAll { get; }
@@ -28,7 +26,6 @@ public sealed class TaskVM : ViewModel, ITaskVM {
 
     public string Name => TaskSet.Name;
     public IObservableCollection<ICodeGenerationResultVM> GenerationResults { get; } = new ObservableCollectionExtended<ICodeGenerationResultVM>();
-    [Reactive] public bool IsBusy { get; set; }
     public IObservable<TaskState> CurrentState { get; }
     public ReactiveCommand<Unit, Task> RunCodeGeneration { get; }
     public ReactiveCommand<Unit, Task> RunAll { get; }
@@ -57,8 +54,6 @@ public sealed class TaskVM : ViewModel, ITaskVM {
             .StartWith(TaskState.NotStarted);
 
         RunCodeGeneration = ReactiveCommand.CreateRunInBackground(async () => {
-            Dispatcher.UIThread.Post(() => IsBusy = true);
-
             var codeGeneration = codeGenerationProvider
                 .GetGenerators()
                 .Select(codeGenerator => {
@@ -69,13 +64,9 @@ public sealed class TaskVM : ViewModel, ITaskVM {
                 .ToList();
 
             await Task.WhenAll(codeGeneration);
-
-            Dispatcher.UIThread.Post(() => IsBusy = false);
         });
 
         RunAll = ReactiveCommand.CreateRunInBackground(async () => {
-            Dispatcher.UIThread.Post(() => IsBusy = true);
-
             var codeGeneration = codeGenerationProvider
                 .GetGenerators()
                 .Where(x => GenerationResults.All(y => y.Result?.Generator != x.Identifier))
@@ -87,8 +78,6 @@ public sealed class TaskVM : ViewModel, ITaskVM {
                 .ToList();
 
             await Task.WhenAll(codeGeneration);
-
-            Dispatcher.UIThread.Post(() => IsBusy = false);
         });
     }
 }
@@ -96,7 +85,6 @@ public sealed class TaskVM : ViewModel, ITaskVM {
 public sealed class DesignTaskVM : ViewModel, ITaskVM {
     public TaskSet TaskSet => null!;
     public string Name { get; }
-    public bool IsBusy { get; set; }
     public IObservable<TaskState> CurrentState { get; } = Observable.Return(TaskState.NotStarted);
     public ReactiveCommand<Unit, Task> RunCodeGeneration { get; }
     public ReactiveCommand<Unit, Task> RunAll { get; }
@@ -104,7 +92,6 @@ public sealed class DesignTaskVM : ViewModel, ITaskVM {
 
     public DesignTaskVM(int index) {
         Name = $"Task{index}";
-        IsBusy = index % 2 == 0;
         RunCodeGeneration = RunAll = ReactiveCommand.Create(() => {
             GenerationResults.AddRange(Enumerable.Range(0, 2)
                 .Select(i => new DesignCodeGenerationResultVM($"Generator{i}")));

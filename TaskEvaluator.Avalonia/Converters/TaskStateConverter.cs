@@ -14,4 +14,15 @@ public static class TaskStateConverter {
                 _ => (string) Application.Current!.ActualThemeVariant.Key == "Dark" ? Brushes.White : Brushes.Black
             };
         });
+
+    public static readonly FuncValueConverter<TaskState, bool> IsRunning
+        = new(outcome => {
+            return outcome switch {
+                TaskState.NotStarted => false,
+                TaskState.Running => true,
+                TaskState.Success => false,
+                TaskState.Fail => false,
+                _ => false
+            };
+        });
 }
