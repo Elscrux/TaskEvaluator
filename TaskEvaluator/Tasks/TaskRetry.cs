@@ -49,6 +49,10 @@ public sealed class TaskRetry(
         }
 
         string? GetHint(CodeGenerationResult codeGenerationResult, IEvaluationResult result) {
+            if (!result.Success) {
+                return "Failed to evaluate code:\n" + result.Context;
+            }
+
             switch (result) {
                 case SyntaxValidationResult syntaxValidationResult:
                     if (!syntaxValidationResult.SyntaxValid) {
