@@ -73,8 +73,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
-        "w": 19,
+        "h": 8,
+        "w": 9,
         "x": 0,
         "y": 0
       },
@@ -87,7 +87,7 @@
         "legend": {
           "calcs": [],
           "displayMode": "list",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "orientation": "horizontal",
@@ -150,22 +150,20 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 2,
-            "pointSize": {
-              "fixed": 8
-            },
+            "lineWidth": 1,
             "scaleDistribution": {
               "type": "linear"
             },
-            "show": "points+lines"
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
           "thresholds": {
@@ -181,286 +179,16 @@
               }
             ]
           },
+          "unit": "short",
           "unitScale": true
         },
         "overrides": []
       },
       "gridPos": {
         "h": 10,
-        "w": 5,
-        "x": 19,
+        "w": 14,
+        "x": 9,
         "y": 0
-      },
-      "id": 1,
-      "options": {
-        "dims": {
-          "frame": 0,
-          "x": "Retry Count"
-        },
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "series": [
-          {
-            "name": "GitHub Copilot",
-            "pointColor": {
-              "field": "Valid",
-              "fixed": "dark-green"
-            },
-            "pointSize": {
-              "fixed": 5,
-              "max": 100,
-              "min": 1
-            },
-            "x": "Retry Count",
-            "y": "Valid"
-          }
-        ],
-        "seriesMapping": "manual",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "10.3.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "-- Syntax invalid for reach try, per generator\r\nSELECT\r\n  code.\"Generator\",\r\n  code.\"RetryCount\" + 1 as \"Retry Count\",\r\n  SUM(results.\"Valid\") / (SUM(results.\"Valid\") + SUM(results.\"Invalid\")) as \"Valid\"\r\nFROM\r\n  \"DbCodeGenerationResult\" as code\r\n  INNER JOIN (\r\n    SELECT\r\n      syn.\"CodeId\",\r\n      COUNT(\r\n        case\r\n          syn.\"SyntaxValid\"\r\n          when true then 1\r\n          else null\r\n        end\r\n      ) as \"Valid\",\r\n      COUNT(\r\n        case\r\n          syn.\"SyntaxValid\"\r\n          when false then 1\r\n          else null\r\n        end\r\n      ) as \"Invalid\"\r\n    FROM\r\n      \"DbSyntaxValidationResult\" as syn\r\n    GROUP BY\r\n      syn.\"CodeId\"\r\n  ) AS results ON results.\"CodeId\" = code.\"CodeId\"\r\n  WHERE code.\"Generator\" = 'GitHub Copilot'\r\nGROUP BY\r\n  code.\"Generator\",\r\n  code.\"RetryCount\"\r\nORDER BY\r\n  code.\"Generator\",\r\n  code.\"RetryCount\"",
-          "refId": "GitHub Copilot",
-          "sql": {
-            "columns": [
-              {
-                "alias": "\"time\"",
-                "parameters": [
-                  {
-                    "name": "\"RetryCount\"",
-                    "type": "functionParameter"
-                  }
-                ],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          },
-          "table": "\"DbCodeGenerationResult\""
-        },
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "hide": false,
-          "rawQuery": true,
-          "rawSql": "-- Syntax invalid for reach try, per generator\r\nSELECT\r\n  code.\"Generator\",\r\n  code.\"RetryCount\" + 1 as \"Retry Count\",\r\n  SUM(results.\"Valid\") / (SUM(results.\"Valid\") + SUM(results.\"Invalid\")) as \"Valid\"\r\nFROM\r\n  \"DbCodeGenerationResult\" as code\r\n  INNER JOIN (\r\n    SELECT\r\n      syn.\"CodeId\",\r\n      COUNT(\r\n        case\r\n          syn.\"SyntaxValid\"\r\n          when true then 1\r\n          else null\r\n        end\r\n      ) as \"Valid\",\r\n      COUNT(\r\n        case\r\n          syn.\"SyntaxValid\"\r\n          when false then 1\r\n          else null\r\n        end\r\n      ) as \"Invalid\"\r\n    FROM\r\n      \"DbSyntaxValidationResult\" as syn\r\n    GROUP BY\r\n      syn.\"CodeId\"\r\n  ) AS results ON results.\"CodeId\" = code.\"CodeId\"\r\n  WHERE code.\"Generator\" = 'Tabby'\r\nGROUP BY\r\n  code.\"Generator\",\r\n  code.\"RetryCount\"\r\nORDER BY\r\n  code.\"Generator\",\r\n  code.\"RetryCount\"",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        }
-      ],
-      "title": "Syntax Validity Rate per Attempt",
-      "type": "xychart"
-    },
-    {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "short",
-          "unitScale": true
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 17,
-        "w": 4,
-        "x": 0,
-        "y": 5
-      },
-      "id": 3,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "right",
-          "showLegend": true
-        },
-        "orientation": "auto",
-        "showValue": "never",
-        "stacking": "none",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "SELECT\r\n  code.\"Generator\",\r\n  SUM(results.\"Passed\") as \"Passed\",\r\n  SUM(results.\"Failed\") as \"Failed\"\r\nFROM\r\n  (\r\n    -- Last Retry\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"CodeId\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      INNER JOIN (\r\n        SELECT\r\n          code.\"TaskId\",\r\n          code.\"Generator\",\r\n          MAX(code.\"RetryCount\") as \"RetryCount\"\r\n        FROM\r\n          \"DbCodeGenerationResult\" as code\r\n          LEFT JOIN \"DbSyntaxValidationResult\" as syn on syn.\"CodeId\" = code.\"CodeId\"\r\n        WHERE\r\n          syn.\"SyntaxValid\" is true\r\n        GROUP BY\r\n          code.\"TaskId\",\r\n          code.\"Generator\"\r\n        ORDER BY\r\n          code.\"TaskId\"\r\n      ) as rc ON rc.\"TaskId\" = code.\"TaskId\"\r\n      and rc.\"Generator\" = code.\"Generator\"\r\n      and rc.\"RetryCount\" = code.\"RetryCount\"\r\n  ) as code\r\n  LEFT JOIN (\r\n    SELECT\r\n      unit.\"CodeId\",\r\n      COUNT(\r\n        case\r\n          res.\"Outcome\"\r\n          when 1 then 1\r\n          else null\r\n        end\r\n      ) as \"Passed\",\r\n      COUNT(\r\n        case\r\n          res.\"Outcome\"\r\n          when 0 then 1\r\n          else null\r\n        end\r\n      ) as \"Failed\"\r\n    FROM\r\n      \"DbUnitTestEvaluationResult\" as unit\r\n      INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n    GROUP BY\r\n      unit.\"CodeId\"\r\n  ) as results ON results.\"CodeId\" = code.\"CodeId\"\r\nGROUP BY\r\n  code.\"Generator\"\r\nORDER BY\r\n  code.\"Generator\"",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        }
-      ],
-      "title": "Unit Tests Results per Generator",
-      "type": "barchart"
-    },
-    {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "short",
-          "unitScale": true
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 11,
-        "x": 4,
-        "y": 5
       },
       "id": 6,
       "options": {
@@ -493,7 +221,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": " -- Perfect\r\nSELECT\r\n  Concat(\r\n    perfect.\"Generator\",\r\n    ' - Attempt ',\r\n    perfect.\"RetryCount\" + 1\r\n  ) as \"Generator\",\r\n  perfect.\"count\" as \"Perfect\",\r\n  invalidSyntax.\"count\" as \"Invalid Syntax\",\r\n  failedUnit.\"count\" as \"Failed Unit Test\"\r\nFROM\r\n  (\r\n    SELECT\r\n      x.\"Generator\",\r\n      x.\"RetryCount\",\r\n      COUNT(x.\"Generator\")\r\n    FROM\r\n      (\r\n        SELECT\r\n          code.\"Generator\",\r\n          code.\"RetryCount\",\r\n          syn.\"SyntaxValid\",\r\n          unit.\"Failed Unit Tests\",\r\n          stat.\"Code Smells\"\r\n        FROM\r\n          \"DbCodeGenerationResult\" as code\r\n          LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  unit.\"CodeId\",\r\n                  COUNT(\r\n                    case\r\n                      res.\"Outcome\"\r\n                      when 0 then 1\r\n                      else null\r\n                    end\r\n                  ) as \"Failed Unit Tests\"\r\n                FROM\r\n                  \"DbUnitTestEvaluationResult\" as unit\r\n                  INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n                GROUP BY\r\n                  unit.\"CodeId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Failed Unit Tests\" > 0\r\n          ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  stat.\"CodeId\",\r\n                  COUNT(res.\"CodeAnalysisId\") as \"Code Smells\"\r\n                FROM\r\n                  \"DbStaticCodeAnalysisEvaluationResult\" as stat\r\n                  INNER JOIN \"DbStaticCodeAnalysisResult\" as res on stat.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  stat.\"Success\" is true\r\n                GROUP BY\r\n                  stat.\"CodeId\",\r\n                  res.\"CodeAnalysisId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Code Smells\" > 0\r\n          ) AS stat ON stat.\"CodeId\" = code.\"CodeId\"\r\n      ) as x\r\n    WHERE\r\n      x.\"SyntaxValid\" is true\r\n      and x.\"Failed Unit Tests\" is null\r\n      and x.\"Code Smells\" is null\r\n    GROUP BY\r\n      x.\"Generator\",\r\n      x.\"RetryCount\"\r\n  ) as perfect\r\n  -- Failed Syntax\r\n  LEFT JOIN (\r\n    SELECT\r\n      x.\"Generator\",\r\n      x.\"RetryCount\",\r\n      COUNT(x.\"Generator\")\r\n    FROM\r\n      (\r\n        SELECT\r\n          code.\"Generator\",\r\n          code.\"RetryCount\",\r\n          syn.\"SyntaxValid\",\r\n          unit.\"Failed Unit Tests\",\r\n          stat.\"Code Smells\"\r\n        FROM\r\n          \"DbCodeGenerationResult\" as code\r\n          LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  unit.\"CodeId\",\r\n                  COUNT(\r\n                    case\r\n                      res.\"Outcome\"\r\n                      when 0 then 1\r\n                      else null\r\n                    end\r\n                  ) as \"Failed Unit Tests\"\r\n                FROM\r\n                  \"DbUnitTestEvaluationResult\" as unit\r\n                  INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n                GROUP BY\r\n                  unit.\"CodeId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Failed Unit Tests\" > 0\r\n          ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  stat.\"CodeId\",\r\n                  COUNT(res.\"CodeAnalysisId\") as \"Code Smells\"\r\n                FROM\r\n                  \"DbStaticCodeAnalysisEvaluationResult\" as stat\r\n                  INNER JOIN \"DbStaticCodeAnalysisResult\" as res on stat.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  stat.\"Success\" is true\r\n                GROUP BY\r\n                  stat.\"CodeId\",\r\n                  res.\"CodeAnalysisId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Code Smells\" > 0\r\n          ) AS stat ON stat.\"CodeId\" = code.\"CodeId\"\r\n      ) as x\r\n    WHERE\r\n      x.\"SyntaxValid\" is false\r\n    GROUP BY\r\n      x.\"Generator\",\r\n      x.\"RetryCount\"\r\n  ) as invalidSyntax ON perfect.\"Generator\" = invalidSyntax.\"Generator\"\r\n  and perfect.\"RetryCount\" = invalidSyntax.\"RetryCount\"\r\n  -- Failed Unit Tests\r\n  LEFT JOIN (\r\n    SELECT\r\n      x.\"Generator\",\r\n      x.\"RetryCount\",\r\n      COUNT(x.\"Generator\")\r\n    FROM\r\n      (\r\n        SELECT\r\n          code.\"Generator\",\r\n          code.\"RetryCount\",\r\n          syn.\"SyntaxValid\",\r\n          unit.\"Failed Unit Tests\",\r\n          stat.\"Code Smells\"\r\n        FROM\r\n          \"DbCodeGenerationResult\" as code\r\n          LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  unit.\"CodeId\",\r\n                  COUNT(\r\n                    case\r\n                      res.\"Outcome\"\r\n                      when 0 then 1\r\n                      else null\r\n                    end\r\n                  ) as \"Failed Unit Tests\"\r\n                FROM\r\n                  \"DbUnitTestEvaluationResult\" as unit\r\n                  INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n                GROUP BY\r\n                  unit.\"CodeId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Failed Unit Tests\" > 0\r\n          ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  stat.\"CodeId\",\r\n                  COUNT(res.\"CodeAnalysisId\") as \"Code Smells\"\r\n                FROM\r\n                  \"DbStaticCodeAnalysisEvaluationResult\" as stat\r\n                  INNER JOIN \"DbStaticCodeAnalysisResult\" as res on stat.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  stat.\"Success\" is true\r\n                GROUP BY\r\n                  stat.\"CodeId\",\r\n                  res.\"CodeAnalysisId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Code Smells\" > 0\r\n          ) AS stat ON stat.\"CodeId\" = code.\"CodeId\"\r\n      ) as x\r\n    WHERE\r\n      x.\"SyntaxValid\" is true\r\n      and x.\"Failed Unit Tests\" is not null\r\n    GROUP BY\r\n      x.\"Generator\",\r\n      x.\"RetryCount\"\r\n  ) as failedUnit ON perfect.\"Generator\" = failedUnit.\"Generator\"\r\n  and perfect.\"RetryCount\" = failedUnit.\"RetryCount\"\r\nORDER BY\r\n  \"Generator\"",
+          "rawSql": "-- Perfect\r\nSELECT\r\n  Concat(\r\n    invalidSyntax.\"Generator\",\r\n    ' - Attempt ',\r\n    invalidSyntax.\"RetryCount\" + 1\r\n  ) as \"Generator\",\r\n  perfect.\"count\" as \"Perfect\",\r\n  failedUnit.\"count\" as \"Failed Unit Test\",\r\n  invalidSyntax.\"count\" as \"Invalid Syntax\"\r\n  -- Failed Syntax\r\n  FROM (\r\n    SELECT\r\n      x.\"Generator\",\r\n      x.\"RetryCount\",\r\n      COUNT(x.\"Generator\")\r\n    FROM\r\n      (\r\n        SELECT\r\n          code.\"Generator\",\r\n          code.\"RetryCount\",\r\n          syn.\"SyntaxValid\",\r\n          unit.\"Failed Unit Tests\",\r\n          stat.\"Code Smells\"\r\n        FROM\r\n          \"DbCodeGenerationResult\" as code\r\n          LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  unit.\"CodeId\",\r\n                  COUNT(\r\n                    case\r\n                      res.\"Outcome\"\r\n                      when 0 then 1\r\n                      else null\r\n                    end\r\n                  ) as \"Failed Unit Tests\"\r\n                FROM\r\n                  \"DbUnitTestEvaluationResult\" as unit\r\n                  INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n                GROUP BY\r\n                  unit.\"CodeId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Failed Unit Tests\" > 0\r\n          ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  stat.\"CodeId\",\r\n                  COUNT(res.\"CodeAnalysisId\") as \"Code Smells\"\r\n                FROM\r\n                  \"DbStaticCodeAnalysisEvaluationResult\" as stat\r\n                  INNER JOIN \"DbStaticCodeAnalysisResult\" as res on stat.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  stat.\"Success\" is true\r\n                GROUP BY\r\n                  stat.\"CodeId\",\r\n                  res.\"CodeAnalysisId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Code Smells\" > 0\r\n          ) AS stat ON stat.\"CodeId\" = code.\"CodeId\"\r\n      ) as x\r\n    WHERE\r\n      x.\"SyntaxValid\" is false\r\n    GROUP BY\r\n      x.\"Generator\",\r\n      x.\"RetryCount\"\r\n  ) as invalidSyntax\r\nLEFT JOIN\r\n  (\r\n    SELECT\r\n      x.\"Generator\",\r\n      x.\"RetryCount\",\r\n      COUNT(x.\"Generator\")\r\n    FROM\r\n      (\r\n        SELECT\r\n          code.\"Generator\",\r\n          code.\"RetryCount\",\r\n          syn.\"SyntaxValid\",\r\n          unit.\"Failed Unit Tests\",\r\n          stat.\"Code Smells\"\r\n        FROM\r\n          \"DbCodeGenerationResult\" as code\r\n          LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  unit.\"CodeId\",\r\n                  COUNT(\r\n                    case\r\n                      res.\"Outcome\"\r\n                      when 0 then 1\r\n                      else null\r\n                    end\r\n                  ) as \"Failed Unit Tests\"\r\n                FROM\r\n                  \"DbUnitTestEvaluationResult\" as unit\r\n                  INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n                GROUP BY\r\n                  unit.\"CodeId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Failed Unit Tests\" > 0\r\n          ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  stat.\"CodeId\",\r\n                  COUNT(res.\"CodeAnalysisId\") as \"Code Smells\"\r\n                FROM\r\n                  \"DbStaticCodeAnalysisEvaluationResult\" as stat\r\n                  INNER JOIN \"DbStaticCodeAnalysisResult\" as res on stat.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  stat.\"Success\" is true\r\n                GROUP BY\r\n                  stat.\"CodeId\",\r\n                  res.\"CodeAnalysisId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Code Smells\" > 0\r\n          ) AS stat ON stat.\"CodeId\" = code.\"CodeId\"\r\n      ) as x\r\n    WHERE\r\n      x.\"SyntaxValid\" is true\r\n      and x.\"Failed Unit Tests\" is null\r\n      and x.\"Code Smells\" is null\r\n    GROUP BY\r\n      x.\"Generator\",\r\n      x.\"RetryCount\"\r\n  ) as perfect ON perfect.\"Generator\" = invalidSyntax.\"Generator\"\r\n  and perfect.\"RetryCount\" = invalidSyntax.\"RetryCount\"\r\n  -- Failed Unit Tests\r\n  LEFT JOIN (\r\n    SELECT\r\n      x.\"Generator\",\r\n      x.\"RetryCount\",\r\n      COUNT(x.\"Generator\")\r\n    FROM\r\n      (\r\n        SELECT\r\n          code.\"Generator\",\r\n          code.\"RetryCount\",\r\n          syn.\"SyntaxValid\",\r\n          unit.\"Failed Unit Tests\",\r\n          stat.\"Code Smells\"\r\n        FROM\r\n          \"DbCodeGenerationResult\" as code\r\n          LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  unit.\"CodeId\",\r\n                  COUNT(\r\n                    case\r\n                      res.\"Outcome\"\r\n                      when 0 then 1\r\n                      else null\r\n                    end\r\n                  ) as \"Failed Unit Tests\"\r\n                FROM\r\n                  \"DbUnitTestEvaluationResult\" as unit\r\n                  INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n                GROUP BY\r\n                  unit.\"CodeId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Failed Unit Tests\" > 0\r\n          ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  stat.\"CodeId\",\r\n                  COUNT(res.\"CodeAnalysisId\") as \"Code Smells\"\r\n                FROM\r\n                  \"DbStaticCodeAnalysisEvaluationResult\" as stat\r\n                  INNER JOIN \"DbStaticCodeAnalysisResult\" as res on stat.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  stat.\"Success\" is true\r\n                GROUP BY\r\n                  stat.\"CodeId\",\r\n                  res.\"CodeAnalysisId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Code Smells\" > 0\r\n          ) AS stat ON stat.\"CodeId\" = code.\"CodeId\"\r\n      ) as x\r\n    WHERE\r\n      x.\"SyntaxValid\" is true\r\n      and x.\"Failed Unit Tests\" is not null\r\n    GROUP BY\r\n      x.\"Generator\",\r\n      x.\"RetryCount\"\r\n  ) as failedUnit ON invalidSyntax.\"Generator\" = failedUnit.\"Generator\"\r\n  and invalidSyntax.\"RetryCount\" = failedUnit.\"RetryCount\"\r\nORDER BY\r\n  \"Generator\"",
           "refId": "A",
           "sql": {
             "columns": [
@@ -514,7 +242,7 @@
           }
         }
       ],
-      "title": "Results per Generator per Attempt",
+      "title": "Results per Try per Generator",
       "type": "barchart"
     },
     {
@@ -568,10 +296,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 15,
+        "h": 12,
         "w": 4,
-        "x": 15,
-        "y": 5
+        "x": 0,
+        "y": 8
       },
       "id": 5,
       "options": {
@@ -582,7 +310,7 @@
         "legend": {
           "calcs": [],
           "displayMode": "list",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "orientation": "vertical",
@@ -604,7 +332,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": " -- Perfect\r\nSELECT\r\n  perfect.\"Generator\",\r\n  perfect.\"count\" as \"Perfect\",\r\n  invalidSyntax.\"count\" as \"Invalid Syntax\",\r\n  failedUnit.\"count\" as \"Failed Unit Test\"\r\nFROM\r\n  (\r\n    SELECT\r\n      x.\"Generator\",\r\n      COUNT(x.\"Generator\")\r\n    FROM\r\n      (\r\n        SELECT\r\n          code.\"Generator\",\r\n          syn.\"Invalid Syntax\",\r\n          unit.\"Failed Unit Tests\",\r\n          stat.\"Code Smells\"\r\n        FROM\r\n          (\r\n            SELECT\r\n              code.\"Generator\",\r\n              code.\"CodeId\"\r\n            FROM\r\n              \"DbCodeGenerationResult\" as code\r\n              INNER JOIN (\r\n                SELECT\r\n                  code.\"TaskId\",\r\n                  code.\"Generator\",\r\n                  MAX(code.\"RetryCount\") as \"RetryCount\"\r\n                FROM\r\n                  \"DbCodeGenerationResult\" as code\r\n                GROUP BY\r\n                  code.\"TaskId\",\r\n                  code.\"Generator\"\r\n                ORDER BY\r\n                  code.\"TaskId\"\r\n              ) as rc ON rc.\"TaskId\" = code.\"TaskId\"\r\n              and rc.\"Generator\" = code.\"Generator\"\r\n              and rc.\"RetryCount\" = code.\"RetryCount\"\r\n          ) as code\r\n          LEFT JOIN (\r\n            SELECT\r\n              syn.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  syn.\"SyntaxValid\"\r\n                  when false then 1\r\n                  else null\r\n                end\r\n              ) as \"Invalid Syntax\"\r\n            FROM\r\n              \"DbSyntaxValidationResult\" as syn\r\n            GROUP BY\r\n              syn.\"CodeId\"\r\n          ) AS syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  unit.\"CodeId\",\r\n                  COUNT(\r\n                    case\r\n                      res.\"Outcome\"\r\n                      when 0 then 1\r\n                      else null\r\n                    end\r\n                  ) as \"Failed Unit Tests\"\r\n                FROM\r\n                  \"DbUnitTestEvaluationResult\" as unit\r\n                  INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n                GROUP BY\r\n                  unit.\"CodeId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Failed Unit Tests\" > 0\r\n          ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  stat.\"CodeId\",\r\n                  COUNT(res.\"CodeAnalysisId\") as \"Code Smells\"\r\n                FROM\r\n                  \"DbStaticCodeAnalysisEvaluationResult\" as stat\r\n                  INNER JOIN \"DbStaticCodeAnalysisResult\" as res on stat.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  stat.\"Success\" is true\r\n                GROUP BY\r\n                  stat.\"CodeId\",\r\n                  res.\"CodeAnalysisId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Code Smells\" > 0\r\n          ) AS stat ON stat.\"CodeId\" = code.\"CodeId\"\r\n      ) as x\r\n    WHERE\r\n      x.\"Invalid Syntax\" = 0\r\n      and x.\"Failed Unit Tests\" is null\r\n      and x.\"Code Smells\" is null\r\n    GROUP BY\r\n      x.\"Generator\"\r\n  ) as perfect\r\n  -- Failed Syntax\r\n  LEFT JOIN (\r\n    SELECT\r\n      code.\"Generator\",\r\n      COUNT(code.\"Generator\")\r\n    FROM\r\n      (\r\n        -- Get last retry\r\n        SELECT\r\n          code.\"Generator\",\r\n          code.\"CodeId\"\r\n        FROM\r\n          \"DbCodeGenerationResult\" as code\r\n          INNER JOIN (\r\n            SELECT\r\n              code.\"TaskId\",\r\n              code.\"Generator\",\r\n              MAX(code.\"RetryCount\") as \"RetryCount\"\r\n            FROM\r\n              \"DbCodeGenerationResult\" as code\r\n            GROUP BY\r\n              code.\"TaskId\",\r\n              code.\"Generator\"\r\n            ORDER BY\r\n              code.\"TaskId\"\r\n          ) as rc ON rc.\"TaskId\" = code.\"TaskId\"\r\n          and rc.\"Generator\" = code.\"Generator\"\r\n          and rc.\"RetryCount\" = code.\"RetryCount\"\r\n      ) as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" AS syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n    WHERE\r\n      syn.\"SyntaxValid\" is false\r\n    GROUP BY\r\n      code.\"Generator\"\r\n  ) as invalidSyntax ON perfect.\"Generator\" = invalidSyntax.\"Generator\"\r\n  -- Failed Unit Tests\r\n  LEFT JOIN (\r\n    SELECT\r\n      x.\"Generator\",\r\n      COUNT(x.\"Generator\")\r\n    FROM\r\n      (\r\n        SELECT\r\n          code.\"Generator\",\r\n          syn.\"Invalid Syntax\",\r\n          unit.\"Failed Unit Tests\",\r\n          stat.\"Code Smells\"\r\n        FROM\r\n          (\r\n            -- Get last retry\r\n            SELECT\r\n              code.\"Generator\",\r\n              code.\"CodeId\"\r\n            FROM\r\n              \"DbCodeGenerationResult\" as code\r\n              INNER JOIN (\r\n                SELECT\r\n                  code.\"TaskId\",\r\n                  code.\"Generator\",\r\n                  MAX(code.\"RetryCount\") as \"RetryCount\"\r\n                FROM\r\n                  \"DbCodeGenerationResult\" as code\r\n                GROUP BY\r\n                  code.\"TaskId\",\r\n                  code.\"Generator\"\r\n                ORDER BY\r\n                  code.\"TaskId\"\r\n              ) as rc ON rc.\"TaskId\" = code.\"TaskId\"\r\n              and rc.\"Generator\" = code.\"Generator\"\r\n              and rc.\"RetryCount\" = code.\"RetryCount\"\r\n          ) as code\r\n          LEFT JOIN (\r\n            SELECT\r\n              syn.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  syn.\"SyntaxValid\"\r\n                  when false then 1\r\n                  else null\r\n                end\r\n              ) as \"Invalid Syntax\"\r\n            FROM\r\n              \"DbSyntaxValidationResult\" as syn\r\n            GROUP BY\r\n              syn.\"CodeId\"\r\n          ) AS syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  unit.\"CodeId\",\r\n                  COUNT(\r\n                    case\r\n                      res.\"Outcome\"\r\n                      when 0 then 1\r\n                      else null\r\n                    end\r\n                  ) as \"Failed Unit Tests\"\r\n                FROM\r\n                  \"DbUnitTestEvaluationResult\" as unit\r\n                  INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n                GROUP BY\r\n                  unit.\"CodeId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Failed Unit Tests\" > 0\r\n          ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  stat.\"CodeId\",\r\n                  COUNT(res.\"CodeAnalysisId\") as \"Code Smells\"\r\n                FROM\r\n                  \"DbStaticCodeAnalysisEvaluationResult\" as stat\r\n                  INNER JOIN \"DbStaticCodeAnalysisResult\" as res on stat.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  stat.\"Success\" is true\r\n                GROUP BY\r\n                  stat.\"CodeId\",\r\n                  res.\"CodeAnalysisId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Code Smells\" > 0\r\n          ) AS stat ON stat.\"CodeId\" = code.\"CodeId\"\r\n      ) as x\r\n    WHERE\r\n      x.\"Invalid Syntax\" = 0\r\n      and x.\"Failed Unit Tests\" is not null\r\n    GROUP BY\r\n      x.\"Generator\"\r\n  ) as failedUnit ON perfect.\"Generator\" = failedUnit.\"Generator\"",
+          "rawSql": " -- Perfect\r\nSELECT\r\n  perfect.\"Generator\",\r\n  perfect.\"count\" as \"Perfect\",\r\n  failedUnit.\"count\" as \"Failed Unit Test\",\r\n  invalidSyntax.\"count\" as \"Invalid Syntax\"\r\nFROM\r\n  (\r\n    SELECT\r\n      x.\"Generator\",\r\n      COUNT(x.\"Generator\")\r\n    FROM\r\n      (\r\n        SELECT\r\n          code.\"Generator\",\r\n          syn.\"Invalid Syntax\",\r\n          unit.\"Failed Unit Tests\",\r\n          stat.\"Code Smells\"\r\n        FROM\r\n          (\r\n            SELECT\r\n              code.\"Generator\",\r\n              code.\"CodeId\"\r\n            FROM\r\n              \"DbCodeGenerationResult\" as code\r\n              INNER JOIN (\r\n                SELECT\r\n                  code.\"TaskId\",\r\n                  code.\"Generator\",\r\n                  MAX(code.\"RetryCount\") as \"RetryCount\"\r\n                FROM\r\n                  \"DbCodeGenerationResult\" as code\r\n                GROUP BY\r\n                  code.\"TaskId\",\r\n                  code.\"Generator\"\r\n                ORDER BY\r\n                  code.\"TaskId\"\r\n              ) as rc ON rc.\"TaskId\" = code.\"TaskId\"\r\n              and rc.\"Generator\" = code.\"Generator\"\r\n              and rc.\"RetryCount\" = code.\"RetryCount\"\r\n          ) as code\r\n          LEFT JOIN (\r\n            SELECT\r\n              syn.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  syn.\"SyntaxValid\"\r\n                  when false then 1\r\n                  else null\r\n                end\r\n              ) as \"Invalid Syntax\"\r\n            FROM\r\n              \"DbSyntaxValidationResult\" as syn\r\n            GROUP BY\r\n              syn.\"CodeId\"\r\n          ) AS syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  unit.\"CodeId\",\r\n                  COUNT(\r\n                    case\r\n                      res.\"Outcome\"\r\n                      when 0 then 1\r\n                      else null\r\n                    end\r\n                  ) as \"Failed Unit Tests\"\r\n                FROM\r\n                  \"DbUnitTestEvaluationResult\" as unit\r\n                  INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n                GROUP BY\r\n                  unit.\"CodeId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Failed Unit Tests\" > 0\r\n          ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  stat.\"CodeId\",\r\n                  COUNT(res.\"CodeAnalysisId\") as \"Code Smells\"\r\n                FROM\r\n                  \"DbStaticCodeAnalysisEvaluationResult\" as stat\r\n                  INNER JOIN \"DbStaticCodeAnalysisResult\" as res on stat.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  stat.\"Success\" is true\r\n                GROUP BY\r\n                  stat.\"CodeId\",\r\n                  res.\"CodeAnalysisId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Code Smells\" > 0\r\n          ) AS stat ON stat.\"CodeId\" = code.\"CodeId\"\r\n      ) as x\r\n    WHERE\r\n      x.\"Invalid Syntax\" = 0\r\n      and x.\"Failed Unit Tests\" is null\r\n      and x.\"Code Smells\" is null\r\n    GROUP BY\r\n      x.\"Generator\"\r\n  ) as perfect\r\n  -- Failed Syntax\r\n  LEFT JOIN (\r\n    SELECT\r\n      code.\"Generator\",\r\n      COUNT(code.\"Generator\")\r\n    FROM\r\n      (\r\n        -- Get last retry\r\n        SELECT\r\n          code.\"Generator\",\r\n          code.\"CodeId\"\r\n        FROM\r\n          \"DbCodeGenerationResult\" as code\r\n          INNER JOIN (\r\n            SELECT\r\n              code.\"TaskId\",\r\n              code.\"Generator\",\r\n              MAX(code.\"RetryCount\") as \"RetryCount\"\r\n            FROM\r\n              \"DbCodeGenerationResult\" as code\r\n            GROUP BY\r\n              code.\"TaskId\",\r\n              code.\"Generator\"\r\n            ORDER BY\r\n              code.\"TaskId\"\r\n          ) as rc ON rc.\"TaskId\" = code.\"TaskId\"\r\n          and rc.\"Generator\" = code.\"Generator\"\r\n          and rc.\"RetryCount\" = code.\"RetryCount\"\r\n      ) as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" AS syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n    WHERE\r\n      syn.\"SyntaxValid\" is false\r\n    GROUP BY\r\n      code.\"Generator\"\r\n  ) as invalidSyntax ON perfect.\"Generator\" = invalidSyntax.\"Generator\"\r\n  -- Failed Unit Tests\r\n  LEFT JOIN (\r\n    SELECT\r\n      x.\"Generator\",\r\n      COUNT(x.\"Generator\")\r\n    FROM\r\n      (\r\n        SELECT\r\n          code.\"Generator\",\r\n          syn.\"Invalid Syntax\",\r\n          unit.\"Failed Unit Tests\",\r\n          stat.\"Code Smells\"\r\n        FROM\r\n          (\r\n            -- Get last retry\r\n            SELECT\r\n              code.\"Generator\",\r\n              code.\"CodeId\"\r\n            FROM\r\n              \"DbCodeGenerationResult\" as code\r\n              INNER JOIN (\r\n                SELECT\r\n                  code.\"TaskId\",\r\n                  code.\"Generator\",\r\n                  MAX(code.\"RetryCount\") as \"RetryCount\"\r\n                FROM\r\n                  \"DbCodeGenerationResult\" as code\r\n                GROUP BY\r\n                  code.\"TaskId\",\r\n                  code.\"Generator\"\r\n                ORDER BY\r\n                  code.\"TaskId\"\r\n              ) as rc ON rc.\"TaskId\" = code.\"TaskId\"\r\n              and rc.\"Generator\" = code.\"Generator\"\r\n              and rc.\"RetryCount\" = code.\"RetryCount\"\r\n          ) as code\r\n          LEFT JOIN (\r\n            SELECT\r\n              syn.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  syn.\"SyntaxValid\"\r\n                  when false then 1\r\n                  else null\r\n                end\r\n              ) as \"Invalid Syntax\"\r\n            FROM\r\n              \"DbSyntaxValidationResult\" as syn\r\n            GROUP BY\r\n              syn.\"CodeId\"\r\n          ) AS syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  unit.\"CodeId\",\r\n                  COUNT(\r\n                    case\r\n                      res.\"Outcome\"\r\n                      when 0 then 1\r\n                      else null\r\n                    end\r\n                  ) as \"Failed Unit Tests\"\r\n                FROM\r\n                  \"DbUnitTestEvaluationResult\" as unit\r\n                  INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n                GROUP BY\r\n                  unit.\"CodeId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Failed Unit Tests\" > 0\r\n          ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n          LEFT JOIN (\r\n            SELECT\r\n              *\r\n            FROM\r\n              (\r\n                SELECT\r\n                  stat.\"CodeId\",\r\n                  COUNT(res.\"CodeAnalysisId\") as \"Code Smells\"\r\n                FROM\r\n                  \"DbStaticCodeAnalysisEvaluationResult\" as stat\r\n                  INNER JOIN \"DbStaticCodeAnalysisResult\" as res on stat.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  stat.\"Success\" is true\r\n                GROUP BY\r\n                  stat.\"CodeId\",\r\n                  res.\"CodeAnalysisId\"\r\n              ) as results\r\n            WHERE\r\n              results.\"Code Smells\" > 0\r\n          ) AS stat ON stat.\"CodeId\" = code.\"CodeId\"\r\n      ) as x\r\n    WHERE\r\n      x.\"Invalid Syntax\" = 0\r\n      and x.\"Failed Unit Tests\" is not null\r\n    GROUP BY\r\n      x.\"Generator\"\r\n  ) as failedUnit ON perfect.\"Generator\" = failedUnit.\"Generator\"",
           "refId": "A",
           "sql": {
             "columns": [
@@ -636,7 +364,120 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.5
+              }
+            ]
+          },
+          "unit": "short",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 5,
+        "x": 4,
+        "y": 8
+      },
+      "id": 3,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "percent",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  code.\"Generator\",\r\n  SUM(results.\"Passed\") / (SUM(results.\"Passed\") + SUM(results.\"Failed\")) as \"Passed\",\r\n  SUM(results.\"Failed\") / (SUM(results.\"Passed\") + SUM(results.\"Failed\")) as \"Failed\"\r\nFROM\r\n  (\r\n    -- Last Retry\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"CodeId\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      INNER JOIN (\r\n        SELECT\r\n          code.\"TaskId\",\r\n          code.\"Generator\",\r\n          MAX(code.\"RetryCount\") as \"RetryCount\"\r\n        FROM\r\n          \"DbCodeGenerationResult\" as code\r\n          LEFT JOIN \"DbSyntaxValidationResult\" as syn on syn.\"CodeId\" = code.\"CodeId\"\r\n        WHERE\r\n          syn.\"SyntaxValid\" is true\r\n        GROUP BY\r\n          code.\"TaskId\",\r\n          code.\"Generator\"\r\n        ORDER BY\r\n          code.\"TaskId\"\r\n      ) as rc ON rc.\"TaskId\" = code.\"TaskId\"\r\n      and rc.\"Generator\" = code.\"Generator\"\r\n      and rc.\"RetryCount\" = code.\"RetryCount\"\r\n  ) as code\r\n  LEFT JOIN (\r\n    SELECT\r\n      unit.\"CodeId\",\r\n      COUNT(\r\n        case\r\n          res.\"Outcome\"\r\n          when 1 then 1\r\n          else null\r\n        end\r\n      ) as \"Passed\",\r\n      COUNT(\r\n        case\r\n          res.\"Outcome\"\r\n          when 0 then 1\r\n          else null\r\n        end\r\n      ) as \"Failed\"\r\n    FROM\r\n      \"DbUnitTestEvaluationResult\" as unit\r\n      INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n    GROUP BY\r\n      unit.\"CodeId\"\r\n  ) as results ON results.\"CodeId\" = code.\"CodeId\"\r\nGROUP BY\r\n  code.\"Generator\"\r\nORDER BY\r\n  code.\"Generator\"",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Percentage of passing Unit Tests per Generator",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-YlRd"
           },
           "custom": {
             "axisBorderShow": false,
@@ -680,8 +521,8 @@
       },
       "gridPos": {
         "h": 11,
-        "w": 5,
-        "x": 19,
+        "w": 7,
+        "x": 9,
         "y": 10
       },
       "id": 7,
@@ -746,8 +587,66 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
+          "rawSql": "SELECT\r\n  x.\"Generator\",\r\n  COUNT(*) as \"Syntax invalid after syntax was valid\"\r\nFROM\r\n  (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n  ) as x\r\n  LEFT JOIN (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\"\r\n    FROM\r\n    \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n  ) as y on x.\"TaskId\" = y.\"TaskId\"\r\n  and x.\"Generator\" = y.\"Generator\"\r\nWHERE\r\n  x.\"RetryCount\" - y.\"RetryCount\" = 1\r\n  and x.\"SyntaxValid\" is false\r\n  and y.\"SyntaxValid\" is true\r\nGROUP BY\r\n  x.\"Generator\"",
+          "refId": "Syntax invalid after syntax was valid",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
           "rawSql": "SELECT\r\n  x.\"Generator\",\r\n  COUNT(*) as \"Unit test not improved\"\r\nFROM\r\n  (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\",\r\n      unit.\"Failed Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n      LEFT JOIN (\r\n        SELECT\r\n          *\r\n        FROM\r\n          (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results\r\n        WHERE\r\n          results.\"Failed Unit Tests\" > 0\r\n      ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n  ) as x\r\n  LEFT JOIN (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\",\r\n      unit.\"Failed Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n      LEFT JOIN (\r\n        SELECT\r\n          *\r\n        FROM\r\n          (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results\r\n        WHERE\r\n          results.\"Failed Unit Tests\" > 0\r\n      ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n  ) as y on x.\"TaskId\" = y.\"TaskId\"\r\n  and x.\"Generator\" = y.\"Generator\"\r\nWHERE\r\n  x.\"RetryCount\" - y.\"RetryCount\" = 1\r\n  and x.\"SyntaxValid\" is true\r\n  and y.\"SyntaxValid\" is true\r\n  and x.\"Failed Unit Tests\" = y.\"Failed Unit Tests\"\r\nGROUP BY\r\n  x.\"Generator\"",
           "refId": "Unit test not improved",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  x.\"Generator\",\r\n  COUNT(*) as \"Unit test worse\"\r\nFROM\r\n  (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\",\r\n      unit.\"Failed Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n      LEFT JOIN (\r\n        SELECT\r\n          *\r\n        FROM\r\n          (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results\r\n        WHERE\r\n          results.\"Failed Unit Tests\" > 0\r\n      ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n  ) as x\r\n  LEFT JOIN (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\",\r\n      unit.\"Failed Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n      LEFT JOIN (\r\n        SELECT\r\n          *\r\n        FROM\r\n          (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results\r\n        WHERE\r\n          results.\"Failed Unit Tests\" > 0\r\n      ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n  ) as y on x.\"TaskId\" = y.\"TaskId\"\r\n  and x.\"Generator\" = y.\"Generator\"\r\nWHERE\r\n  x.\"RetryCount\" - y.\"RetryCount\" = 1\r\n  and x.\"SyntaxValid\" is true\r\n  and y.\"SyntaxValid\" is true\r\n  and x.\"Failed Unit Tests\" > y.\"Failed Unit Tests\"\r\nGROUP BY\r\n  x.\"Generator\"\r\n\r\n\r\n\r\n",
+          "refId": "Unit test worse",
           "sql": {
             "columns": [
               {
@@ -773,7 +672,7 @@
           "id": "joinByField",
           "options": {
             "byField": "Generator",
-            "mode": "outerTabular"
+            "mode": "outer"
           }
         }
       ],
@@ -830,124 +729,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
-        "w": 11,
-        "x": 4,
-        "y": 13
+        "h": 11,
+        "w": 7,
+        "x": 16,
+        "y": 10
       },
-      "id": 4,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "right",
-          "showLegend": true
-        },
-        "orientation": "auto",
-        "showValue": "never",
-        "stacking": "none",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
-      },
-      "pluginVersion": "10.3.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "SELECT Concat(code.\"Generator\", ' - Attempt ', code.\"RetryCount\" + 1) as Generator, COUNT(syn.\"Invalid\") as \"Invalid Syntax\", COUNT(unit.\"Failed\") as \"Failed Unit Test\", COUNT(stat.\"Code Smells\") as \"Code Smells\"\r\nFROM \"DbCodeGenerationResult\" as code\r\nLEFT JOIN (\r\n  SELECT syn.\"CodeId\", COUNT(case syn.\"SyntaxValid\" when false then 1 else null end) as \"Invalid\"\r\n  FROM \"DbSyntaxValidationResult\" as syn\r\n  GROUP BY syn.\"CodeId\")\r\n  AS syn ON syn.\"CodeId\" = code.\"CodeId\"\r\nLEFT JOIN (\r\n\tSELECT *\r\n  FROM (\r\n    SELECT unit.\"CodeId\",  COUNT(case res.\"Outcome\" when 0 then 1 else null end) as \"Failed\"\r\n    FROM \"DbUnitTestEvaluationResult\" as unit\r\n    INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n    GROUP BY unit.\"CodeId\") as results\r\n  WHERE results.\"Failed\" > 0)\r\n  AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\nLEFT JOIN (\r\n\tSELECT *\r\n  FROM (\r\n    SELECT stat.\"CodeId\",  COUNT(res.\"CodeAnalysisId\") as \"Code Smells\"\r\n    FROM \"DbStaticCodeAnalysisEvaluationResult\" as stat\r\n    INNER JOIN \"DbStaticCodeAnalysisResult\" as res on stat.\"CodeId\" = res.\"CodeId\"\r\n    GROUP BY stat.\"CodeId\", res.\"CodeAnalysisId\") as results\r\n  WHERE results.\"Code Smells\" > 0)\r\n  AS stat ON stat.\"CodeId\" = code.\"CodeId\"\r\nGROUP BY code.\"Generator\", code.\"RetryCount\"\r\nORDER BY code.\"Generator\", code.\"RetryCount\"\r\n",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        }
-      ],
-      "title": "Problems per Attempt per Generator",
-      "type": "barchart"
-    },
-    {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "short",
-          "unitScale": true
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 5,
-        "x": 19,
-        "y": 21
-      },
-      "id": 8,
+      "id": 9,
       "options": {
         "barRadius": 0,
         "barWidth": 0.97,
@@ -969,6 +756,216 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
+      "pluginVersion": "10.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  x.\"Generator\",\r\n  COUNT(*) as \"Syntax invalid to perfect\"\r\nFROM\r\n  (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\",\r\n      unit.\"Failed Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n      LEFT JOIN (\r\n        SELECT\r\n          *\r\n        FROM\r\n          (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results\r\n        WHERE\r\n          results.\"Failed Unit Tests\" > 0\r\n      ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n  ) as x\r\n  LEFT JOIN (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\",\r\n      unit.\"Failed Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n      LEFT JOIN (\r\n        SELECT\r\n          *\r\n        FROM\r\n          (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results\r\n        WHERE\r\n          results.\"Failed Unit Tests\" > 0\r\n      ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n  ) as y on x.\"TaskId\" = y.\"TaskId\"\r\n  and x.\"Generator\" = y.\"Generator\"\r\nWHERE\r\n  x.\"RetryCount\" - y.\"RetryCount\" = 1\r\n  and y.\"SyntaxValid\" is false\r\n  and x.\"SyntaxValid\" is true\r\n  and x.\"Failed Unit Tests\" is null\r\nGROUP BY\r\n  x.\"Generator\"",
+          "refId": "Syntax invalid to perfect",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  x.\"Generator\",\r\n  COUNT(*) as \"Syntax invalid to valid but not perfect\"\r\nFROM\r\n  (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\",\r\n      unit.\"Failed Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n      LEFT JOIN (\r\n        SELECT\r\n          *\r\n        FROM\r\n          (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results\r\n        WHERE\r\n          results.\"Failed Unit Tests\" > 0\r\n      ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n  ) as x\r\n  LEFT JOIN (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\",\r\n      unit.\"Failed Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n      LEFT JOIN (\r\n        SELECT\r\n          *\r\n        FROM\r\n          (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results\r\n        WHERE\r\n          results.\"Failed Unit Tests\" > 0\r\n      ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n  ) as y on x.\"TaskId\" = y.\"TaskId\"\r\n  and x.\"Generator\" = y.\"Generator\"\r\nWHERE\r\n  x.\"RetryCount\" - y.\"RetryCount\" = 1\r\n  and y.\"SyntaxValid\" is false\r\n  and x.\"SyntaxValid\" is true\r\n  and x.\"Failed Unit Tests\" > 0\r\nGROUP BY\r\n  x.\"Generator\"",
+          "refId": "Syntax invalid to valid but not perfect",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  x.\"Generator\",\r\n  COUNT(*) as \"Unit test failed to perfect\"\r\nFROM\r\n  (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\",\r\n      unit.\"Failed Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n      LEFT JOIN (\r\n        SELECT\r\n          *\r\n        FROM\r\n          (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results\r\n        WHERE\r\n          results.\"Failed Unit Tests\" > 0\r\n      ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n  ) as x\r\n  LEFT JOIN (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\",\r\n      unit.\"Failed Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n      LEFT JOIN (\r\n        SELECT\r\n          *\r\n        FROM\r\n          (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results\r\n        WHERE\r\n          results.\"Failed Unit Tests\" > 0\r\n      ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n  ) as y on x.\"TaskId\" = y.\"TaskId\"\r\n  and x.\"Generator\" = y.\"Generator\"\r\nWHERE\r\n  x.\"RetryCount\" - y.\"RetryCount\" = 1\r\n  and y.\"SyntaxValid\" is true\r\n  and y.\"Failed Unit Tests\" > 0\r\n  and x.\"SyntaxValid\" is true\r\n  and x.\"Failed Unit Tests\" is null\r\nGROUP BY\r\n  x.\"Generator\"",
+          "refId": "Unit test failed to perfect",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  x.\"Generator\",\r\n  COUNT(*) as \"Unit test improved\"\r\nFROM\r\n  (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\",\r\n      unit.\"Failed Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n      LEFT JOIN (\r\n        SELECT\r\n          *\r\n        FROM\r\n          (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results\r\n        WHERE\r\n          results.\"Failed Unit Tests\" > 0\r\n      ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n  ) as x\r\n  LEFT JOIN (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      code.\"CodeId\",\r\n      code.\"RetryCount\",\r\n      syn.\"SyntaxValid\",\r\n      unit.\"Failed Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n      LEFT JOIN (\r\n        SELECT\r\n          *\r\n        FROM\r\n          (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n                WHERE\r\n                  unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results\r\n        WHERE\r\n          results.\"Failed Unit Tests\" > 0\r\n      ) AS unit ON unit.\"CodeId\" = code.\"CodeId\"\r\n  ) as y on x.\"TaskId\" = y.\"TaskId\"\r\n  and x.\"Generator\" = y.\"Generator\"\r\nWHERE\r\n  x.\"RetryCount\" - y.\"RetryCount\" = 1\r\n  and y.\"SyntaxValid\" is true\r\n  and x.\"SyntaxValid\" is true\r\n  and y.\"Failed Unit Tests\" - x.\"Failed Unit Tests\" > 0\r\nGROUP BY\r\n  x.\"Generator\"",
+          "refId": "Unit test improved",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Retry effectiveness",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "Generator",
+            "mode": "outer"
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 5,
+        "x": 4,
+        "y": 20
+      },
+      "id": 10,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "10.3.1",
       "targets": [
         {
           "datasource": {
@@ -978,7 +975,118 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  x.\"Generator\",\r\n  1 + AVG(x.\"First Try with Valid Syntax\") as \"Tries until Syntax is valid\"\r\nFROM\r\n  (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      MIN(code.\"RetryCount\") as \"First Try with Valid Syntax\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n    WHERE\r\n      syn.\"SyntaxValid\"\r\n    GROUP BY\r\n      code.\"Generator\",\r\n      code.\"TaskId\"\r\n  ) as x\r\nGROUP BY\r\n  x.\"Generator\"",
+          "rawSql": "SELECT\r\n  c.\"Generator\",\r\n  AVG(LENGTH(c.\"GeneratedPart\") - LENGTH(REPLACE(c.\"GeneratedPart\", E'\\n', '')) + 1) as \"Average Line Count\"\r\n  \r\nFROM\r\n  \"DbCodeGenerationResult\" c\r\n  LEFT JOIN \"DbSyntaxValidationResult\" syn on syn.\"CodeId\" = c.\"CodeId\"\r\n  LEFT JOIN (\r\n    SELECT\r\n      *\r\n    FROM\r\n      (\r\n        SELECT\r\n          unit.\"CodeId\",\r\n          COUNT(\r\n            case\r\n              res.\"Outcome\"\r\n              when 0 then 1\r\n              else null\r\n            end\r\n          ) as \"Failed Unit Tests\"\r\n        FROM\r\n          \"DbUnitTestEvaluationResult\" as unit\r\n          INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n        WHERE\r\n          unit.\"Success\" is true\r\n        GROUP BY\r\n          unit.\"CodeId\"\r\n      ) as results\r\n  ) AS unit ON unit.\"CodeId\" = c.\"CodeId\"\r\nWHERE\r\n  syn.\"SyntaxValid\" is true\r\n  and unit.\"Failed Unit Tests\" = 0\r\nGROUP BY\r\n  c.\"Generator\"",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Average Line Count per Generator",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic-by-name"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 5,
+        "x": 9,
+        "y": 21
+      },
+      "id": 8,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "never",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  x.\"Generator\",\r\n  1 + AVG(x.\"First Try with Valid Syntax\") as \"Tries until Syntax is valid\"\r\nFROM\r\n  (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      MIN(code.\"RetryCount\") as \"First Try with Valid Syntax\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" as code\r\n      LEFT JOIN \"DbSyntaxValidationResult\" as syn ON syn.\"CodeId\" = code.\"CodeId\"\r\n    WHERE\r\n      syn.\"SyntaxValid\" is true or code.\"RetryCount\" = 2\r\n    GROUP BY\r\n      code.\"Generator\",\r\n      code.\"TaskId\"\r\n  ) as x\r\nGROUP BY\r\n  x.\"Generator\"\r\nORDER BY\r\n  x.\"Generator\"\r\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1007,7 +1115,7 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  x.\"Generator\",\r\n  1 + AVG(x.\"First Try with No Failing Unit Tests\") as \"Tries until Unit Tests pass\"\r\nFROM\r\n  (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      MAX(code.\"RetryCount\") as \"First Try with No Failing Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" code\r\n      LEFT JOIN (\r\n        SELECT\r\n          code.\"Generator\",\r\n          code.\"TaskId\"\r\n        FROM\r\n          \"DbCodeGenerationResult\" as code\r\n          LEFT JOIN (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n            WHERE\r\n              unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results on results.\"CodeId\" = code.\"CodeId\"\r\n        WHERE\r\n          results.\"Failed Unit Tests\" = 0\r\n        GROUP BY\r\n          code.\"Generator\",\r\n          code.\"TaskId\"\r\n      ) as y on y.\"TaskId\" = code.\"TaskId\"\r\n      and y.\"Generator\" = code.\"Generator\"\r\n    GROUP BY\r\n      code.\"Generator\",\r\n      code.\"TaskId\"\r\n  ) as x\r\nGROUP BY\r\n  x.\"Generator\"",
+          "rawSql": "SELECT\r\n  x.\"Generator\",\r\n  1 + AVG(x.\"First Try with No Failing Unit Tests\") as \"Tries until Unit Tests pass\"\r\nFROM\r\n  (\r\n    SELECT\r\n      code.\"Generator\",\r\n      code.\"TaskId\",\r\n      MAX(code.\"RetryCount\") as \"First Try with No Failing Unit Tests\"\r\n    FROM\r\n      \"DbCodeGenerationResult\" code\r\n      LEFT JOIN (\r\n        SELECT\r\n          code.\"Generator\",\r\n          code.\"TaskId\"\r\n        FROM\r\n          \"DbCodeGenerationResult\" as code\r\n          LEFT JOIN (\r\n            SELECT\r\n              unit.\"CodeId\",\r\n              COUNT(\r\n                case\r\n                  res.\"Outcome\"\r\n                  when 0 then 1\r\n                  else null\r\n                end\r\n              ) as \"Failed Unit Tests\"\r\n            FROM\r\n              \"DbUnitTestEvaluationResult\" as unit\r\n              INNER JOIN \"DbUnitTestResult\" as res on unit.\"CodeId\" = res.\"CodeId\"\r\n            WHERE\r\n              unit.\"Success\" is true\r\n            GROUP BY\r\n              unit.\"CodeId\"\r\n          ) as results on results.\"CodeId\" = code.\"CodeId\"\r\n        WHERE\r\n          results.\"Failed Unit Tests\" = 0\r\n        GROUP BY\r\n          code.\"Generator\",\r\n          code.\"TaskId\"\r\n      ) as y on y.\"TaskId\" = code.\"TaskId\"\r\n      and y.\"Generator\" = code.\"Generator\"\r\n    GROUP BY\r\n      code.\"Generator\",\r\n      code.\"TaskId\"\r\n  ) as x\r\nGROUP BY\r\n  x.\"Generator\"\r\nORDER BY\r\n  x.\"Generator\"",
           "refId": "B",
           "sql": {
             "columns": [
@@ -1039,6 +1147,167 @@
         }
       ],
       "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": {
+              "fixed": 8
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "show": "points+lines"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 7,
+        "x": 16,
+        "y": 21
+      },
+      "id": 1,
+      "options": {
+        "dims": {
+          "frame": 0,
+          "x": "Retry Count"
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "series": [
+          {
+            "name": "GitHub Copilot",
+            "pointColor": {
+              "field": "Valid",
+              "fixed": "dark-green"
+            },
+            "pointSize": {
+              "fixed": 5,
+              "max": 100,
+              "min": 1
+            },
+            "x": "Try",
+            "y": "Valid"
+          }
+        ],
+        "seriesMapping": "manual",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- Syntax invalid for reach try, per generator\r\nSELECT\r\n  code.\"Generator\",\r\n  code.\"RetryCount\" + 1 as \"Try\",\r\n  SUM(results.\"Valid\") / (SUM(results.\"Valid\") + SUM(results.\"Invalid\")) as \"Valid\"\r\nFROM\r\n  \"DbCodeGenerationResult\" as code\r\n  INNER JOIN (\r\n    SELECT\r\n      syn.\"CodeId\",\r\n      COUNT(\r\n        case\r\n          syn.\"SyntaxValid\"\r\n          when true then 1\r\n          else null\r\n        end\r\n      ) as \"Valid\",\r\n      COUNT(\r\n        case\r\n          syn.\"SyntaxValid\"\r\n          when false then 1\r\n          else null\r\n        end\r\n      ) as \"Invalid\"\r\n    FROM\r\n      \"DbSyntaxValidationResult\" as syn\r\n    GROUP BY\r\n      syn.\"CodeId\"\r\n  ) AS results ON results.\"CodeId\" = code.\"CodeId\"\r\n  WHERE code.\"Generator\" = 'GitHub Copilot'\r\nGROUP BY\r\n  code.\"Generator\",\r\n  code.\"RetryCount\"\r\nORDER BY\r\n  code.\"Generator\",\r\n  code.\"RetryCount\"",
+          "refId": "GitHub Copilot",
+          "sql": {
+            "columns": [
+              {
+                "alias": "\"time\"",
+                "parameters": [
+                  {
+                    "name": "\"RetryCount\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "\"DbCodeGenerationResult\""
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "c310dc0b-8372-42da-a2d2-3817f3803c81"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "-- Syntax invalid for reach try, per generator\r\nSELECT\r\n  code.\"Generator\",\r\n  code.\"RetryCount\" + 1 as \"Try\",\r\n  SUM(results.\"Valid\") / (SUM(results.\"Valid\") + SUM(results.\"Invalid\")) as \"Valid\"\r\nFROM\r\n  \"DbCodeGenerationResult\" as code\r\n  INNER JOIN (\r\n    SELECT\r\n      syn.\"CodeId\",\r\n      COUNT(\r\n        case\r\n          syn.\"SyntaxValid\"\r\n          when true then 1\r\n          else null\r\n        end\r\n      ) as \"Valid\",\r\n      COUNT(\r\n        case\r\n          syn.\"SyntaxValid\"\r\n          when false then 1\r\n          else null\r\n        end\r\n      ) as \"Invalid\"\r\n    FROM\r\n      \"DbSyntaxValidationResult\" as syn\r\n    GROUP BY\r\n      syn.\"CodeId\"\r\n  ) AS results ON results.\"CodeId\" = code.\"CodeId\"\r\n  WHERE code.\"Generator\" = 'Tabby'\r\nGROUP BY\r\n  code.\"Generator\",\r\n  code.\"RetryCount\"\r\nORDER BY\r\n  code.\"Generator\",\r\n  code.\"RetryCount\"",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Syntax Validity Rate per Try",
+      "type": "xychart"
     }
   ],
   "refresh": "5s",
@@ -1068,6 +1337,6 @@
   "timezone": "",
   "title": "TaskEvaluator Dashboard",
   "uid": "d30016bd-7b40-4743-a634-b313ede8761b",
-  "version": 2,
+  "version": 12,
   "weekStart": ""
 }
